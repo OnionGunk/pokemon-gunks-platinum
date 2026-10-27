@@ -3,6 +3,7 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "constants/pokemon_follower.h"
 #include "generated/movement_actions.h"
 
 #include "struct_decls/map_object.h"
@@ -14,9 +15,11 @@
 #include "overlay005/map_prop_animation.h"
 
 #include "camera.h"
+#include "field_map_change.h"
 #include "field_task.h"
 #include "heap.h"
 #include "map_object.h"
+#include "map_object_move.h"
 #include "player_avatar.h"
 #include "screen_fade.h"
 #include "sound_playback.h"
@@ -36,6 +39,7 @@ typedef struct UnkStruct_ov5_021D432C_t {
     u8 unk_1E;
     BOOL unk_20;
     u16 unk_24;
+    BOOL doorKeptOpen;
 } UnkStruct_ov5_021D432C;
 
 typedef struct UnkStruct_ov5_021D4E00_t {
@@ -49,10 +53,40 @@ static void ov5_021D4798(Camera *camera, u8 *param1);
 static void ov5_021D47DC(Camera *camera, u8 *param1);
 static u8 DoorAnimation_GetSoundEffectType(const int doorModelID);
 
+// Following Platinum: the follower walks after the player through doors and onto escalators
+static MapObject *GetVisiblePokemonFollower(FieldSystem *fieldSystem)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+
+    if (follower == NULL || MapObject_IsHidden(follower)) {
+        return NULL;
+    }
+
+    return follower;
+}
+
+static void PokemonFollower_WalkToPlayer(FieldSystem *fieldSystem)
+{
+    MapObject *follower = GetVisiblePokemonFollower(fieldSystem);
+    int playerX = PlayerAvatar_GetXPos(fieldSystem->playerAvatar);
+    int playerZ = PlayerAvatar_GetZPos(fieldSystem->playerAvatar);
+
+    if (follower == NULL || LocalMapObj_IsAnimationSet(follower) == FALSE) {
+        return;
+    }
+
+    if (MapObject_GetX(follower) != playerX || MapObject_GetZ(follower) != playerZ) {
+        int dir = GetDirectionBetweenPoints(MapObject_GetX(follower), MapObject_GetZ(follower), playerX, playerZ);
+
+        LocalMapObj_SetAnimationCode(follower, MovementAction_TurnActionTowardsDir(dir, MOVEMENT_ACTION_WALK_NORMAL_NORTH));
+    }
+}
+
 UnkStruct_ov5_021D432C *ov5_021D431C(void)
 {
     UnkStruct_ov5_021D432C *v0 = Heap_AllocAtEnd(HEAP_ID_FIELD1, sizeof(UnkStruct_ov5_021D432C));
     v0->unk_00 = 0;
+    v0->doorKeptOpen = FALSE;
 
     return v0;
 }
@@ -169,6 +203,7 @@ BOOL ov5_021D433C(FieldSystem *fieldSystem, UnkStruct_ov5_021D432C *param1)
         }
     } break;
     case 3:
+        PokemonFollower_WalkToPlayer(fieldSystem);
         v0 = PlayerAvatar_GetMapObject(fieldSystem->playerAvatar);
         LocalMapObj_SetAnimationCode(v0, MOVEMENT_ACTION_WALK_NORMAL_NORTH);
         (param1->unk_00)++;
@@ -179,6 +214,19 @@ BOOL ov5_021D433C(FieldSystem *fieldSystem, UnkStruct_ov5_021D432C *param1)
         if (LocalMapObj_CheckAnimationFinished(v0) == 1) {
             sub_020656AC(v0);
             MapObject_SetHidden(v0, 1);
+
+            if (PokemonFollower_GetMapObject(fieldSystem) != NULL) {
+                sub_020656AC(PokemonFollower_GetMapObject(fieldSystem));
+            }
+
+            // Following Platinum: the door stays open for the follower
+            param1->doorKeptOpen = GetVisiblePokemonFollower(fieldSystem) != NULL;
+
+            if (param1->doorKeptOpen) {
+                (param1->unk_00)++;
+                break;
+            }
+
             {
                 int v13;
                 int v14;
@@ -214,7 +262,11 @@ BOOL ov5_021D433C(FieldSystem *fieldSystem, UnkStruct_ov5_021D432C *param1)
         v16 = MapPropOneShotAnimationManager_IsAnimationLoopFinished(fieldSystem->mapPropOneShotAnimMan, 1);
 
         if (v16) {
-            MapPropOneShotAnimationManager_UnloadAnimation(fieldSystem->mapPropAnimMan, fieldSystem->mapPropOneShotAnimMan, 1);
+            // an open door isn't snapped shut before the fade; the map teardown unloads its animation
+            if (!param1->doorKeptOpen) {
+                MapPropOneShotAnimationManager_UnloadAnimation(fieldSystem->mapPropAnimMan, fieldSystem->mapPropOneShotAnimMan, 1);
+            }
+
             return 1;
         }
     } break;
@@ -574,6 +626,15 @@ BOOL ov5_021D4858(FieldSystem *fieldSystem, UnkStruct_ov5_021D432C *param1, cons
 
         if (LocalMapObj_CheckAnimationFinished(v0) == 1) {
             sub_020656AC(v0);
+
+            {
+                MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+
+                if (follower != NULL && (MapObject_GetDataAt(follower, POKEMON_FOLLOWER_DATA_FLAGS) & POKEMON_FOLLOWER_FLAG_ARRIVING)) {
+                    PokemonFollower_ReturnToPlayer(fieldSystem, (MapObject_GetDataAt(follower, POKEMON_FOLLOWER_DATA_FLAGS) & POKEMON_FOLLOWER_FLAG_RELEASE) != 0);
+                }
+            }
+
             (param1->unk_00)++;
         }
         break;
@@ -653,6 +714,7 @@ BOOL ov5_021D4A24(FieldSystem *fieldSystem, UnkStruct_ov5_021D432C *param1, cons
                 v8 = 0xb;
             }
 
+            PokemonFollower_WalkToPlayer(fieldSystem);
             LocalMapObj_SetAnimationCode(v0, v8);
         } else {
             GF_ASSERT(FALSE);
@@ -675,6 +737,11 @@ BOOL ov5_021D4A24(FieldSystem *fieldSystem, UnkStruct_ov5_021D432C *param1, cons
 
         if (LocalMapObj_CheckAnimationFinished(v0) == 1) {
             sub_020656AC(v0);
+
+            if (PokemonFollower_GetMapObject(fieldSystem) != NULL) {
+                sub_020656AC(PokemonFollower_GetMapObject(fieldSystem));
+            }
+
             (param1->unk_00)++;
         }
         break;

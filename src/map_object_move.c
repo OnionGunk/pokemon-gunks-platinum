@@ -12,6 +12,7 @@
 
 #include "field/field_system.h"
 #include "overlay005/object_event_gfx_data.h"
+#include "overlay005/ov5_021ECA70.h"
 #include "overlay005/ov5_021ECC20.h"
 #include "overlay005/ov5_021F134C.h"
 #include "overlay005/ov5_021F17B8.h"
@@ -317,8 +318,50 @@ static BOOL MapObject_IsHiddenPokemonFollower(MapObject *mapObj)
     return MapObject_GetLocalID(mapObj) == POKEMON_FOLLOWER_LOCAL_ID && MapObject_IsHidden(mapObj);
 }
 
+// Following Platinum: a 64x64 follower covers the tile behind it too. Returns FALSE for other objects and
+// when the follower faces south (the tile behind is then hidden under it).
+static BOOL MapObject_GetLargePokemonFollowerBackTile(MapObject *mapObj, int *x, int *z)
+{
+    int dir;
+
+    if (MapObject_GetLocalID(mapObj) != POKEMON_FOLLOWER_LOCAL_ID
+        || MapObject_IsHidden(mapObj)
+        || PokemonFollowerRenderer_IsLargeSprite(mapObj) == FALSE) {
+        return FALSE;
+    }
+
+    dir = MapObject_GetFacingDir(mapObj);
+
+    *x = MapObject_GetX(mapObj) - MapObject_GetDxFromDir(dir);
+    *z = MapObject_GetZ(mapObj) - MapObject_GetDzFromDir(dir);
+
+    return dir != DIR_SOUTH;
+}
+
+static void MapObject_StartLargePokemonFollowerGrassEffect(MapObject *mapObj, int param1)
+{
+    int x, z;
+    u8 tileBehavior;
+
+    if (MapObject_GetLargePokemonFollowerBackTile(mapObj, &x, &z) == FALSE) {
+        return;
+    }
+
+    tileBehavior = TerrainCollisionManager_GetTileBehavior(MapObject_FieldSystem(mapObj), x, z);
+
+    if (TileBehavior_IsTallGrass(tileBehavior) == TRUE) {
+        ov5_021F2EA4_AtTile(mapObj, param1, x, z);
+    } else if (TileBehavior_IsVeryTallGrass(tileBehavior) == TRUE) {
+        ov5_021F3844_AtTile(mapObj, param1, x, z);
+    } else if (TileBehavior_IsMudWithGrass(tileBehavior) == TRUE) {
+        ov5_021F3AEC_AtTile(mapObj, param1, x, z);
+    }
+}
+
 static void sub_02063964(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBehavior, const ObjectEventGfxRenderDetailsEntry *renderDetails)
 {
+    MapObject_StartLargePokemonFollowerGrassEffect(mapObj, 0);
+
     if (!MapObject_IsHiddenPokemonFollower(mapObj) && TileBehavior_IsTallGrass(currTileBehavior) == TRUE) {
         ov5_021F2EA4(mapObj, 0);
     }
@@ -326,6 +369,8 @@ static void sub_02063964(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBeha
 
 static void sub_0206397C(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBehavior, const ObjectEventGfxRenderDetailsEntry *renderDetails)
 {
+    MapObject_StartLargePokemonFollowerGrassEffect(mapObj, 1);
+
     if (!MapObject_IsHiddenPokemonFollower(mapObj) && TileBehavior_IsTallGrass(currTileBehavior) == TRUE) {
         ov5_021F2EA4(mapObj, 1);
     }
@@ -516,6 +561,35 @@ static void sub_02063CFC(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBeha
     }
 }
 
+// Following Platinum: a 64x64 follower also reflects in the tile behind it and the tile south of that one
+static u8 MapObject_GetLargePokemonFollowerBackReflection(MapObject *mapObj)
+{
+    FieldSystem *fieldSystem = MapObject_FieldSystem(mapObj);
+    int dir, x, z;
+    u8 tileBehavior;
+
+    if (PokemonFollowerRenderer_IsLargeSprite(mapObj) == FALSE) {
+        return GetNullTileBehaviorID();
+    }
+
+    dir = MapObject_GetFacingDir(mapObj);
+    x = MapObject_GetX(mapObj) - MapObject_GetDxFromDir(dir);
+    z = MapObject_GetZ(mapObj) - MapObject_GetDzFromDir(dir);
+    tileBehavior = TerrainCollisionManager_GetTileBehavior(fieldSystem, x, z);
+
+    if (TileBehavior_HasReflectiveSurface(tileBehavior) == TRUE) {
+        return tileBehavior;
+    }
+
+    tileBehavior = TerrainCollisionManager_GetTileBehavior(fieldSystem, x, z + 1);
+
+    if (TileBehavior_HasReflectiveSurface(tileBehavior) == TRUE) {
+        return tileBehavior;
+    }
+
+    return GetNullTileBehaviorID();
+}
+
 static void sub_02063D30(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBehavior, const ObjectEventGfxRenderDetailsEntry *renderDetails)
 {
     if (renderDetails->hasReflection == 0) {
@@ -532,6 +606,8 @@ static void sub_02063D30(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBeha
 
             if (TileBehavior_HasReflectiveSurface(southTileBehavior) == TRUE) {
                 tileBehavior = southTileBehavior;
+            } else {
+                tileBehavior = MapObject_GetLargePokemonFollowerBackReflection(mapObj);
             }
         }
 
@@ -561,7 +637,8 @@ static void sub_02063DA8(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBeha
 
     u8 southTileBehavior = MapObject_GetTileBehaviorFromDir(mapObj, DIR_SOUTH);
 
-    if (TileBehavior_HasReflectiveSurface(southTileBehavior) == FALSE) {
+    if (TileBehavior_HasReflectiveSurface(southTileBehavior) == FALSE
+        && MapObject_GetLargePokemonFollowerBackReflection(mapObj) == GetNullTileBehaviorID()) {
         sub_02062F48(mapObj, 0);
     }
 }

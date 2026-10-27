@@ -18,6 +18,7 @@
 #include "map_object.h"
 #include "narc.h"
 #include "player_avatar.h"
+#include "script_manager.h"
 #include "sound_playback.h"
 
 typedef struct {
@@ -103,6 +104,15 @@ static void ov6_022480BC(PlayerAvatar *const playerAvatar, Easy3DObject *param1)
     int v0;
     int v1, v2;
     VecFx32 v3;
+    MapObject **target = FieldSystem_GetScriptMemberPtr(MapObject_FieldSystem(PlayerAvatar_GetMapObject(playerAvatar)), SCRIPT_MANAGER_TARGET_OBJECT);
+
+    // Following Platinum: the effect goes on the tree or rock being cut or smashed, even when the field move
+    // script has turned the player away from it (to make room for the follower)
+    if (*target != NULL) {
+        MapObject_GetPosPtr(*target, &v3);
+        Easy3DObject_SetPosition(param1, ((MapObject_GetX(*target) << 4) * FX32_ONE) + ((16 * FX32_ONE) >> 1), v3.y, ((MapObject_GetZ(*target) << 4) * FX32_ONE) + ((16 * FX32_ONE) >> 1));
+        return;
+    }
 
     PlayerAvatar_GetPosPtr(playerAvatar, &v3);
 

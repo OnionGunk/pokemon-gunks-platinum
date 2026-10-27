@@ -16,11 +16,13 @@
 #include "berry_patch_graphics.h"
 #include "berry_patches.h"
 #include "easy3d.h"
+#include "field_map_change.h"
 #include "field_task.h"
 #include "gfx_box_test.h"
 #include "heap.h"
 #include "location.h"
 #include "map_object.h"
+#include "map_object_move.h"
 #include "player_avatar.h"
 #include "savedata_misc.h"
 #include "sys_task_manager.h"
@@ -28,6 +30,8 @@
 #include "terrain_collision_manager.h"
 #include "tv_segment.h"
 #include "unk_020655F4.h"
+#include "unk_02069BE0.h"
+#include "generated/movement_actions.h"
 
 #include "res/graphics/field_effects/field_effects.naix"
 
@@ -36,6 +40,7 @@ typedef struct BerryWateringTask {
     enum FaceDirection direction;
     int timer;
     SysTask *animationTask;
+    MapObject *steppingFollower;
 } BerryWateringTask;
 
 static void BerryPatchManager_Init3DRendering(FieldSystem *fieldSystem, BerryPatchManager *manager);
@@ -340,6 +345,36 @@ static void BerryPatches_StartAnimation(FieldSystem *fieldSystem, BerryWateringT
     task->animationTask = MapObject_StartAnimation(playerObject, animationCmd);
 }
 
+// Following Platinum: when the follower stands where the player wants to step along the row of patches,
+// it steps aside (onward if it can, otherwise away from the patches) and the player moves on
+static BOOL BerryPatches_MovePokemonFollowerAside(FieldSystem *fieldSystem, BerryWateringTask *task, enum FaceDirection direction)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+    int x = PlayerAvatar_GetXPos(fieldSystem->playerAvatar) + MapObject_GetDxFromDir(direction);
+    int z = PlayerAvatar_GetZPos(fieldSystem->playerAvatar) + MapObject_GetDzFromDir(direction);
+    int dir;
+
+    if (follower == NULL || MapObject_IsHidden(follower) || MapObject_GetX(follower) != x || MapObject_GetZ(follower) != z
+        || LocalMapObj_IsAnimationSet(follower) == FALSE || TerrainCollisionManager_CheckCollision(fieldSystem, x, z)) {
+        return FALSE;
+    }
+
+    if (sub_02063EBC(follower, direction) == 0) {
+        dir = direction;
+    } else if (task->direction == FACE_UP && sub_02063EBC(follower, FACE_DOWN) == 0) {
+        dir = FACE_DOWN;
+    } else if (task->direction == FACE_DOWN && sub_02063EBC(follower, FACE_UP) == 0) {
+        dir = FACE_UP;
+    } else {
+        return FALSE;
+    }
+
+    LocalMapObj_SetAnimationCode(follower, MovementAction_TurnActionTowardsDir(dir, MOVEMENT_ACTION_WALK_NORMAL_NORTH));
+    task->steppingFollower = follower;
+
+    return TRUE;
+}
+
 static BOOL BerryPatches_TaskMain(FieldTask *taskManager)
 {
     FieldSystem *fieldSystem = FieldTask_GetFieldSystem(taskManager);
@@ -363,7 +398,7 @@ static BOOL BerryPatches_TaskMain(FieldTask *taskManager)
             if ((adjacentObject == NULL) || !BerryPatches_IsBerryPatch(adjacentObject)) {
                 task->state = BERRY_WATERING_STATE_CLEANUP;
                 break;
-            } else if (!BerryPatches_CheckCollision(fieldSystem, task, FACE_LEFT)) {
+            } else if (!BerryPatches_CheckCollision(fieldSystem, task, FACE_LEFT) || BerryPatches_MovePokemonFollowerAside(fieldSystem, task, FACE_LEFT)) {
                 BerryPatches_StartAnimation(fieldSystem, task, BerryWatering_LeftAnimation);
                 task->state = BERRY_WATERING_STATE_ANIMATION;
                 break;
@@ -374,7 +409,7 @@ static BOOL BerryPatches_TaskMain(FieldTask *taskManager)
             if ((adjacentObject == NULL) || !BerryPatches_IsBerryPatch(adjacentObject)) {
                 task->state = BERRY_WATERING_STATE_CLEANUP;
                 break;
-            } else if (!BerryPatches_CheckCollision(fieldSystem, task, FACE_RIGHT)) {
+            } else if (!BerryPatches_CheckCollision(fieldSystem, task, FACE_RIGHT) || BerryPatches_MovePokemonFollowerAside(fieldSystem, task, FACE_RIGHT)) {
                 BerryPatches_StartAnimation(fieldSystem, task, BerryWatering_RightAnimation);
                 task->state = BERRY_WATERING_STATE_ANIMATION;
                 break;
@@ -396,6 +431,15 @@ static BOOL BerryPatches_TaskMain(FieldTask *taskManager)
         }
         break;
     case BERRY_WATERING_STATE_ANIMATION:
+        if (task->steppingFollower != NULL) {
+            if (sub_020656AC(task->steppingFollower) == FALSE) {
+                break;
+            }
+
+            PokemonFollower_SyncWithPlayer(task->steppingFollower);
+            task->steppingFollower = NULL;
+        }
+
         if (MapObject_HasAnimationEnded(task->animationTask)) {
             MapObject *targetPatch;
 
@@ -426,6 +470,7 @@ void BerryPatches_StartWatering(FieldSystem *fieldSystem)
 
     task->state = BERRY_WATERING_STATE_INIT;
     task->animationTask = NULL;
+    task->steppingFollower = NULL;
     task->direction = PlayerAvatar_GetFacingDir(fieldSystem->playerAvatar);
 
     FieldTask_InitCall(fieldSystem->task, BerryPatches_TaskMain, task);

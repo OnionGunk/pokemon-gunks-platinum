@@ -170,9 +170,16 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     Bag_RegisterItem(SaveData_GetBag(saveData), ITEM_DEXNAV);
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_BICYCLE, 1, HEAP_ID_GAME_START);
 
-    // post-game test save with the Bicycle on Select instead of the DexNav
+    // post-game test save with the Bicycle on Y instead of the DexNav
     if (gTestSaveMode == 4) {
         Bag_RegisterItem(SaveData_GetBag(saveData), ITEM_BICYCLE);
+    }
+
+    // anywhere post-game test save, set up for berry watering
+    if (gTestSaveMode == 5) {
+        Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_SPRAYDUCK, 1, HEAP_ID_GAME_START);
+        Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_ORAN_BERRY, 10, HEAP_ID_GAME_START);
+        Bag_RegisterItem(SaveData_GetBag(saveData), ITEM_SPRAYDUCK);
     }
     // six varied Pokemon for follower checks; the emulator harness picks the lead via gTestLeadSpecies
     static const u16 sTestParty[] = { SPECIES_PIKACHU, SPECIES_PIPLUP, SPECIES_LUCARIO, SPECIES_STARAPTOR, SPECIES_STEELIX, SPECIES_GYARADOS };

@@ -9,6 +9,7 @@ void sub_02069BE0(MapObject *param0);
 void sub_02069C0C(MapObject *param0);
 void PokemonFollower_MovementInit(MapObject *mapObj);
 void PokemonFollower_MovementUpdate(MapObject *mapObj);
+void PokemonFollower_SyncWithPlayer(MapObject *mapObj);
 void sub_02069C44(MapObject *param0);
 void sub_02069DF4(MapObject *param0);
 void sub_02069E1C(MapObject *param0);

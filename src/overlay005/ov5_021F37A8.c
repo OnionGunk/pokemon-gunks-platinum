@@ -38,6 +38,8 @@ typedef struct {
     int unk_14;
     UnkStruct_ov5_021F3844 unk_18;
     Billboard *unk_34;
+    int offsetX; // Following Platinum: object position minus the grass tile (non-zero for the tile behind a large Pokemon)
+    int offsetZ;
 } UnkStruct_ov5_021F38AC;
 
 static void ov5_021F37D4(UnkStruct_ov5_021F37D4 *param0);
@@ -79,7 +81,7 @@ static void ov5_021F381C(UnkStruct_ov5_021F37D4 *param0)
     ov5_021DF9D4(param0->unk_00, 9);
 }
 
-void ov5_021F3844(MapObject *param0, int param1)
+void ov5_021F3844_AtTile(MapObject *param0, int param1, int x, int z)
 {
     int v0;
     VecFx32 v1;
@@ -89,9 +91,9 @@ void ov5_021F3844(MapObject *param0, int param1)
 
     v3 = MapObject_GetFieldEffectManager(param0);
 
-    v2.unk_00 = MapObject_GetX(param0);
+    v2.unk_00 = x;
     v2.unk_04 = MapObject_GetY(param0);
-    v2.unk_08 = MapObject_GetZ(param0);
+    v2.unk_08 = z;
     v2.unk_10 = v3;
     v2.fieldSystem = FieldEffectManager_GetFieldSystem(v3);
     v2.unk_14 = FieldEffectManager_GetRendererContext(v3, 24);
@@ -101,6 +103,11 @@ void ov5_021F3844(MapObject *param0, int param1)
 
     v0 = MapObject_CalculateTaskPriority(param0, 2);
     v4 = FieldEffectManager_InitAnimManager(v3, &Unk_ov5_02200620, &v1, param1, &v2, v0);
+}
+
+void ov5_021F3844(MapObject *param0, int param1)
+{
+    ov5_021F3844_AtTile(param0, param1, MapObject_GetX(param0), MapObject_GetZ(param0));
 }
 
 static int ov5_021F38AC(OverworldAnimManager *param0, void *param1)
@@ -117,6 +124,8 @@ static int ov5_021F38AC(OverworldAnimManager *param0, void *param1)
     v3->unk_04 = MapObject_GetEffectiveGraphicsID(v3->unk_18.unk_18);
     v3->unk_08 = MapObject_GetLocalID(v3->unk_18.unk_18);
     v3->unk_0C = MapObject_GetMapHeaderID(v3->unk_18.unk_18);
+    v3->offsetX = MapObject_GetX(v3->unk_18.unk_18) - v3->unk_18.unk_00;
+    v3->offsetZ = MapObject_GetZ(v3->unk_18.unk_18) - v3->unk_18.unk_08;
 
     v2.x = (((v3->unk_18.unk_00) << 4) * FX32_ONE);
     v2.z = (((v3->unk_18.unk_08) << 4) * FX32_ONE);
@@ -188,7 +197,7 @@ static void ov5_021F394C(OverworldAnimManager *param0, void *param1)
         int v5 = MapObject_GetX(v2);
         int v6 = MapObject_GetZ(v2);
 
-        if ((v1->unk_18.unk_00 != v5) || (v1->unk_18.unk_08 != v6)) {
+        if ((v5 - v1->unk_18.unk_00 != v1->offsetX) || (v6 - v1->unk_18.unk_08 != v1->offsetZ)) {
             FieldEffectManager_FinishAnimManager(param0);
             return;
         }

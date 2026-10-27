@@ -766,7 +766,7 @@ void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem)
     fieldSystem->mapLoadType = MAP_LOAD_TYPE_OVERWORLD;
     FieldSystem_InitNewGameState(fieldSystem);
 #ifdef TEST_SKIP_INTRO
-    if (gTestSaveMode == 0 || gTestSaveMode == 4) {
+    if (gTestSaveMode == 0 || gTestSaveMode == 4 || gTestSaveMode == 5) {
         TestSave_ApplyPostgame(SaveData_GetVarsFlags(fieldSystem->saveData));
     } else if (gTestSaveMode == 2) {
         VarsFlags *varsFlags = SaveData_GetVarsFlags(fieldSystem->saveData);

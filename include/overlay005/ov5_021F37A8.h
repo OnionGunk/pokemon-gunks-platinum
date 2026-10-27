@@ -8,5 +8,6 @@
 void *ov5_021F37A8(FieldEffectManager *param0);
 void ov5_021F37C4(void *param0);
 void ov5_021F3844(MapObject *param0, int param1);
+void ov5_021F3844_AtTile(MapObject *param0, int param1, int x, int z);
 
 #endif // POKEPLATINUM_OV5_021F37A8_H

@@ -5,6 +5,7 @@
 
 #include "constants/player_avatar.h"
 #include "generated/movement_actions.h"
+#include "generated/movement_types.h"
 
 #include "struct_decls/map_object.h"
 #include "struct_decls/map_object_manager.h"
@@ -263,6 +264,21 @@ void PokemonFollower_MovementInit(MapObject *mapObj)
     sub_02062D80(mapObj, 0);
 }
 
+// After the follower was moved by something else (stepping aside while the player waters berries), it
+// treats the player's current tile as already followed instead of chasing the player's previous one.
+void PokemonFollower_SyncWithPlayer(MapObject *mapObj)
+{
+    if (MapObject_GetMovementType(mapObj) != MOVEMENT_TYPE_POKEMON_FOLLOWER) {
+        return;
+    }
+
+    UnkStruct_02069CA8 *data = sub_02062A78(mapObj);
+
+    if (data->unk_01 != 0) {
+        sub_02069D30(mapObj, data);
+    }
+}
+
 void PokemonFollower_MovementUpdate(MapObject *mapObj)
 {
     UnkStruct_02069CA8 *data = sub_02062A78(mapObj);
@@ -321,8 +337,8 @@ static BOOL PokemonFollower_PlayerStepStarted(MapObject *mapObj)
 }
 
 // The follower spawns hidden on the player's arrival tile and appears there once the player steps off
-// it. If that tile is a door it waits until it has walked out onto the free tile behind the player,
-// so it never draws through the doorway.
+// it. If that tile is a door or an escalator it waits until it has walked out onto the free tile behind
+// the player, so it never draws through the doorway or on the escalator.
 static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
 {
     int flags = MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_FLAGS);
@@ -344,7 +360,10 @@ static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
     int spawnZ = MapObject_GetZInitial(mapObj);
     BOOL onSpawnTile = MapObject_GetX(mapObj) == spawnX && MapObject_GetZ(mapObj) == spawnZ;
 
-    if (TileBehavior_IsDoor(TerrainCollisionManager_GetTileBehavior(fieldSystem, spawnX, spawnZ))) {
+    u8 spawnTileBehavior = TerrainCollisionManager_GetTileBehavior(fieldSystem, spawnX, spawnZ);
+
+    // escalators too: the escalator arrival then puts it under the player (Following Platinum)
+    if (TileBehavior_IsDoor(spawnTileBehavior) || TileBehavior_IsEscalator(spawnTileBehavior) || TileBehavior_IsEscalatorFlipFace(spawnTileBehavior)) {
         if (onSpawnTile) {
             return;
         }

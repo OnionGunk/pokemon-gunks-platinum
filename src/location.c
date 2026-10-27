@@ -7,6 +7,7 @@
 
 #ifdef TEST_SKIP_INTRO
 extern u16 gTestSaveMode;
+extern u16 gTestStartLocation[4];
 
 static const Location sStoryStartLocation = {
     .mapHeaderID = MAP_HEADER_TWINLEAF_TOWN_PLAYER_HOUSE_2F,
@@ -73,6 +74,15 @@ void SetPlayerStartLocation(Location *outLocation)
 
     if (gTestSaveMode == 3) {
         *outLocation = sRoute201BriefcaseLocation;
+        return;
+    }
+
+    if (gTestSaveMode == 5) {
+        outLocation->mapHeaderID = gTestStartLocation[0];
+        outLocation->warpId = WARP_ID_NONE;
+        outLocation->x = gTestStartLocation[1];
+        outLocation->z = gTestStartLocation[2];
+        outLocation->faceDirection = gTestStartLocation[3];
         return;
     }
 #endif
