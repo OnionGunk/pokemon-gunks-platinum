@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pastoria_city_observatory_gate_1f.h"
 #include "res/field/events/events_pastoria_city_observatory_gate_1f.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PastoriaCityObservatoryGate1F_CashierM
     ScriptEntry PastoriaCityObservatoryGate1F_CoordEvent_TryStartSafariGame
@@ -55,11 +55,13 @@ PastoriaCityObservatoryGate1F_TryStartSafariGame:
 
 PastoriaCityObservatoryGate1F_EnterGreatMarshX4:
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerEnterGreatMarshX4
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PokemonFollower1
     WaitMovement
     GoTo PastoriaCityObservatoryGate1F_StartSafariGame
 
 PastoriaCityObservatoryGate1F_EnterGreatMarshX5:
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerEnterGreatMarshX5
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PokemonFollower2
     WaitMovement
     GoTo PastoriaCityObservatoryGate1F_StartSafariGame
 
@@ -80,6 +82,7 @@ PastoriaCityObservatoryGate1F_NotEnoughMoney:
     CloseMessage
     HideMoney
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkSouth
     WaitMovement
     ReleaseAll
     End
@@ -88,6 +91,7 @@ PastoriaCityObservatoryGate1F_DontPlaySafariGame:
     CloseMessage
     HideMoney
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkSouth
     WaitMovement
     ReleaseAll
     End
@@ -97,12 +101,14 @@ PastoriaCityObservatoryGate1F_NoRoomForPokemon:
     Message PastoriaCityObservatoryGate1F_Text_NoRoomForPokemon
     CloseMessage
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkSouth
     WaitMovement
     ReleaseAll
     End
 
 PastoriaCityObservatoryGate1F_PlayerWalkWest:
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PlayerWalkWest
     WaitMovement
     Return
 
@@ -133,6 +139,22 @@ PastoriaCityObservatoryGate1F_Movement_PlayerEnterGreatMarshX5:
     EndMovement
 
     .balign 4, 0
+PastoriaCityObservatoryGate1F_Movement_PokemonFollower1:
+    Delay8
+    WalkNormalNorth 4
+    WalkNormalEast
+    WalkNormalNorth
+    SetInvisible
+    EndMovement
+
+    .balign 4, 0
+PastoriaCityObservatoryGate1F_Movement_PokemonFollower2:
+    Delay8
+    WalkNormalNorth 5
+    SetInvisible
+    EndMovement
+
+    .balign 4, 0
 PastoriaCityObservatoryGate1F_Movement_PlayerWalkSouth:
     WalkNormalSouth
     EndMovement
@@ -148,7 +170,9 @@ PastoriaCityObservatoryGate1F_OnFrame_TryExitEarly:
 PastoriaCityObservatoryGate1F_ExitGreatMarsh:
     Message PastoriaCityObservatoryGate1F_Text_ThanksForPlaying
     CloseMessage
+    ShowPokemonFollower
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerExitGreatMarsh
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PokemonFollower3
     WaitMovement
     SetVar VAR_SAFARI_GAME_STATE, 0
     EndSafariGame
@@ -190,6 +214,18 @@ PastoriaCityObservatoryGate1F_Movement_PlayerExitGreatMarsh:
     EndMovement
 
     .balign 4, 0
+PastoriaCityObservatoryGate1F_Movement_PokemonFollower4:
+    FaceSouth
+    Delay8
+    WalkNormalSouth 4
+    EndMovement
+
+    .balign 4, 0
+PastoriaCityObservatoryGate1F_Movement_PokemonFollower3:
+    WalkNormalSouth 5
+    EndMovement
+
+    .balign 4, 0
 PastoriaCityObservatoryGate1F_Movement_PlayerReturnToGreatMarsh:
     FaceNorth
     WalkNormalNorth
@@ -198,7 +234,9 @@ PastoriaCityObservatoryGate1F_Movement_PlayerReturnToGreatMarsh:
 
 PastoriaCityObservatoryGate1F_OnFrame_GameEnded:
     LockAll
+    ShowPokemonFollower
     ApplyMovement LOCALID_PLAYER, PastoriaCityObservatoryGate1F_Movement_PlayerExitGreatMarsh
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCityObservatoryGate1F_Movement_PokemonFollower4
     WaitMovement
     SetVar VAR_SAFARI_GAME_STATE, 0
     GetCurrentSafariGameCaughtNum VAR_MAP_LOCAL_0x02

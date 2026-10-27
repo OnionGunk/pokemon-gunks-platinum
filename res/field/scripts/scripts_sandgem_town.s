@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/sandgem_town.h"
 #include "res/field/events/events_sandgem_town.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry SandgemTown_OnTransition
     ScriptEntry SandgemTown_CoordEvent_CounterpartLeadToLab
@@ -115,36 +115,42 @@ SandgemTown_WalkToLab:
 SandgemTown_WalkToLabZ843:
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToLabZ843
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToLabZ843
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower1
     WaitMovement
     GoTo SandgemTown_ThisIsOurPokemonResearchLab
 
 SandgemTown_WalkToLabZ844:
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToLabZ844
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToLabZ844
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower2
     WaitMovement
     GoTo SandgemTown_ThisIsOurPokemonResearchLab
 
 SandgemTown_WalkToLabZ845:
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToLabZ845
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToLabZ845
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower3
     WaitMovement
     GoTo SandgemTown_ThisIsOurPokemonResearchLab
 
 SandgemTown_WalkToLabZ846:
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToLabZ846
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToLabZ846
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower4
     WaitMovement
     GoTo SandgemTown_ThisIsOurPokemonResearchLab
 
 SandgemTown_WalkToLabZ847:
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToLabZ847
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToLabZ847
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower5
     WaitMovement
     GoTo SandgemTown_ThisIsOurPokemonResearchLab
 
 SandgemTown_WalkToLabZ848:
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToLabZ848
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToLabZ848
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower6
     WaitMovement
     GoTo SandgemTown_ThisIsOurPokemonResearchLab
 
@@ -207,6 +213,7 @@ SandgemTown_EnterPokemonResearchLab:
     CloseMessage
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartEnterLab
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerEnterLab
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower7
     WaitMovement
     PlayDoorCloseAnimation ANIMATION_TAG_DOOR_1
     WaitForAnimation ANIMATION_TAG_DOOR_1
@@ -397,10 +404,66 @@ SandgemTown_Movement_PlayerWalkToLabZ848:
     EndMovement
 
     .balign 4, 0
+SandgemTown_Movement_PokemonFollower1:
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast 3
+    EndMovement
+
+    .balign 4, 0
+SandgemTown_Movement_PokemonFollower2:
+    WalkNormalEast
+    WalkNormalEast 2
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
+SandgemTown_Movement_PokemonFollower3:
+    WalkNormalEast
+    WalkNormalEast
+    WalkNormalNorth
+    WalkNormalEast 2
+    EndMovement
+
+    .balign 4, 0
+SandgemTown_Movement_PokemonFollower4:
+    WalkNormalEast
+    WalkNormalNorth
+    WalkNormalEast 2
+    WalkNormalNorth
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
+SandgemTown_Movement_PokemonFollower5:
+    WalkNormalEast
+    WalkNormalNorth 3
+    WalkNormalEast 3
+    EndMovement
+
+    .balign 4, 0
+SandgemTown_Movement_PokemonFollower6:
+    WalkNormalEast
+    WalkNormalNorth 4
+    WalkNormalEast 3
+    EndMovement
+
+    .balign 4, 0
 SandgemTown_Movement_PlayerEnterLab:
     Delay8
     WalkOnSpotNormalNorth
     Delay8 2
+    WalkNormalNorth 2
+    SetInvisible
+    EndMovement
+
+    .balign 4, 0
+SandgemTown_Movement_PokemonFollower7:
+    Delay8
+    Delay8
+    Delay8 2
+    WalkNormalEast
+
     WalkNormalNorth 2
     SetInvisible
     EndMovement
@@ -502,8 +565,10 @@ SandgemTown_LucasShowYouAFewThings:
 SandgemTown_WalkToPokemonCenter:
     CloseMessage
     Common_SetFollowMeBGM
+    ShowPokemonFollower
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToPokemonCenter
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToPokemonCenter
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower8
     WaitMovement
     GetPlayerGender VAR_RESULT
     GoToIfEq VAR_RESULT, GENDER_MALE, SandgemTown_DawnThisIsThePokemonCenter
@@ -526,6 +591,7 @@ SandgemTown_WalkToPokeMart:
     CloseMessage
     ApplyMovement LOCALID_SANDGEM_COUNTERPART, SandgemTown_Movement_CounterpartWalkToPokeMart
     ApplyMovement LOCALID_PLAYER, SandgemTown_Movement_PlayerWalkToPokeMart
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTown_Movement_PokemonFollower9
     WaitMovement
     GetPlayerGender VAR_RESULT
     GoToIfEq VAR_RESULT, GENDER_MALE, SandgemTown_DawnThisIsThePokeMart
@@ -605,9 +671,22 @@ SandgemTown_Movement_PlayerWalkToPokemonCenter:
     EndMovement
 
     .balign 4, 0
+SandgemTown_Movement_PokemonFollower8:
+    Delay8
+    WalkNormalSouth
+    WalkNormalEast 8
+    EndMovement
+
+    .balign 4, 0
 SandgemTown_Movement_PlayerWalkToPokeMart:
     WalkNormalEast 10
     WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+SandgemTown_Movement_PokemonFollower9:
+    WalkNormalEast 10
+
     EndMovement
 
     .balign 4, 0

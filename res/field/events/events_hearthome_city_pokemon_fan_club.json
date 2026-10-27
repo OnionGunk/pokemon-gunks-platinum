@@ -33,7 +33,7 @@
         },
         {
             "id": "LOCALID_PSYDUCK",
-            "graphics_id": "OBJ_EVENT_GFX_PSYDUCK",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_PSYDUCK",
             "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -48,7 +48,7 @@
         },
         {
             "id": "LOCALID_BUNEARY",
-            "graphics_id": "OBJ_EVENT_GFX_BUNEARY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_BUNEARY",
             "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -63,7 +63,7 @@
         },
         {
             "id": "LOCALID_CLEFAIRY",
-            "graphics_id": "OBJ_EVENT_GFX_CLEFAIRY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CLEFAIRY",
             "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",

@@ -3,13 +3,13 @@
 #include "res/text/bank/menu_entries.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_arcade_functions.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry BattleArcade_SingleAttendant
     ScriptEntry BattleArcade_OnFrame_ResumeChallenge
     ScriptEntry BattleArcade_OnFrame_DidntSaveBeforeQuit
     ScriptEntry BattleArcade_OnFrame_ChallengeEndedCompletedRound
-    ScriptEntry BattleArcade_OnFrame_ChallengeEnded
+    ScriptEntry BattleArcade_PokemonFollower4
     ScriptEntry BattleArcade_MultiAttendant
     ScriptEntry BattleArcade_Worker
     ScriptEntry BattleArcade_ParasolLady
@@ -164,7 +164,7 @@ BattleArcade_HealAndSaveBeforeChallenge:
     SetVar VAR_RESULT, VAR_MAP_LOCAL_0x00
     GoToIfEq VAR_RESULT, 0, BattleArcade_EndChallenge
     GoToIfEq VAR_BATTLE_ARCADE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleArcade_BecomeLeaderOrJoinGroup
-    GoTo BattleArcade_WalkIntoCorridor
+    GoTo BattleArcade_PokemonFollower1
     End
 
 BattleArcade_BecomeLeaderOrJoinGroup:
@@ -236,7 +236,7 @@ BattleArcade_StartMultiChallenge:
     Message BattleArcade_Text_MustSaveFirst
     CallIfEq VAR_BATTLE_ARCADE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleArcade_SetChallengeInProgress
     Call BattleArcade_SaveGame
-    GoTo BattleArcade_WalkIntoCorridor
+    GoTo BattleArcade_PokemonFollower1
     End
 
 BattleArcade_SetChallengeInProgress:
@@ -275,6 +275,8 @@ BattleArcade_EndCommunicationSamePokemon:
     EndCommunication
     Return
 
+BattleArcade_PokemonFollower1:
+    PokemonFollowerStartCutscene
 BattleArcade_WalkIntoCorridor:
     CallIfEq VAR_BATTLE_ARCADE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_SINGLE, BattleArcade_WalkToCorridorSingleChallenge
     CallIfEq VAR_BATTLE_ARCADE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleArcade_WalkToCorridorDoubleChallenge
@@ -452,7 +454,7 @@ BattleArcade_OnFrame_ResumeChallenge:
     Message BattleArcade_Text_MustSaveBeforeResuming
     Call BattleArcade_SetChallengeInProgress
     Call BattleArcade_SaveGame
-    GoTo BattleArcade_WalkIntoCorridor
+    GoTo BattleArcade_PokemonFollower1
     End
 
 BattleArcade_SaveGame:
@@ -466,6 +468,7 @@ BattleArcade_SaveGame:
 BattleArcade_OnFrame_DidntSaveBeforeQuit:
     Message BattleArcade_Text_DidntSaveBeforeQuit
     DeleteActiveBattleArcadeStreak VAR_BATTLE_ARCADE_CHALLENGE_TYPE
+    Call BattleArcade_PokemonFollower2
     GoTo BattleArcade_EndChallenge
     End
 
@@ -474,6 +477,7 @@ BattleArcade_OnFrame_ChallengeEndedCompletedRound:
     CallIfEq VAR_BATTLE_ARCADE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleArcade_IncrementTrainerScoreRoundCompleted
     CallIfEq VAR_BATTLE_ARCADE_PRINT_STATE, 1, BattleArcade_EarnedSilverPrint
     CallIfEq VAR_BATTLE_ARCADE_PRINT_STATE, 3, BattleArcade_EarnedGoldPrint
+    Call BattleArcade_PokemonFollower2
     GoTo BattleArcade_EndChallenge
     End
 
@@ -500,6 +504,8 @@ BattleArcade_EarnedGoldPrint:
     Common_CheckAllFrontierGoldPrintsObtained
     Return
 
+BattleArcade_PokemonFollower4:
+    Call BattleArcade_PokemonFollower2
 BattleArcade_OnFrame_ChallengeEnded:
     GoTo BattleArcade_EndChallenge
     End
@@ -557,3 +563,11 @@ BattleArcade_Hiker2:
     End
 
     .balign 4, 0
+
+BattleArcade_PokemonFollower2:
+    GetMovementType VAR_RESULT, LOCALID_POKEMON_FOLLOWER
+    GoToIfEq VAR_RESULT, 68, BattleArcade_PokemonFollower3
+    PokemonFollowerEndCutscene
+
+BattleArcade_PokemonFollower3:
+    Return

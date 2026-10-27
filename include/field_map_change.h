@@ -63,5 +63,8 @@ int PokemonFollower_GetLeadSlot(SaveData *saveData);
 Pokemon *PokemonFollower_GetLead(SaveData *saveData);
 int PokemonFollower_GraphicsID(Pokemon *mon);
 BOOL PokemonFollower_CanSpawn(int species, enum MapHeaderID mapHeaderID);
+MapObject *PokemonFollower_GetMapObject(FieldSystem *fieldSystem);
+void PokemonFollower_SetFlag(MapObject *follower, int flag, BOOL set);
+void PokemonFollower_SetScriptHidden(MapObject *follower, BOOL hidden);
 
 #endif // POKEPLATINUM_FIELD_MAP_CHANGE_H

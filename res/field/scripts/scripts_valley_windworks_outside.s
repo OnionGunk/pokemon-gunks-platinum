@@ -2,7 +2,6 @@
 #include "res/text/bank/valley_windworks_outside.h"
 #include "res/field/events/events_valley_windworks_outside.h"
 
-
     ScriptEntry ValleyWindworksOutside_OnTransition
     ScriptEntry ValleyWindworksOutside_OnLoad
     ScriptEntry ValleyWindworksOutside_GruntM
@@ -191,6 +190,7 @@ ValleyWindworksOutside_OnFrame_Looker:
     ApplyMovement LOCALID_LOOKER, ValleyWindworksOutside_Movement_LookerLeave
     WaitMovement
     RemoveObject LOCALID_LOOKER
+    PokemonFollowerResumeFollowing
     SetVar VAR_VALLEY_WINDWORKS_LOOKER_STATE, 2
     ReleaseAll
     End

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pal_park.h"
 #include "res/field/events/events_pal_park.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PalPark_OnTransition
     ScriptEntry PalPark_OnFrame_Countdown
@@ -92,6 +92,7 @@ PalPark_CoordEvent_RetireFromGate:
 
 PalPark_PlayerWalkNorth:
     ApplyMovement LOCALID_PLAYER, PalPark_Movement_PlayerWalkNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PalPark_Movement_PlayerWalkNorth
     WaitMovement
     ReleaseAll
     End

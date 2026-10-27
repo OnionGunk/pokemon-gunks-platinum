@@ -2,7 +2,7 @@
 #include "generated/distribution_events.h"
 #include "res/text/bank/hall_of_origin.h"
 #include "res/field/events/events_hall_of_origin.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry HallOfOrigin_OnLoad
     ScriptEntry HallOfOrigin_CoordEvent_Arceus
@@ -94,24 +94,28 @@ HallOfOrigin_PlayerWalkToArceusReturn:
 
 HallOfOrigin_PlayerWalkToArceusX30:
     ApplyMovement LOCALID_PLAYER, HallOfOrigin_Movement_PlayerWalkToArceusX30
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, HallOfOrigin_Movement_PokemonFollower1
     WaitMovement
     GoTo HallOfOrigin_PlayerWalkToArceusReturn
     End
 
 HallOfOrigin_PlayerWalkToArceusX31:
     ApplyMovement LOCALID_PLAYER, HallOfOrigin_Movement_PlayerWalkToArceusX31
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, HallOfOrigin_Movement_PlayerWalkToArceusX31
     WaitMovement
     GoTo HallOfOrigin_PlayerWalkToArceusReturn
     End
 
 HallOfOrigin_PlayerWalkToArceusX32:
     ApplyMovement LOCALID_PLAYER, HallOfOrigin_Movement_PlayerWalkToArceusX32
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, HallOfOrigin_Movement_PokemonFollower1
     WaitMovement
     GoTo HallOfOrigin_PlayerWalkToArceusReturn
     End
 
 HallOfOrigin_PlayerWalkNorth:
     ApplyMovement LOCALID_PLAYER, HallOfOrigin_Movement_PlayerWalkNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, HallOfOrigin_Movement_PlayerWalkNorth
     WaitMovement
     Return
 
@@ -137,4 +141,9 @@ HallOfOrigin_Movement_PlayerWalkToArceusX32:
     .balign 4, 0
 HallOfOrigin_Movement_PlayerWalkNorth:
     WalkNormalNorth 2
+    EndMovement
+
+    .balign 4, 0
+HallOfOrigin_Movement_PokemonFollower1:
+    WalkNormalNorth 5
     EndMovement

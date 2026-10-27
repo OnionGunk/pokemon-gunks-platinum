@@ -269,7 +269,7 @@ void PokemonFollowerRenderer_Refresh(MapObject *mapObj)
             int species = Pokemon_GetValue(lead, MON_DATA_SPECIES, NULL);
 
             MapObject_SetHidden(mapObj, !PokemonFollower_CanSpawn(species, fieldSystem->location->mapHeaderID)
-                    || (MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_FLAGS) & POKEMON_FOLLOWER_FLAG_ARRIVING));
+                    || (MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_FLAGS) & (POKEMON_FOLLOWER_FLAG_ARRIVING | POKEMON_FOLLOWER_FLAG_SCRIPT_HIDDEN)));
 
             int gfx = PokemonFollower_GraphicsID(lead);
 

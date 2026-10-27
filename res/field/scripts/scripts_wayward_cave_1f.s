@@ -2,7 +2,6 @@
 #include "res/text/bank/wayward_cave_1f.h"
 #include "res/field/events/events_wayward_cave_1f.h"
 
-
     ScriptEntry WaywardCave1F_OnTransition
     ScriptEntry WaywardCave1F_Mira
     ScriptEntry WaywardCave1F_Dummy3
@@ -31,6 +30,7 @@ WaywardCave1F_Mira:
     PlayFanfare SEQ_GONIN_sseq
     Message WaywardCave1F_Text_PlayerDecidedToGoWithMira
     WaitFanfare
+    PokemonFollowerStartCutscene
     SetFlag FLAG_TALKED_TO_WAYWARD_CAVE_1F_MIRA
     SetVar VAR_WAYWARD_CAVE_1F_FOLLOWER_MIRA_STATE, 1
     Message WaywardCave1F_Text_IllKeepYourPokemonHealthy
@@ -122,6 +122,7 @@ WaywardCave1F_MiraWalkSouthLeave:
 WaywardCave1F_RemoveMira:
     RemoveObject LOCALID_MIRA
     SetFlag FLAG_TRAVELED_WITH_MIRA
+    PokemonFollowerEndCutscene
     SetVar VAR_WAYWARD_CAVE_1F_FOLLOWER_MIRA_STATE, 2
     ReleaseAll
     End

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/jubilife_tv_2f_gallery.h"
 #include "res/field/events/events_jubilife_tv_2f_gallery.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry JubilifeTV2FGallery_Hiker
     ScriptEntry JubilifeTV2FGallery_Frame0
@@ -92,6 +92,7 @@ JubilifeTV2FGallery_ChoosePokemonForDressUp:
 JubilifeTV2FGallery_DressItUpAdorably:
     Message JubilifeTV2FGallery_Text_DressItUpAdorably
     CloseMessage
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8000, VAR_0x8001
     GetPlayerDir VAR_0x8006
     GoToIfEq VAR_0x8006, DIR_NORTH, JubilifeTV2FGallery_EnterDressingRoomNorth
     GoToIfEq VAR_0x8006, DIR_WEST, JubilifeTV2FGallery_EnterDressingRoomWest
@@ -102,22 +103,107 @@ JubilifeTV2FGallery_EnterDressingRoomNorth:
     ApplyMovement LOCALID_HIKER, JubilifeTV2FGallery_Movement_HikerMoveOutOfTheWayNorth
     WaitMovement
     ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PlayerEnterDressingRoomNorth
+    CallIfEq VAR_0x8000, 2, JubilifeTV2FGallery_PokemonFollower1
+    CallIfEq VAR_0x8000, 3, JubilifeTV2FGallery_PokemonFollower2
+    CallIfEq VAR_0x8000, 4, JubilifeTV2FGallery_PokemonFollower3
     WaitMovement
     GoTo JubilifeTV2FGallery_EnterDressingRoom
+
+JubilifeTV2FGallery_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower4
+    Return
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower4:
+    WalkSlowEast
+    WalkSlowNorth 2
+    SetInvisible
+    EndMovement
+
+JubilifeTV2FGallery_PokemonFollower2:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower5
+    Return
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower5:
+    WalkSlowNorth 3
+    SetInvisible
+    EndMovement
+
+JubilifeTV2FGallery_PokemonFollower3:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower6
+    Return
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower6:
+    WalkSlowWest
+    WalkSlowNorth 2
+    SetInvisible
+    EndMovement
 
 JubilifeTV2FGallery_EnterDressingRoomWest:
     ApplyMovement LOCALID_HIKER, JubilifeTV2FGallery_Movement_HikerMoveOutOfTheWayWest
     WaitMovement
     ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PlayerEnterDressingRoomWest
+    CallIfEq VAR_0x8000, 4, JubilifeTV2FGallery_PokemonFollower7
+    CallIfEq VAR_0x8000, 5, JubilifeTV2FGallery_PokemonFollower8
     WaitMovement
     GoTo JubilifeTV2FGallery_EnterDressingRoom
+
+JubilifeTV2FGallery_PokemonFollower11:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower9
+    Return
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower9:
+    WalkSlowEast 2
+    WalkSlowNorth
+    SetInvisible
+    EndMovement
+
+JubilifeTV2FGallery_PokemonFollower12:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower10
+    Return
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower10:
+    WalkSlowNorth
+    WalkSlowEast
+    WalkSlowNorth
+    SetInvisible
+    EndMovement
 
 JubilifeTV2FGallery_EnterDressingRoomEast:
     ApplyMovement LOCALID_HIKER, JubilifeTV2FGallery_Movement_HikerMoveOutOfTheWayEast
     WaitMovement
     ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PlayerEnterDressingRoomEast
+    CallIfEq VAR_0x8000, 1, JubilifeTV2FGallery_PokemonFollower11
+    CallIfEq VAR_0x8000, 2, JubilifeTV2FGallery_PokemonFollower12
     WaitMovement
     GoTo JubilifeTV2FGallery_EnterDressingRoom
+
+JubilifeTV2FGallery_PokemonFollower7:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower13
+    Return
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower13:
+    WalkSlowNorth
+    WalkSlowWest
+    WalkSlowNorth
+    SetInvisible
+    EndMovement
+
+JubilifeTV2FGallery_PokemonFollower8:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower14
+    Return
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower14:
+    WalkSlowWest 2
+    WalkSlowNorth
+    SetInvisible
+    EndMovement
 
 JubilifeTV2FGallery_EnterDressingRoom:
     SetFlag FLAG_ENTERED_DRESSING_ROOM
@@ -129,27 +215,33 @@ JubilifeTV2FGallery_EnterDressingRoom:
     WaitMovement
     FadeScreenIn
     WaitFadeScreen
-    GoToIfEq VAR_0x8006, DIR_NORTH, JubilifeTV2FGallery_ExitDressingRoomNorth
-    GoToIfEq VAR_0x8006, DIR_WEST, JubilifeTV2FGallery_ExitDressingRoomWest
-    GoToIfEq VAR_0x8006, DIR_EAST, JubilifeTV2FGallery_ExitDressingRoomEast
+    GoToIfEq VAR_0x8006, DIR_NORTH, JubilifeTV2FGallery_PokemonFollower15
+    GoToIfEq VAR_0x8006, DIR_WEST, JubilifeTV2FGallery_PokemonFollower16
+    GoToIfEq VAR_0x8006, DIR_EAST, JubilifeTV2FGallery_PokemonFollower17
     End
 
+JubilifeTV2FGallery_PokemonFollower15:
+    ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PokemonFollower18
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower19
 JubilifeTV2FGallery_ExitDressingRoomNorth:
-    ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PlayerExitDressingRoom
     WaitMovement
     ApplyMovement LOCALID_HIKER, JubilifeTV2FGallery_Movement_HikerBlockDoorNorth
     WaitMovement
     GoTo JubilifeTV2FGallery_CheckDressUpPokemonResult
 
+JubilifeTV2FGallery_PokemonFollower16:
+    ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PokemonFollower18
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower19
 JubilifeTV2FGallery_ExitDressingRoomWest:
-    ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PlayerExitDressingRoom
     WaitMovement
     ApplyMovement LOCALID_HIKER, JubilifeTV2FGallery_Movement_HikerBlockDoorWest
     WaitMovement
     GoTo JubilifeTV2FGallery_CheckDressUpPokemonResult
 
+JubilifeTV2FGallery_PokemonFollower17:
+    ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PokemonFollower18
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeTV2FGallery_Movement_PokemonFollower19
 JubilifeTV2FGallery_ExitDressingRoomEast:
-    ApplyMovement LOCALID_PLAYER, JubilifeTV2FGallery_Movement_PlayerExitDressingRoom
     WaitMovement
     ApplyMovement LOCALID_HIKER, JubilifeTV2FGallery_Movement_HikerBlockDoorEast
     WaitMovement
@@ -213,18 +305,24 @@ JubilifeTV2FGallery_CameOutWithoutDoingAnything:
     .balign 4, 0
 JubilifeTV2FGallery_Movement_PlayerEnterDressingRoomNorth:
     WalkSlowNorth 2
+    SetInvisible
+
     EndMovement
 
     .balign 4, 0
 JubilifeTV2FGallery_Movement_PlayerEnterDressingRoomWest:
     WalkSlowWest
     WalkSlowNorth
+    SetInvisible
+
     EndMovement
 
     .balign 4, 0
 JubilifeTV2FGallery_Movement_PlayerEnterDressingRoomEast:
     WalkSlowEast
     WalkSlowNorth
+    SetInvisible
+
     EndMovement
 
     .balign 4, 0
@@ -233,8 +331,21 @@ JubilifeTV2FGallery_Movement_PlayerFaceSouth:
     EndMovement
 
     .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower18:
+    Delay16
+    SetVisible
+
+    .balign 4, 0
 JubilifeTV2FGallery_Movement_PlayerExitDressingRoom:
     WalkSlowSouth 2
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+JubilifeTV2FGallery_Movement_PokemonFollower19:
+    SetVisible
+    WalkSlowSouth 3
+
     FaceNorth
     EndMovement
 

@@ -548,6 +548,7 @@ Overlay overlay5
 	Object src/overlay005/ov5_021F5894.c
 	Object src/overlay005/ov5_021F5A10.c
 	Object src/overlay005/pokemon_follower_emote.c
+	Object src/overlay005/pokemon_follower_ball.c
 	Object src/overlay005/ov5_021F600C.c
 	Object src/overlay005/ov5_021F61BC.c
 	Object src/overlay005/ov5_021F6454.c

@@ -2,7 +2,6 @@
 #include "res/text/bank/veilstone_city_galactic_warehouse.h"
 #include "res/field/events/events_veilstone_city_galactic_warehouse.h"
 
-
     ScriptEntry VeilstoneCityGalacticWarehouse_GalacticHQDoor
     ScriptEntry VeilstoneCityGalacticWarehouse_OnFrame_EnterWithLooker
     ScriptEntry VeilstoneCityGalacticWarehouse_Looker
@@ -143,7 +142,7 @@ VeilstoneCityGalacticWarehouse_CoordEvent_LookerOpenDoor:
     ClearFlag FLAG_HIDE_VEILSTONE_CITY_GALACTIC_WAREHOUSE_LOOKER
     AddObject LOCALID_LOOKER
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    CallIfEq VAR_0x8004, 8, VeilstoneCityGalacticWarehouse_LookerWalkToPlayerX8
+    CallIfEq VAR_0x8004, 8, VeilstoneCityGalacticWarehouse_PokemonFollower1
     CallIfEq VAR_0x8004, 9, VeilstoneCityGalacticWarehouse_LookerWalkToPlayerX9
     Message VeilstoneCityGalacticWarehouse_Text_IHaveKeptYouWaiting
     CloseMessage
@@ -171,8 +170,9 @@ VeilstoneCityGalacticWarehouse_CoordEvent_LookerOpenDoor:
     ReleaseAll
     End
 
+VeilstoneCityGalacticWarehouse_PokemonFollower1:
+    ApplyMovement LOCALID_LOOKER, VeilstoneCityGalacticWarehouse_Movement_PokemonFollower2
 VeilstoneCityGalacticWarehouse_LookerWalkToPlayerX8:
-    ApplyMovement LOCALID_LOOKER, VeilstoneCityGalacticWarehouse_Movement_LookerWalkToPlayerX8
     ApplyMovement LOCALID_PLAYER, VeilstoneCityGalacticWarehouse_Movement_PlayerFaceLookerEast
     WaitMovement
     Return
@@ -224,10 +224,13 @@ VeilstoneCityGalacticWarehouse_Movement_PlayerWatchLookerEnterGalacticHQ:
     EndMovement
 
     .balign 4, 0
+VeilstoneCityGalacticWarehouse_Movement_PokemonFollower2:
+    WalkNormalNorth
+    WalkNormalEast
+
+    .balign 4, 0
 VeilstoneCityGalacticWarehouse_Movement_LookerWalkToPlayerX8:
     WalkNormalNorth 2
-    WalkNormalEast
-    WalkNormalNorth
     WalkOnSpotNormalWest
     EndMovement
 

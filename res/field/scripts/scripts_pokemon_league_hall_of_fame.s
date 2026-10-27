@@ -3,12 +3,34 @@
 #include "res/text/bank/pokemon_league_hall_of_fame.h"
 #include "res/field/events/events_pokemon_league_hall_of_fame.h"
 
-
     ScriptEntry PokemonLeagueHallOfFame_OnFrame_EnterHallOfFame
     ScriptEntryEnd
 
 PokemonLeagueHallOfFame_OnFrame_EnterHallOfFame:
     LockAll
+    GoToIfNe VAR_OBJ_GFX_ID_1, 0, PokemonLeagueHallOfFame_PokemonFollower1
+    RemoveObject LOCALID_PARTY_MON_1
+
+PokemonLeagueHallOfFame_PokemonFollower1:
+    GoToIfNe VAR_OBJ_GFX_ID_2, 0, PokemonLeagueHallOfFame_PokemonFollower2
+    RemoveObject LOCALID_PARTY_MON_2
+
+PokemonLeagueHallOfFame_PokemonFollower2:
+    GoToIfNe VAR_OBJ_GFX_ID_3, 0, PokemonLeagueHallOfFame_PokemonFollower3
+    RemoveObject LOCALID_PARTY_MON_3
+
+PokemonLeagueHallOfFame_PokemonFollower3:
+    GoToIfNe VAR_OBJ_GFX_ID_4, 0, PokemonLeagueHallOfFame_PokemonFollower4
+    RemoveObject LOCALID_PARTY_MON_4
+
+PokemonLeagueHallOfFame_PokemonFollower4:
+    GoToIfNe VAR_OBJ_GFX_ID_5, 0, PokemonLeagueHallOfFame_PokemonFollower5
+    RemoveObject LOCALID_PARTY_MON_5
+
+PokemonLeagueHallOfFame_PokemonFollower5:
+    GoToIfNe VAR_OBJ_GFX_ID_6, 0, PokemonLeagueHallOfFame_PokemonFollower6
+    RemoveObject LOCALID_PARTY_MON_6
+PokemonLeagueHallOfFame_PokemonFollower6:
     ApplyMovement LOCALID_PLAYER, PokemonLeague_HallOfFame_Movement_WalkUp
     WaitMovement
     ApplyMovement LOCALID_PROF_ROWAN, PokemonLeague_HallOfFame_Movement_TurnAroundInPlace
@@ -48,6 +70,32 @@ PokemonLeagueHallOfFame_EnterHallOfFame:
     GetNationalDexEnabled VAR_RESULT
     CallIfEq VAR_RESULT, TRUE, PokemonLeagueHallOfFame_EnableHiddenLocationSpringPath
     CallIfEq VAR_DUMMY_0x40F4, 0, PokemonLeagueHallOfFame_IncreaseDummyVar
+    WaitTime 15, VAR_RESULT
+    GoToIfEq VAR_OBJ_GFX_ID_1, 0, PokemonLeagueHallOfFame_PokemonFollower7
+    PlayPokeBallAnimation LOCALID_PARTY_MON_1, 0, 1
+
+PokemonLeagueHallOfFame_PokemonFollower7:
+    GoToIfEq VAR_OBJ_GFX_ID_2, 0, PokemonLeagueHallOfFame_PokemonFollower8
+    PlayPokeBallAnimation LOCALID_PARTY_MON_2, 0, 1
+
+PokemonLeagueHallOfFame_PokemonFollower8:
+    GoToIfEq VAR_OBJ_GFX_ID_3, 0, PokemonLeagueHallOfFame_PokemonFollower9
+    PlayPokeBallAnimation LOCALID_PARTY_MON_3, 0, 1
+
+PokemonLeagueHallOfFame_PokemonFollower9:
+    GoToIfEq VAR_OBJ_GFX_ID_4, 0, PokemonLeagueHallOfFame_PokemonFollower10
+    PlayPokeBallAnimation LOCALID_PARTY_MON_4, 0, 1
+
+PokemonLeagueHallOfFame_PokemonFollower10:
+    GoToIfEq VAR_OBJ_GFX_ID_5, 0, PokemonLeagueHallOfFame_PokemonFollower11
+    PlayPokeBallAnimation LOCALID_PARTY_MON_5, 0, 1
+
+PokemonLeagueHallOfFame_PokemonFollower11:
+    GoToIfEq VAR_OBJ_GFX_ID_6, 0, PokemonLeagueHallOfFame_PokemonFollower12
+    PlayPokeBallAnimation LOCALID_PARTY_MON_6, 0, 1
+
+PokemonLeagueHallOfFame_PokemonFollower12:
+    WaitTime 30, VAR_RESULT
     GetPartyCount VAR_RESULT
     PlayHallOfFameHealingAnimation VAR_RESULT
     FadeScreenOut FADE_SCREEN_SPEED_MEDIUM

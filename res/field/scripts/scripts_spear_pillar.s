@@ -3,7 +3,7 @@
 #include "res/text/bank/spear_pillar.h"
 #include "res/field/events/events_spear_pillar.h"
 #include "constants/versions.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry SpearPillar_OnTransition
     ScriptEntry SpearPillar_OnLoad
@@ -92,6 +92,7 @@ SpearPillar_GruntsOnlyOnePokemon:
     Message SpearPillar_Text_OnlyOnePokemon
     CloseMessage
     ApplyMovement LOCALID_PLAYER, SpearPillar_Movement_PlayerWalkSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SpearPillar_Movement_PlayerWalkSouth
     WaitMovement
     ApplyMovement LOCALID_GRUNT_F, SpearPillar_Movement_GruntFWalkOnSpotSouth
     ApplyMovement LOCALID_GRUNT_M, SpearPillar_Movement_GruntMWalkOnSpotSouth

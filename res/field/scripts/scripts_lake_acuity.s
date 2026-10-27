@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/lake_acuity.h"
 #include "res/field/events/events_lake_acuity.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry LakeAcuity_CoordEvent_JupiterRival
     ScriptEntryEnd
@@ -35,8 +35,8 @@ LakeAcuity_CoordEvent_JupiterRival:
     RemoveObject LOCALID_JUPITER
     WaitSE SEQ_SE_DP_KAIDAN2_sseq
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    CallIfEq VAR_0x8004, 14, LakeAcuity_PlayerWalkToRivalX14
-    CallIfEq VAR_0x8004, 15, LakeAcuity_PlayerWalkToRivalX15
+    CallIfEq VAR_0x8004, 14, LakeAcuity_PokemonFollower1
+    CallIfEq VAR_0x8004, 15, LakeAcuity_PokemonFollower2
     ApplyMovement LOCALID_RIVAL, LakeAcuity_Movement_RivalWalkOnSpotWest
     WaitMovement
     BufferRivalName 0
@@ -53,6 +53,7 @@ LakeAcuity_CoordEvent_JupiterRival:
     CloseMessage
     ApplyMovement LOCALID_RIVAL, LakeAcuity_Movement_RivalLeave
     ApplyMovement LOCALID_PLAYER, LakeAcuity_Movement_PlayerWatchRivalLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, LakeAcuity_Movement_PlayerWatchRivalLeave
     WaitMovement
     PlaySE SEQ_SE_DP_KAIDAN2_sseq
     RemoveObject LOCALID_RIVAL
@@ -93,13 +94,19 @@ LakeAcuity_JupiterLeaveX15:
     WaitMovement
     Return
 
+LakeAcuity_PokemonFollower1:
+    ShowPokemonFollower
 LakeAcuity_PlayerWalkToRivalX14:
     ApplyMovement LOCALID_PLAYER, LakeAcuity_Movement_PlayerWalkToRivalX14
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, LakeAcuity_Movement_PokemonFollower3
     WaitMovement
     Return
 
+LakeAcuity_PokemonFollower2:
+    ShowPokemonFollower
 LakeAcuity_PlayerWalkToRivalX15:
     ApplyMovement LOCALID_PLAYER, LakeAcuity_Movement_PlayerWalkToRivalX15
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, LakeAcuity_Movement_PokemonFollower4
     WaitMovement
     Return
 
@@ -113,6 +120,21 @@ LakeAcuity_Movement_PlayerWalkToRivalX14:
 LakeAcuity_Movement_PlayerWalkToRivalX15:
     WalkNormalNorth 5
     WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
+LakeAcuity_Movement_PokemonFollower3:
+    Delay8
+    WalkNormalNorth 5
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
+LakeAcuity_Movement_PokemonFollower4:
+    Delay8
+    WalkNormalNorth 5
+    FaceEast
+
     EndMovement
 
     .balign 4, 0

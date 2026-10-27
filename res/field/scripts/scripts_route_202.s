@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_202.h"
 #include "res/field/events/events_route_202.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route202_OnTransition
     ScriptEntry Route202_Youngster
@@ -110,6 +110,14 @@ Route202_LucasIllDemonstrateHowToCatch:
 
 Route202_DoCatchingTutorial:
     CloseMessage
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    GoToIfEq VAR_0x8007, 830, Route202_PokemonFollower1
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route202_Movement_PokemonFollower2
+    GoTo Route202_PokemonFollower3
+
+Route202_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route202_Movement_PokemonFollower4
+Route202_PokemonFollower3:
     ApplyMovement LOCALID_COUNTERPART, Route202_Movement_CounterpartWalkWestIntoTallGrass
     ApplyMovement LOCALID_PLAYER, Route202_Movement_PlayerWalkWestIntoTallGrass
     WaitMovement
@@ -206,30 +214,35 @@ Route202_CloseMessageTellYourFamily:
 Route202_CounterpartWalkBackZ825:
     ApplyMovement LOCALID_COUNTERPART, Route202_Movement_CounterpartPushPlayerAndWalkBackZ825
     ApplyMovement LOCALID_PLAYER, Route202_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route202_Movement_PokemonFollower5
     WaitMovement
     GoTo Route202_TellYourFamilyEnd
 
 Route202_CounterpartWalkBackZ826:
     ApplyMovement LOCALID_COUNTERPART, Route202_Movement_CounterpartPushPlayerAndWalkBackZ826
     ApplyMovement LOCALID_PLAYER, Route202_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route202_Movement_PokemonFollower5
     WaitMovement
     GoTo Route202_TellYourFamilyEnd
 
 Route202_CounterpartWalkBackZ827:
     ApplyMovement LOCALID_COUNTERPART, Route202_Movement_CounterpartPushPlayerAndWalkBackZ827
     ApplyMovement LOCALID_PLAYER, Route202_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route202_Movement_PokemonFollower5
     WaitMovement
     GoTo Route202_TellYourFamilyEnd
 
 Route202_CounterpartWalkBackZ828:
     ApplyMovement LOCALID_COUNTERPART, Route202_Movement_CounterpartPushPlayerAndWalkBackZ828
     ApplyMovement LOCALID_PLAYER, Route202_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route202_Movement_PokemonFollower5
     WaitMovement
     GoTo Route202_TellYourFamilyEnd
 
 Route202_CounterpartWalkBackZ829:
     ApplyMovement LOCALID_COUNTERPART, Route202_Movement_CounterpartPushPlayerAndWalkBackZ829
     ApplyMovement LOCALID_PLAYER, Route202_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route202_Movement_PokemonFollower5
     WaitMovement
     GoTo Route202_TellYourFamilyEnd
 
@@ -354,8 +367,25 @@ Route202_Movement_PlayerStepBackEast:
     EndMovement
 
     .balign 4, 0
+Route202_Movement_PokemonFollower5:
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
 Route202_Movement_PlayerWalkWestIntoTallGrass:
     WalkNormalWest 2
+    EndMovement
+
+    .balign 4, 0
+Route202_Movement_PokemonFollower2:
+    WalkNormalWest 2
+    EndMovement
+
+    .balign 4, 0
+Route202_Movement_PokemonFollower4:
+    WalkNormalNorth
+    WalkNormalWest
+
     EndMovement
 
 Route202_Counterpart:

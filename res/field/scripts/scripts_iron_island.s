@@ -2,7 +2,6 @@
 #include "res/text/bank/iron_island.h"
 #include "res/field/events/events_iron_island.h"
 
-
     ScriptEntry IronIsland_OnTransition
     ScriptEntry IronIsland_Sailor
     ScriptEntry IronIsland_Riley
@@ -27,7 +26,7 @@ IronIsland_Sailor:
 IronIsland_TakeShipToCanalave:
     Message IronIsland_Text_AnchorsAweigh
     CloseMessage
-    Call IronIsland_SailorEnterShip
+    Call IronIsland_PokemonFollower1
     CallIfEq VAR_0x8004, DIR_SOUTH, IronIsland_PlayerEnterShipSouth
     CallIfEq VAR_0x8004, DIR_WEST, IronIsland_PlayerEnterShipWest
     TakeShipToCanalave
@@ -41,6 +40,8 @@ IronIsland_TellWheneverSetSail:
     ReleaseAll
     End
 
+IronIsland_PokemonFollower1:
+    PokemonFollowerStartCutscene
 IronIsland_SailorEnterShip:
     ApplyMovement LOCALID_SAILOR, IronIsland_Movement_SailorFaceWest
     WaitMovement

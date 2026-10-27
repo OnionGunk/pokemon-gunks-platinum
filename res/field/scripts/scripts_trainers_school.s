@@ -2,7 +2,7 @@
 #include "res/text/bank/trainers_school.h"
 #include "res/text/bank/menu_entries.h"
 #include "res/field/events/events_trainers_school.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry TrainersSchool_Rival
     ScriptEntry TrainersSchool_AceTrainerF
@@ -41,11 +41,15 @@ TrainersSchool_Rival:
     CloseMessage
     GetPlayerDir VAR_RESULT
     SetVar VAR_0x8008, VAR_RESULT
-    GoToIfEq VAR_0x8008, DIR_NORTH, TrainersSchool_RivalLeaveNorth
+    GoToIfEq VAR_0x8008, DIR_NORTH, TrainersSchool_PokemonFollower1
     GoToIfEq VAR_0x8008, DIR_WEST, TrainersSchool_RivalLeaveWest
     GoTo TrainersSchool_RivalLeaveEast
     End
 
+TrainersSchool_PokemonFollower1:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    GoToIfNe VAR_0x8006, 7, TrainersSchool_RivalLeaveNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, TrainersSchool_Movement_PokemonFollower2
 TrainersSchool_RivalLeaveNorth:
     ApplyMovement LOCALID_RIVAL, TrainersSchool_Movement_RivalLeaveNorth
     ApplyMovement LOCALID_PLAYER, TrainersSchool_Movement_PlayerWatchRivalLeaveNorth
@@ -83,6 +87,17 @@ TrainersSchool_Movement_RivalLeaveNorth:
     WalkFastEast
     WalkFastSouth 8
     WalkOnSpotFastSouth
+    EndMovement
+
+    .balign 4, 0
+TrainersSchool_Movement_PokemonFollower2:
+    FaceWest
+    LockDir
+    JumpNearFastEast
+    UnlockDir
+    Delay16
+    WalkSlowWest
+
     EndMovement
 
     .balign 4, 0

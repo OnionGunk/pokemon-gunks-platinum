@@ -4,7 +4,7 @@
 #include "res/field/events/events_pal_park_lobby.h"
 #include "constants/pokemon.h"
 #include "constants/versions.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PalParkLobby_OnTransition
     ScriptEntry PalParkLobby_Worker
@@ -159,6 +159,7 @@ PalParkLobby_WalkInAndWarp:
     ApplyMovement LOCALID_WORKER, PalParkLobby_Movement_WorkerMoveAside
     WaitMovement
     ApplyMovement LOCALID_PLAYER, PalParkLobby_Movement_PlayerEnterPalPark
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PalParkLobby_Movement_PlayerEnterPalPark
     WaitMovement
     PlaySE SEQ_SE_DP_KAIDAN2_sseq
     FadeScreenOut
@@ -208,6 +209,7 @@ PalParkLobby_OnFrame_ExitPalPark:
     WaitMovement
     ApplyMovement LOCALID_WORKER, PalParkLobby_Movement_WorkerMoveBack
     WaitMovement
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -265,6 +267,7 @@ PalParkLobby_Worker_End:
     WaitMovement
     ApplyMovement LOCALID_WORKER, PalParkLobby_Movement_WorkerMoveBack
     WaitMovement
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -380,6 +383,7 @@ PalParkLobby_PokemonFromAroundTheCountry:
     RemoveObject LOCALID_PROF_OAK
     WaitSE SEQ_SE_DP_KAIDAN2_sseq
     SetVar VAR_PAL_PARK_LOBBY_STATE, 1
+    PokemonFollowerResumeFollowing
     ReleaseAll
     End
 

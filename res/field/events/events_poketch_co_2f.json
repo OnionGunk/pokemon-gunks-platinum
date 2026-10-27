@@ -33,7 +33,7 @@
         },
         {
             "id": "LOCALID_CLEFAIRY",
-            "graphics_id": "OBJ_EVENT_GFX_CLEFAIRY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CLEFAIRY",
             "movement_type": "MOVEMENT_TYPE_LOOK_EAST",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -48,7 +48,7 @@
         },
         {
             "id": "LOCALID_PACHIRISU",
-            "graphics_id": "OBJ_EVENT_GFX_PACHIRISU",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_PACHIRISU",
             "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",

@@ -87,7 +87,7 @@
         },
         {
             "id": "LOCALID_PACHIRISU",
-            "graphics_id": "OBJ_EVENT_GFX_PACHIRISU",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_PACHIRISU",
             "movement_type": "MOVEMENT_TYPE_LOOK_NORTH_AND_EAST",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",

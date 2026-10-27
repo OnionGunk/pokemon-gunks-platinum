@@ -79,8 +79,10 @@ typedef struct DexNavSearch {
 // Lives in the main binary so it survives the field unloading for the DexNav screen and battles.
 static DexNavSearch sSearch;
 
-// Test hook: the emulator harness writes a species here to choose the test save's lead Pokemon.
+// Test hooks: the emulator harness writes these before a new game. gTestLeadSpecies picks the
+// test save's lead Pokemon; gTestSaveMode picks post-game (0) or story start (1).
 u16 gTestLeadSpecies;
+u16 gTestSaveMode;
 
 int DexNavSave_SaveSize(void)
 {

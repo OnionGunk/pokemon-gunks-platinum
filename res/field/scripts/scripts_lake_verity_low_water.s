@@ -2,7 +2,6 @@
 #include "res/text/bank/lake_verity_low_water.h"
 #include "res/field/events/events_lake_verity_low_water.h"
 
-
     ScriptEntry LakeVerityLowWater_OnTransition
     ScriptEntry LakeVerityLowWater_OnLoad
     ScriptEntry LakeVerityLowWater_OnFrame_Cyrus
@@ -106,6 +105,7 @@ LakeVerityLowWater_OnFrame_Cyrus:
     SetFlag FLAG_HIDE_LAKE_VERITY_LOW_WATER_RIVAL
     RemoveObject LOCALID_RIVAL
     PlaySE SEQ_SE_DP_KAIDAN2_sseq
+    PokemonFollowerEndCutscene
     GoTo LakeVerityLowWater_EndRivalFollower
     End
 

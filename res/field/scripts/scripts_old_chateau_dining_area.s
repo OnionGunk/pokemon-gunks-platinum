@@ -1,7 +1,6 @@
 #include "macros/scrcmd.inc"
 #include "res/field/events/events_old_chateau_dining_area.h"
 
-
     ScriptEntry OldChateauDiningArea_OnTransition
     ScriptEntry OldChateauDiningArea_OnFrame_OldManLeave
     ScriptEntryEnd
@@ -19,6 +18,7 @@ OldChateauDiningArea_ShowOldMan:
 
 OldChateauDiningArea_OnFrame_OldManLeave:
     LockAll
+    ShowPokemonFollower
     ApplyMovement LOCALID_PLAYER, OldChateauDiningArea_Movement_PlayerWatchOldManLeave
     ApplyMovement LOCALID_OLD_MAN, OldChateauDiningArea_Movement_OldManLeave
     WaitMovement

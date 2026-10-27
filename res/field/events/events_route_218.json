@@ -244,7 +244,7 @@
         },
         {
             "id": "LOCALID_CLEFAIRY_SOUTH",
-            "graphics_id": "OBJ_EVENT_GFX_CLEFAIRY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CLEFAIRY",
             "movement_type": "MOVEMENT_TYPE_LOOK_SOUTH",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_ROUTE_218_BLOCKADE",
@@ -259,7 +259,7 @@
         },
         {
             "id": "LOCALID_CLEFAIRY_NORTH",
-            "graphics_id": "OBJ_EVENT_GFX_CLEFAIRY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CLEFAIRY",
             "movement_type": "MOVEMENT_TYPE_LOOK_SOUTH",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_ROUTE_218_BLOCKADE",
@@ -274,7 +274,7 @@
         },
         {
             "id": "LOCALID_PIKACHU_SOUTH",
-            "graphics_id": "OBJ_EVENT_GFX_PIKACHU",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_PIKACHU",
             "movement_type": "MOVEMENT_TYPE_LOOK_NORTH",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_ROUTE_218_BLOCKADE",
@@ -289,7 +289,7 @@
         },
         {
             "id": "LOCALID_PIKACHU_NORTH",
-            "graphics_id": "OBJ_EVENT_GFX_PIKACHU",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_PIKACHU",
             "movement_type": "MOVEMENT_TYPE_LOOK_NORTH",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_ROUTE_218_BLOCKADE",

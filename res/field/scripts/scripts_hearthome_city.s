@@ -3,7 +3,6 @@
 #include "res/field/events/events_hearthome_city.h"
 #include "generated/goods.h"
 
-
     ScriptEntry HearthomeCity_OnTransition
     ScriptEntry HearthomeCity_PokefanM2
     ScriptEntry HearthomeCity_Hiker2
@@ -87,7 +86,8 @@ HearthomeCity_Fisherman:
     GoToIfEq VAR_RESULT, MENU_NO, HearthomeCity_IDoApologize
     Message HearthomeCity_Text_PleaseFollowMe
     CloseMessage
-    WaitTime 15, VAR_RESULT
+    WaitTime 10, VAR_RESULT
+    PokemonFollowerStartCutscene
     GetPlayerDir VAR_0x8004
     GoToIfEq VAR_0x8004, DIR_NORTH, HearthomeCity_WalkToContestHallNorth
     GoToIfEq VAR_0x8004, DIR_SOUTH, HearthomeCity_WalkToContestHallSouth
@@ -142,6 +142,7 @@ HearthomeCity_ThisIsTheContestHall:
     Message HearthomeCity_Text_ThisIsTheContestHall
     WaitButton
     CloseMessage
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -497,6 +498,8 @@ HearthomeCity_BunearyAndKeira:
     Message HearthomeCity_Text_BackIntoThePokeBall
     PlayCry SPECIES_BUNEARY
     WaitCry
+    PlayPokeBallAnimation LOCALID_BUNEARY, 427, 1
+    WaitTime 12, VAR_RESULT
     RemoveObject LOCALID_BUNEARY
     Message HearthomeCity_Text_ImKeira
     CloseMessage

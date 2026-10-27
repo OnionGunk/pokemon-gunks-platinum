@@ -2,13 +2,13 @@
 #include "res/text/bank/battle_factory.h"
 #include "res/text/bank/menu_entries.h"
 #include "constants/battle_frontier.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry BattleFactory_SingleAttendant
     ScriptEntry BattleFactory_OnFrame_ResumeChallenge
     ScriptEntry BattleFactory_OnFrame_DidntSaveBeforeQuit
     ScriptEntry BattleFactory_OnFrame_ChallengeEndedCompletedRound
-    ScriptEntry BattleFactory_OnFrame_ChallengeEnded
+    ScriptEntry BattleFactory_PokemonFollower4
     ScriptEntry BattleFactory_MultiAttendant
     ScriptEntry BattleFactory_PokemonBreederF
     ScriptEntry BattleFactory_Sailor
@@ -137,7 +137,7 @@ BattleFactory_HealAndSaveBeforeChallenge:
     SetVar VAR_RESULT, VAR_MAP_LOCAL_0x00
     GoToIfEq VAR_RESULT, 0, BattleFactory_EndChallenge
     GoToIfEq VAR_BATTLE_FACTORY_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleFactory_BecomeLeaderOrJoinGroup
-    GoTo BattleFactory_WalkIntoCorridor
+    GoTo BattleFactory_PokemonFollower1
     End
 
 BattleFactory_BecomeLeaderOrJoinGroup:
@@ -216,13 +216,15 @@ BattleFactory_StartMultiChallenge:
     Message BattleFactory_Text_MustSaveFirst
     CallIfEq VAR_BATTLE_FACTORY_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleFactory_SetChallengeInProgress
     Call BattleFactory_SaveGame
-    GoTo BattleFactory_WalkIntoCorridor
+    GoTo BattleFactory_PokemonFollower1
     End
 
 BattleFactory_SetChallengeInProgress:
     SetVar VAR_BATTLE_FACTORY_LOBBY_LOAD_ACTION, 0xFF
     Return
 
+BattleFactory_PokemonFollower1:
+    PokemonFollowerStartCutscene
 BattleFactory_WalkIntoCorridor:
     CallIfEq VAR_BATTLE_FACTORY_CHALLENGE_TYPE, FRONTIER_CHALLENGE_SINGLE, BattleFactory_WalkToCorridorSingleChallenge
     CallIfEq VAR_BATTLE_FACTORY_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleFactory_WalkToCorridorDoubleChallenge
@@ -403,7 +405,7 @@ BattleFactory_OnFrame_ResumeChallenge:
     Message BattleFactory_Text_MustSaveBeforeResuming
     Call BattleFactory_SetChallengeInProgress
     Call BattleFactory_SaveGame
-    GoTo BattleFactory_WalkIntoCorridor
+    GoTo BattleFactory_PokemonFollower1
     End
 
 BattleFactory_SaveGame:
@@ -417,6 +419,7 @@ BattleFactory_SaveGame:
 BattleFactory_OnFrame_DidntSaveBeforeQuit:
     Message BattleFactory_Text_DidntSaveBeforeQuit
     DeleteActiveBattleFactoryStreak VAR_BATTLE_FACTORY_CHALLENGE_TYPE, VAR_BATTLE_FACTORY_CHALLENGE_LEVEL
+    Call BattleFactory_PokemonFollower2
     GoTo BattleFactory_EndChallenge
     End
 
@@ -425,6 +428,7 @@ BattleFactory_OnFrame_ChallengeEndedCompletedRound:
     CallIfEq VAR_BATTLE_FACTORY_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleFactory_IncrementTrainerScoreRoundCompleted
     CallIfEq VAR_BATTLE_FACTORY_PRINT_STATE, 1, BattleFactory_EarnedSilverPrint
     CallIfEq VAR_BATTLE_FACTORY_PRINT_STATE, 3, BattleFactory_EarnedGoldPrint
+    Call BattleFactory_PokemonFollower2
     GoTo BattleFactory_EndChallenge
     End
 
@@ -451,6 +455,8 @@ BattleFactory_EarnedGoldPrint:
     Common_CheckAllFrontierGoldPrintsObtained
     Return
 
+BattleFactory_PokemonFollower4:
+    Call BattleFactory_PokemonFollower2
 BattleFactory_OnFrame_ChallengeEnded:
     GoTo BattleFactory_EndChallenge
     End
@@ -497,3 +503,11 @@ BattleFactory_Policeman:
     End
 
     .balign 4, 0
+
+BattleFactory_PokemonFollower2:
+    GetMovementType VAR_RESULT, LOCALID_POKEMON_FOLLOWER
+    GoToIfEq VAR_RESULT, 68, BattleFactory_PokemonFollower3
+    PokemonFollowerEndCutscene
+
+BattleFactory_PokemonFollower3:
+    Return

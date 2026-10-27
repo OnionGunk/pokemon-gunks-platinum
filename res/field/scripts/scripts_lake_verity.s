@@ -2,7 +2,6 @@
 #include "res/text/bank/lake_verity.h"
 #include "res/field/events/events_lake_verity.h"
 
-
     ScriptEntry LakeVerity_OnTransition
     ScriptEntry LakeVerity_OnLoad
     ScriptEntry LakeVerity_ProfRowan
@@ -216,7 +215,9 @@ LakeVerity_Mars:
     ApplyMovement LOCALID_COUNTERPART, LakeVerity_Movement_CounterpartFaceSouth
     ApplyMovement LOCALID_PLAYER, LakeVerity_Movement_PlayerFaceWest
     WaitMovement
+    PokemonFollowerPlaceNearPlayer 1, 2
     SetPosition LOCALID_PROF_ROWAN, 53, 1, 39, DIR_EAST
+    WaitTime 1, VAR_RESULT
     FadeScreenIn
     WaitFadeScreen
     SetFlag FLAG_HIDE_MT_CORONET_1F_NORTH_ROOM_1_GRUNTS_M

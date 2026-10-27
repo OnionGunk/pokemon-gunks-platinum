@@ -2,7 +2,6 @@
 #include "res/text/bank/stark_mountain_room_1.h"
 #include "res/field/events/events_stark_mountain_room_1.h"
 
-
     ScriptEntry StarkMountainOutside_OnTransition
     ScriptEntry StarkMountainOutside_OnFrame_TeamGalactic
     ScriptEntryEnd
@@ -80,6 +79,7 @@ StarkMountainOutside_OnFrame_TeamGalactic:
     RemoveObject LOCALID_GRUNT_M_1
     RemoveObject LOCALID_GRUNT_M_2
     SetVar VAR_STARK_MOUNTAIN_ROOM_1_STATE, 1
+    PokemonFollowerResumeFollowing
     ReleaseAll
     End
 

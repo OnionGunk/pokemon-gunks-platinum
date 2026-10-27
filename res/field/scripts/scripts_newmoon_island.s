@@ -3,7 +3,6 @@
 #include "res/text/bank/newmoon_island.h"
 #include "res/field/events/events_newmoon_island.h"
 
-
     ScriptEntry NewmoonIsland_OnTransition
     ScriptEntry NewmoonIsland_Sailor
     ScriptEntryEnd
@@ -34,7 +33,7 @@ NewmoonIsland_Sailor:
 NewmoonIsland_TakeShipToCanalave:
     Message NewmoonIsland_Text_AnchorsAweigh
     CloseMessage
-    Call NewmoonIsland_SailorEnterShip
+    Call NewmoonIsland_PokemonFollower1
     CallIfEq VAR_0x8004, DIR_SOUTH, NewmoonIsland_PlayerEnterShipSouth
     CallIfEq VAR_0x8004, DIR_WEST, NewmoonIsland_PlayerEnterShipWest
     CallIfEq VAR_0x8004, DIR_NORTH, NewmoonIsland_PlayerEnterShipNorth
@@ -49,6 +48,8 @@ NewmoonIsland_AllRightThen:
     ReleaseAll
     End
 
+NewmoonIsland_PokemonFollower1:
+    PokemonFollowerStartCutscene
 NewmoonIsland_SailorEnterShip:
     ApplyMovement LOCALID_SAILOR, NewmoonIslandForest_Movement_SailorWalkToShip
     WaitMovement

@@ -108,7 +108,7 @@
         },
         {
             "id": "LOCALID_DRIFLOON",
-            "graphics_id": "OBJ_EVENT_GFX_DRIFLOON",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_DRIFLOON",
             "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -123,7 +123,7 @@
         },
         {
             "id": "LOCALID_HAPPINY",
-            "graphics_id": "OBJ_EVENT_GFX_HAPPINY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_HAPPINY",
             "movement_type": "MOVEMENT_TYPE_NONE",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -168,7 +168,7 @@
         },
         {
             "id": "LOCALID_PIKACHU",
-            "graphics_id": "OBJ_EVENT_GFX_PIKACHU",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_PIKACHU",
             "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -198,7 +198,7 @@
         },
         {
             "id": "LOCALID_CLEFAIRY",
-            "graphics_id": "OBJ_EVENT_GFX_CLEFAIRY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CLEFAIRY",
             "movement_type": "MOVEMENT_TYPE_NONE",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",

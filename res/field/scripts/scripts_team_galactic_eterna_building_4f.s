@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/team_galactic_eterna_building_4f.h"
 #include "res/field/events/events_team_galactic_eterna_building_4f.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry TeamGalacticEternaBuilding4F_OnLoad
     ScriptEntry TeamGalacticEternaBuilding4F_Jupiter
@@ -39,14 +39,22 @@ TeamGalacticEternaBuilding4F_Jupiter:
     WaitFadeScreen
     WaitTime 15, VAR_RESULT
     GetPlayerDir VAR_0x8004
-    GoToIfEq VAR_0x8004, DIR_NORTH, TeamGalacticEternaBuilding4F_PokefanMWalkToPlayerNorth
+    GoToIfEq VAR_0x8004, DIR_NORTH, TeamGalacticEternaBuilding4F_PokemonFollower1
     GoToIfEq VAR_0x8004, DIR_WEST, TeamGalacticEternaBuilding4F_PokefanMWalkToPlayerWest
     GoToIfEq VAR_0x8004, DIR_EAST, TeamGalacticEternaBuilding4F_PokefanMWalkToPlayerEast
     End
 
-TeamGalacticEternaBuilding4F_PokefanMWalkToPlayerNorth:
+TeamGalacticEternaBuilding4F_PokemonFollower1:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    GoToIfEq VAR_0x8007, 8, TeamGalacticEternaBuilding4F_PokemonFollower2
     ApplyMovement LOCALID_POKEFAN_M, TeamGalacticEternaBuilding4F_Movement_PokefanMWalkToPlayerNorth
     ApplyMovement LOCALID_PLAYER, TeamGalacticEternaBuilding4F_Movement_PlayerFacePokefanM
+    GoTo TeamGalacticEternaBuilding4F_PokefanMWalkToPlayerNorth
+
+TeamGalacticEternaBuilding4F_PokemonFollower2:
+    ApplyMovement LOCALID_POKEFAN_M, TeamGalacticEternaBuilding4F_Movement_PokemonFollower3
+    ApplyMovement LOCALID_PLAYER, TeamGalacticEternaBuilding4F_Movement_PokemonFollower4
+TeamGalacticEternaBuilding4F_PokefanMWalkToPlayerNorth:
     WaitMovement
     GoTo TeamGalacticEternaBuilding4F_HandleTeamGalacticLeftEternaBuilding
     End
@@ -107,6 +115,13 @@ TeamGalacticEternaBuilding4F_Movement_Unused:
     EndMovement
 
     .balign 4, 0
+TeamGalacticEternaBuilding4F_Movement_PokemonFollower3:
+    WalkNormalWest
+    WalkNormalNorth 2
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
 TeamGalacticEternaBuilding4F_Movement_PokefanMWalkToPlayerWest:
     WalkNormalNorth 3
     WalkOnSpotNormalEast
@@ -122,6 +137,13 @@ TeamGalacticEternaBuilding4F_Movement_PokefanMWalkToPlayerEast:
 TeamGalacticEternaBuilding4F_Movement_PlayerFacePokefanM:
     Delay8
     WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+TeamGalacticEternaBuilding4F_Movement_PokemonFollower4:
+    Delay8 3
+    WalkOnSpotNormalWest
+
     EndMovement
 
 TeamGalacticEternaBuilding4F_Movement_Unused2:

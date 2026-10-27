@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_206_cycling_road_north_gate.h"
 #include "res/field/events/events_route_206_cycling_road_north_gate.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route206CyclingRoadNorthGate_OnTransition
     ScriptEntry Route206CyclingRoadNorthGate_CashierM
@@ -42,6 +42,7 @@ Route206CyclingRoadNorthGate_CoordEvent_OnlyBicycles:
     Message Route206CyclingRoadNorthGate_Text_OnlyForBicycles
     CloseMessage
     ApplyMovement LOCALID_PLAYER, Route206CyclingRoadNorthGate_Movement_PlayerWalkNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route206CyclingRoadNorthGate_Movement_PokemonFollower1
     WaitMovement
     ReleaseAll
     End
@@ -60,6 +61,12 @@ Route206CyclingRoadNorthGate_Movement_CashierMExclamationMark:
     .balign 4, 0
 Route206CyclingRoadNorthGate_Movement_PlayerWalkNorth:
     WalkNormalNorth
+    EndMovement
+
+    .balign 4, 0
+Route206CyclingRoadNorthGate_Movement_PokemonFollower1:
+    WalkNormalSouth
+
     EndMovement
 
 Route206CyclingRoadNorthGate_CoordEvent_ClearFlagForceBikingInGate:

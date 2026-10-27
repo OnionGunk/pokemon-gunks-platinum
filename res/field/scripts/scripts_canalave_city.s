@@ -4,7 +4,6 @@
 #include "res/text/bank/menu_entries.h"
 #include "res/field/events/events_canalave_city.h"
 
-
     ScriptEntry CanalaveCity_OnTransition
     ScriptEntry CanalaveCity_CoordEvent_Rival
     ScriptEntry CanalaveCity_RivalBridge
@@ -557,6 +556,7 @@ CanalaveCity_DontTakeShip:
 CanalaveCity_SailorEldritchEnterShip:
     Message CanalaveCity_Text_AnchorsAweigh
     CloseMessage
+    PokemonFollowerStartCutscene
     ApplyMovement LOCALID_SAILOR_ELDRITCH, CanalaveCity_Movement_SailorEldritchFaceEast
     WaitMovement
     PlaySE SEQ_SE_DP_KAIDAN2_sseq

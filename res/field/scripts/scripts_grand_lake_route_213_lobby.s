@@ -2,7 +2,6 @@
 #include "res/text/bank/grand_lake_route_213_lobby.h"
 #include "res/field/events/events_grand_lake_route_213_lobby.h"
 
-
     ScriptEntry GrandLakeRoute213Lobby_OnTransition
     ScriptEntry GrandLakeRoute213Lobby_Policeman
     ScriptEntry GrandLakeRoute213Lobby_AceTrainerF
@@ -23,6 +22,8 @@ GrandLakeRoute213Lobby_Policeman:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     Message GrandLakeRoute213Lobby_Text_RestoredYourPokemon

@@ -1,6 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/oreburgh_city.h"
 #include "res/field/events/events_oreburgh_city.h"
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry OreburghCity_Rival
     ScriptEntry OreburghCity_Youngster
@@ -90,42 +91,63 @@ OreburghCity_RivalRunIntoPlayerZ748:
     SetObjectEventPos LOCALID_RIVAL, 271, 748
     AddObject LOCALID_RIVAL
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerGetPushedByRival
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower1
     ApplyMovement LOCALID_RIVAL, OreburghCity_Movement_RivalRunIntoPlayer
     WaitMovement
-    GoTo OreburghCity_NextStopTheEternaGymBadge
+    PlaySE 1538
+    Message OreburghCity_Text_BigThud
+    CloseMessage
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower2
+    GoTo OreburghCity_PokemonFollower3
+
     End
 
 OreburghCity_RivalRunIntoPlayerZ749:
     SetObjectEventPos LOCALID_RIVAL, 271, 749
     AddObject LOCALID_RIVAL
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerGetPushedByRival
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower1
     ApplyMovement LOCALID_RIVAL, OreburghCity_Movement_RivalRunIntoPlayer
     WaitMovement
-    GoTo OreburghCity_NextStopTheEternaGymBadge
+    PlaySE 1538
+    Message OreburghCity_Text_BigThud
+    CloseMessage
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower2
+    GoTo OreburghCity_PokemonFollower3
+
     End
 
 OreburghCity_RivalRunIntoPlayerZ750:
     SetObjectEventPos LOCALID_RIVAL, 271, 750
     AddObject LOCALID_RIVAL
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerGetPushedByRival
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower4
     ApplyMovement LOCALID_RIVAL, OreburghCity_Movement_RivalRunIntoPlayer
     WaitMovement
-    GoTo OreburghCity_NextStopTheEternaGymBadge
+    PlaySE 1538
+    Message OreburghCity_Text_BigThud
+    CloseMessage
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower5
+    GoTo OreburghCity_PokemonFollower3
+
     End
 
 OreburghCity_RivalRunIntoPlayerZ751:
     SetObjectEventPos LOCALID_RIVAL, 271, 751
     AddObject LOCALID_RIVAL
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerGetPushedByRival
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower4
     ApplyMovement LOCALID_RIVAL, OreburghCity_Movement_RivalRunIntoPlayer
     WaitMovement
-    GoTo OreburghCity_NextStopTheEternaGymBadge
-    End
 
 OreburghCity_NextStopTheEternaGymBadge:
     PlaySE SEQ_SE_DP_WALL_HIT2_sseq
     Message OreburghCity_Text_BigThud
     CloseMessage
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower5
+    GoTo OreburghCity_PokemonFollower3
+
+OreburghCity_PokemonFollower3:
     Common_SetRivalBGM
     BufferRivalName 0
     BufferPlayerName 1
@@ -177,6 +199,7 @@ OreburghCity_RemoveRival:
     PlaySE SEQ_SE_DP_KAIDAN2_sseq
     RemoveObject LOCALID_RIVAL
     Common_FadeToDefaultMusic2
+    WaitMovement
     SetVar VAR_OREBURGH_CITY_STATE, 3
     ReleaseAll
     End
@@ -188,6 +211,27 @@ OreburghCity_Movement_PlayerGetPushedByRival:
     WalkFastWest
     UnlockDir
     FaceEast
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower4:
+    Delay4 6
+    FaceNorth
+    LockDir
+    WalkFastWest
+    JumpFarSouth
+    UnlockDir
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower1:
+    Delay4 6
+    FaceSouth
+    LockDir
+    WalkFastWest
+    JumpFarNorth
+    UnlockDir
+
     EndMovement
 
     .balign 4, 0
@@ -249,6 +293,21 @@ OreburghCity_Movement_PlayerWatchRivalLeaveZ750:
 OreburghCity_Movement_PlayerWatchRivalLeaveZ751:
     WalkOnSpotNormalNorth
     WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower5:
+    Delay8 3
+    WalkNormalWest
+    WalkNormalNorth
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower2:
+    Delay8 3
+    WalkNormalWest
+    WalkNormalSouth
+
     EndMovement
 
     .balign 4, 0
@@ -354,6 +413,7 @@ OreburghCity_IllTakeYouToTheGym:
 
 OreburghCity_WalkWithYoungsterToTheGymZ748:
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerWalkToTheGymZ748
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower6
     ApplyMovement LOCALID_YOUNGSTER, OreburghCity_Movement_YoungsterWalkToTheGymZ748
     WaitMovement
     GoTo OreburghCity_HuhTheresSomeoneThere
@@ -361,6 +421,7 @@ OreburghCity_WalkWithYoungsterToTheGymZ748:
 
 OreburghCity_WalkWithYoungsterToTheGymZ749:
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerWalkToTheGymZ749
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower7
     ApplyMovement LOCALID_YOUNGSTER, OreburghCity_Movement_YoungsterWalkToTheGymZ749
     WaitMovement
     GoTo OreburghCity_HuhTheresSomeoneThere
@@ -368,6 +429,7 @@ OreburghCity_WalkWithYoungsterToTheGymZ749:
 
 OreburghCity_WalkWithYoungsterToTheGymZ750:
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerWalkToTheGymZ750
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower8
     ApplyMovement LOCALID_YOUNGSTER, OreburghCity_Movement_YoungsterWalkToTheGymZ750
     WaitMovement
     GoTo OreburghCity_HuhTheresSomeoneThere
@@ -375,6 +437,7 @@ OreburghCity_WalkWithYoungsterToTheGymZ750:
 
 OreburghCity_WalkWithYoungsterToTheGymZ751:
     ApplyMovement LOCALID_PLAYER, OreburghCity_Movement_PlayerWalkToTheGymZ751
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, OreburghCity_Movement_PokemonFollower9
     ApplyMovement LOCALID_YOUNGSTER, OreburghCity_Movement_YoungsterWalkToTheGymZ751
     WaitMovement
     GoTo OreburghCity_HuhTheresSomeoneThere
@@ -424,6 +487,43 @@ OreburghCity_Movement_PlayerWalkToTheGymZ751:
     WalkNormalEast
     WalkNormalSouth 7
     WalkNormalEast 12
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower6:
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast
+    WalkNormalSouth 10
+    WalkNormalEast 11
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower7:
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast
+    WalkNormalSouth 9
+    WalkNormalEast 11
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower8:
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast
+    WalkNormalSouth 8
+    WalkNormalEast 11
+    EndMovement
+
+    .balign 4, 0
+OreburghCity_Movement_PokemonFollower9:
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast
+    WalkNormalSouth 7
+    WalkNormalEast 11
+
     EndMovement
 
     .balign 4, 0

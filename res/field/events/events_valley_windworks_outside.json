@@ -85,7 +85,7 @@
         },
         {
             "id": "LOCALID_DRIFLOON",
-            "graphics_id": "OBJ_EVENT_GFX_DRIFLOON",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_DRIFLOON",
             "movement_type": "MOVEMENT_TYPE_NONE",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_VALLEY_WINDWORKS_OUTSIDE_DRIFLOON",

@@ -3,7 +3,7 @@
 #include "generated/hidden_locations.h"
 #include "res/text/bank/route_224.h"
 #include "res/field/events/events_route_224.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route224_OnTransition
     ScriptEntry Route224_OnResume
@@ -78,6 +78,7 @@ Route224_ProfOak:
     Message Route224_Text_ExamineTabletMale
 Route224_ExamineTablet:
     CloseMessage
+    PokemonFollowerStartCutscene
     Call Route224_PlayerWalkToTabletFaceProfOak
     BufferPlayerName 0
     Message Route224_Text_SayThanksToWhom
@@ -117,6 +118,7 @@ Route224_ExpressThanks:
     SetFlag FLAG_HIDE_ROUTE_224_PROF_OAK
     SetFlag FLAG_HIDE_ROUTE_224_MARLEY
     SetVar VAR_ROUTE_224_PROF_OAK_STATE, 0
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -338,6 +340,7 @@ Route224_MarleyWalkToPlayerZ496:
     AddObject LOCALID_MARLEY
     LockObject LOCALID_MARLEY
     ApplyMovement LOCALID_MARLEY, Route224_Movement_MarleyWalkToPlayerZ496
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route224_Movement_PokemonFollower1
     WaitMovement
     GoTo Route224_PokemonThatConveysGratitude
     End
@@ -347,6 +350,7 @@ Route224_MarleyWalkToPlayerZ497:
     AddObject LOCALID_MARLEY
     LockObject LOCALID_MARLEY
     ApplyMovement LOCALID_MARLEY, Route224_Movement_MarleyWalkToPlayerZ497
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route224_Movement_PokemonFollower1
     WaitMovement
     GoTo Route224_PokemonThatConveysGratitude
     End
@@ -356,6 +360,7 @@ Route224_MarleyWalkToPlayerZ498:
     AddObject LOCALID_MARLEY
     LockObject LOCALID_MARLEY
     ApplyMovement LOCALID_MARLEY, Route224_Movement_MarleyWalkToPlayerZ498
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route224_Movement_PokemonFollower2
     WaitMovement
     GoTo Route224_PokemonThatConveysGratitude
     End
@@ -374,6 +379,7 @@ Route224_PokemonThatConveysGratitude:
 Route224_MarleyWalkToTabletZ496:
     ApplyMovement LOCALID_MARLEY, Route224_Movement_MarleyWalkToTabletZ496
     ApplyMovement LOCALID_PLAYER, Route224_Movement_PlayerWatchMarleyWalkToTabletZ496
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route224_Movement_PlayerWatchMarleyWalkToTabletZ496
     WaitMovement
     GoTo Route224_ThatStoneTablet
     End
@@ -381,6 +387,7 @@ Route224_MarleyWalkToTabletZ496:
 Route224_MarleyWalkToTabletZ497:
     ApplyMovement LOCALID_MARLEY, Route224_Movement_MarleyWalkToTabletZ497
     ApplyMovement LOCALID_PLAYER, Route224_Movement_PlayerWatchMarleyWalkToTabletZ497
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route224_Movement_PlayerWatchMarleyWalkToTabletZ497
     WaitMovement
     GoTo Route224_ThatStoneTablet
     End
@@ -388,6 +395,7 @@ Route224_MarleyWalkToTabletZ497:
 Route224_MarleyWalkToTabletZ498:
     ApplyMovement LOCALID_MARLEY, Route224_Movement_MarleyWalkToTabletZ498
     ApplyMovement LOCALID_PLAYER, Route224_Movement_PlayerWatchMarleyWalkToTabletZ498
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route224_Movement_PlayerWatchMarleyWalkToTabletZ498
     WaitMovement
     GoTo Route224_ThatStoneTablet
     End
@@ -417,6 +425,28 @@ Route224_Movement_MarleyWalkToPlayerZ497:
 Route224_Movement_MarleyWalkToPlayerZ498:
     WalkNormalNorth 8
     WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+Route224_Movement_PokemonFollower1:
+    Delay8
+    FaceSouth
+    Delay8 2
+    WalkNormalSouth
+    WalkNormalEast 2
+    WalkNormalNorth
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+Route224_Movement_PokemonFollower2:
+    Delay8
+    FaceSouth
+    Delay8 2
+    WalkNormalSouth
+    WalkNormalEast
+    FaceWest
+
     EndMovement
 
     .balign 4, 0

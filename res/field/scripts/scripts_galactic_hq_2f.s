@@ -1,7 +1,6 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/galactic_hq_2f.h"
 
-
     ScriptEntry GalacticHQ2F_Bed
     ScriptEntry GalacticHQ2F_BgSignNapRoom
     ScriptEntry GalacticHQ2F_BgSignTVRoom
@@ -28,6 +27,8 @@ GalacticHQ2F_TakeARest:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     BufferPlayerName 0

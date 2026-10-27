@@ -11,7 +11,6 @@
 #include "generated/pokemon_contest_ranks.h"
 #include "generated/pokemon_contest_types.h"
 
-
     ScriptEntry Contests_LobbyOnFrameExitContestHall @ 0x2648
     ScriptEntry Contests_Dummy9801 @ 0x2649
     ScriptEntry Contests_OngoingContestOnTransition @ 0x264A
@@ -44,6 +43,7 @@ Contests_ExitContestHall:
     ApplyMovement LOCALID_PLAYER, Contests_Movement_ExitThroughGate
     WaitMovement
     Call Contests_DoorCloseAnimation
+    PokemonFollowerEndCutscene
     Return
 
 Contests_ReturnToReceptionist:
@@ -200,7 +200,6 @@ Contests_AskEnterContest:
     Message ContestCommon_Text_EnterPokemonInAContest
     GoTo Contests_ContestMenu
 
-
 #define MENU_ENTRY_ENTER 0
 #define MENU_ENTRY_INFO 1
 #define MENU_ENTRY_EXIT 2
@@ -256,7 +255,6 @@ Contests_ContestInfo:
 Contests_LinkContestInfo:
     Message ContestCommon_Text_ExplainLinkContest
     GoTo Contests_AskEnterContest
-
 
 #define MENU_ENTRY_CONTEST_BASICS 0
 #define MENU_ENTRY_TYPES_OF_CONTESTS 1
@@ -337,7 +335,6 @@ Contests_OfficialContestInfoActingCompetition:
     GoTo Contests_OfficialContestInfoBasicsMenuReentry
     End
 
-
 #define MENU_ENTRY_NORMAL_RANK 0
 #define MENU_ENTRY_GREAT_RANK 1
 #define MENU_ENTRY_ULTRA_RANK 2
@@ -380,7 +377,6 @@ Contests_OfficialContestMasterRank:
     SetVar VAR_0x8004, CONTEST_RANK_MASTER
     GoTo Contests_OfficialContestTypeMenu
     End
-
 
 #define MENU_ENTRY_COOL 0
 #define MENU_ENTRY_BEAUTY 1
@@ -478,7 +474,6 @@ Contests_OfficialContestStart:
     GoTo Contests_StartContest
     End
 
-
 #define MENU_ENTRY_JOIN_GROUP 0
 #define MENU_ENTRY_BECOME_LEADER 1
 #define MENU_ENTRY_ESTABLISH_GROUP_EXIT 2
@@ -552,6 +547,9 @@ Contests_StartContest:
     StartContestCommSync 25
     WaitForCommSyncState 25
     CloseMessage
+
+Contests_PokemonFollower1:
+    PokemonFollowerStartCutscene
 Contests_SelectContestDoor:
     GoToIfEq VAR_MAP_LOCAL_0x03, CONTEST_MODE_OFFICIAL, Contests_OfficialContestDoor
     GoToIfEq VAR_MAP_LOCAL_0x03, CONTEST_MODE_LINK, Contests_LinkContestDoor
@@ -567,7 +565,7 @@ Contests_RegisteredForPractice:
     BufferContestantTrainerName VAR_RESULT, 0
     BufferContestantMonName VAR_RESULT, 1
     CloseMessage
-    GoTo Contests_SelectContestDoor
+    GoTo Contests_PokemonFollower1
 
 Contests_SetupLinkContest:
     Message ContestCommon_Text_CommunicatingStandBy
@@ -1029,7 +1027,6 @@ Contests_ReceptionistPracticeContest:
     GoTo Contests_PracticeContestMenu
     End
 
-
 #define MENU_ENTRY_PRACTICE_JOIN 0
 #define MENU_ENTRY_PRACTICE_INFO 1
 #define MENU_ENTRY_PRACTICE_EXIT 2
@@ -1047,7 +1044,6 @@ Contests_PracticeContestMenu:
     GoToIfEq VAR_0x8008, MENU_ENTRY_PRACTICE_EXIT, Contests_PracticeContestExit
     GoTo Contests_PracticeContestExit
     End
-
 
 #define MENU_ENTRY_PRACTICE_VISUAL 0
 #define MENU_ENTRY_PRACTICE_DANCE 1
@@ -1324,7 +1320,6 @@ Contests_PracticeContestInfoDancePanel:
 Contests_PracticeContestInfoDanceReturn:
     GoTo Contests_PracticeContestInfoMenu
     End
-
 
 #define MENU_ENTRY_ACTING_INFO_OVERALL_FLOW 0
 #define MENU_ENTRY_ACTING_INFO_CONTEST_MOVES 1

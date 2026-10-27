@@ -112,6 +112,7 @@ Route201_GoIntoTallGrass:
     WaitTime 15, VAR_RESULT
     ApplyMovement LOCALID_RIVAL, Route201_Movement_RivalRunTowardsGrass
     ApplyMovement LOCALID_PLAYER, Route201_Movement_PlayerWatchRivalRunTowardsGrass
+    FadeOutBGM 0, 15
     WaitMovement
     Message Route201_Text_HoldIt
     CloseMessage
@@ -204,11 +205,12 @@ Route201_WeStillLovePokemon:
     CloseMessage
     ApplyMovement LOCALID_PROF_ROWAN, Route201_Movement_ProfRowanLookAround
     WaitMovement
-    WaitTime 25, VAR_RESULT
+    FadeOutBGM 0, 20
+    WaitTime 22, VAR_RESULT
+    CallCommonScript 2040
     ClearFlag FLAG_HIDE_ROUTE_201_COUNTERPART
     AddObject LOCALID_COUNTERPART
     LockObject LOCALID_COUNTERPART
-    Common_SetCounterpartBGM
     ApplyMovement LOCALID_COUNTERPART, Route201_Movement_CounterpartEnter
     WaitMovement
     GetPlayerGender VAR_RESULT
@@ -279,6 +281,31 @@ Route201_Briefcase:
     RemoveObject LOCALID_BRIEFCASE
     StartChooseStarterScene
     SaveChosenStarter
+    GetPlayerStarterSpecies VAR_RESULT
+    SetVarFromVar VAR_0x8008, VAR_RESULT
+    GoToIfEq VAR_0x8008, 387, Route201_PokemonFollower1
+    GoToIfEq VAR_0x8008, 390, Route201_PokemonFollower2
+    GoTo Route201_PokemonFollower3
+
+Route201_PokemonFollower1:
+    SetVarFromValue VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_FOLLOWER_CHIMCHAR
+    SetVarFromValue VAR_OBJ_GFX_ID_2, OBJ_EVENT_GFX_FOLLOWER_TURTWIG
+    SetVarFromValue VAR_0x8006, 390
+    GoTo Route201_PokemonFollower4
+
+Route201_PokemonFollower2:
+    SetVarFromValue VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_FOLLOWER_PIPLUP
+    SetVarFromValue VAR_OBJ_GFX_ID_2, OBJ_EVENT_GFX_FOLLOWER_CHIMCHAR
+    SetVarFromValue VAR_0x8006, 393
+    GoTo Route201_PokemonFollower4
+
+Route201_PokemonFollower3:
+    SetVarFromValue VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_FOLLOWER_TURTWIG
+    SetVarFromValue VAR_OBJ_GFX_ID_2, OBJ_EVENT_GFX_FOLLOWER_PIPLUP
+    SetVarFromValue VAR_0x8006, 387
+    GoTo Route201_PokemonFollower4
+
+Route201_PokemonFollower4:
     ReturnToField
     FadeScreenIn
     WaitFadeScreen
@@ -336,9 +363,30 @@ Route201_CounterpartLeave:
     BufferRivalName 0
     Message Route201_Text_ProfRowansReallyNice
     CloseMessage
-    WaitTime 40, VAR_RESULT
+    WaitTime 20, VAR_RESULT
+    ApplyMovement LOCALID_RIVAL, Route201_Movement_PokemonFollower5
+    ApplyMovement LOCALID_PLAYER, Route201_Movement_PokemonFollower6
+    WaitMovement
+    ClearFlag FLAG_HIDE_ROUTE_201_COUNTERPART
+    SetObjectEventPos LOCALID_RIVAL_STARTER, 113, 852
+    AddObject LOCALID_RIVAL_STARTER
+    HideObject LOCALID_RIVAL_STARTER
+    PlayPokeBallAnimation LOCALID_RIVAL_STARTER, VAR_0x8006, 0
+    WaitTime 10, VAR_RESULT
+    ApplyMovement LOCALID_PLAYER, Route201_Movement_PokemonFollower7
+    WaitMovement
+    WaitTime 10, VAR_RESULT
+    SetObjectEventPos LOCALID_PLAYER_STARTER, 114, 854
+    AddObject LOCALID_PLAYER_STARTER
+    HideObject LOCALID_PLAYER_STARTER
+    PlayPokeBallAnimation LOCALID_PLAYER_STARTER, VAR_0x8000, 0
+    SetFlag FLAG_HIDE_ROUTE_201_COUNTERPART
+    WaitTime 20, VAR_RESULT
+    ApplyMovement LOCALID_PLAYER_STARTER, Route201_Movement_PlayerFaceRivalRightPlayer
+    WaitMovement
     ApplyMovement LOCALID_RIVAL, Route201_Movement_RivalRunToPlayerForBattle
     ApplyMovement LOCALID_PLAYER, Route201_Movement_PlayerFaceRivalForBattle
+    ApplyMovement LOCALID_RIVAL_STARTER, Route201_Movement_PokemonFollower8
     WaitMovement
     GoTo Route201_AskUpForABattle
     End
@@ -405,6 +453,8 @@ Route201_EndChooseStarterSequenceAndWarpHome:
     WaitFadeScreen
     HealParty
     Warp MAP_HEADER_TWINLEAF_TOWN_PLAYER_HOUSE_1F, 2, 6, DIR_NORTH
+    PokemonFollowerPlaceNearPlayer 2, 3
+    ShowPokemonFollower
     FadeScreenIn FADE_SCREEN_SPEED_MEDIUM
     WaitFadeScreen
     ReleaseAll
@@ -577,6 +627,35 @@ Route201_Movement_RivalRunToPlayerForBattle:
     WalkOnSpotFastSouth 8
     WalkFastWest
     WalkFastSouth
+    EndMovement
+
+    .balign 4, 0
+Route201_Movement_PokemonFollower5:
+    Delay8
+    WalkOnSpotFastWest
+    EndMovement
+
+    .balign 4, 0
+Route201_Movement_PokemonFollower7:
+    Delay8
+    FaceEast
+    EndMovement
+
+    .balign 4, 0
+Route201_Movement_PokemonFollower6:
+    Delay8 2
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+Route201_Movement_PokemonFollower8:
+    Delay8 8
+    FaceEast
+    LockDir
+    JumpNearFastWest
+    UnlockDir
+    FaceSouth
+
     EndMovement
 
     .balign 4, 0
@@ -1045,6 +1124,8 @@ Route201_EndDPProfRowanScene_Unused:
     FadeScreenOut FADE_SCREEN_SPEED_MEDIUM
     WaitFadeScreen
     Warp MAP_HEADER_TWINLEAF_TOWN_PLAYER_HOUSE_1F, 2, 6, DIR_NORTH
+    PokemonFollowerPlaceNearPlayer 2, 3
+    ShowPokemonFollower
     FadeScreenIn FADE_SCREEN_SPEED_MEDIUM
     WaitFadeScreen
     ReleaseAll
@@ -1233,6 +1314,7 @@ Route201_SetRivalPartner:
     Message Route201_Text_NothingToFear
     WaitButton
     CloseMessage
+    PokemonFollowerStartCutscene
     SetVar VAR_FOLLOWER_RIVAL_STATE, 3
     SetStepFlag
     SetHasPartner

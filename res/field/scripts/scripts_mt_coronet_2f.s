@@ -2,7 +2,6 @@
 #include "res/text/bank/mt_coronet_2f.h"
 #include "res/field/events/events_mt_coronet_2f.h"
 
-
     ScriptEntry MtCoronet2F_CavePainting
     ScriptEntry MtCoronet2F_CoordEvent_Looker
     ScriptEntry MtCoronet2F_Looker
@@ -29,14 +28,20 @@ MtCoronet2F_CoordEvent_Looker:
     ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_LookerNoticePlayer
     WaitMovement
     Common_SetLookerBGM
-    CallIfEq VAR_0x8005, 24, MtCoronet2F_LookerWalkToPlayerZ24
-    CallIfEq VAR_0x8005, 25, MtCoronet2F_LookerWalkToPlayerZ25
-    CallIfEq VAR_0x8005, 26, MtCoronet2F_LookerWalkToPlayerZ26
+    CallIfEq VAR_0x8005, 24, MtCoronet2F_PokemonFollower1
+    CallIfEq VAR_0x8005, 25, MtCoronet2F_PokemonFollower2
+    CallIfEq VAR_0x8005, 26, MtCoronet2F_PokemonFollower3
     Message MtCoronet2F_Text_ObserveThatHole
     ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_LookerWalkOnSpotSouth
     WaitMovement
     Message MtCoronet2F_Text_AreYouEnoughToAdvance
-    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_LookerWalkOnSpotWest
+    GoToIfEq VAR_0x8005, 26, MtCoronet2F_PokemonFollower4
+    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_PokemonFollower5
+    GoTo MtCoronet2F_PokemonFollower6
+
+MtCoronet2F_PokemonFollower4:
+    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_PokemonFollower7
+MtCoronet2F_PokemonFollower6:
     WaitMovement
     Message MtCoronet2F_Text_YouAreFarSuperiorToMe
     SetVar VAR_0x8004, ITEM_BLACK_FLUTE
@@ -67,21 +72,24 @@ MtCoronet2F_YourBagItIsFull:
     CloseMessage
     Return
 
+MtCoronet2F_PokemonFollower1:
+    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_PokemonFollower8
 MtCoronet2F_LookerWalkToPlayerZ24:
-    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_LookerWalkToPlayerZ24
     ApplyMovement LOCALID_PLAYER, MtCoronet2F_Movement_PlayerFaceLooker
     WaitMovement
     Return
 
+MtCoronet2F_PokemonFollower2:
+    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_PokemonFollower9
 MtCoronet2F_LookerWalkToPlayerZ25:
-    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_LookerWalkToPlayerZ25
     ApplyMovement LOCALID_PLAYER, MtCoronet2F_Movement_PlayerFaceLooker
     WaitMovement
     Return
 
+MtCoronet2F_PokemonFollower3:
+    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_PokemonFollower10
+    ApplyMovement LOCALID_PLAYER, MtCoronet2F_Movement_PokemonFollower11
 MtCoronet2F_LookerWalkToPlayerZ26:
-    ApplyMovement LOCALID_LOOKER, MtCoronet2F_Movement_LookerWalkToPlayerZ26
-    ApplyMovement LOCALID_PLAYER, MtCoronet2F_Movement_PlayerFaceLooker
     WaitMovement
     Return
 
@@ -94,22 +102,33 @@ MtCoronet2F_Movement_LookerNoticePlayer:
     EndMovement
 
     .balign 4, 0
+MtCoronet2F_Movement_PokemonFollower8:
+    WalkFastWest 5
+    WalkOnSpotFastNorth
+    EndMovement
+
+    .balign 4, 0
+MtCoronet2F_Movement_PokemonFollower9:
+    WalkFastWest
+    WalkFastSouth
+
+    .balign 4, 0
 MtCoronet2F_Movement_LookerWalkToPlayerZ24:
     WalkFastWest 4
-    WalkFastNorth
-    WalkOnSpotFastWest
+    WalkOnSpotFastNorth
+
     EndMovement
+
+    .balign 4, 0
+MtCoronet2F_Movement_PokemonFollower10:
+    WalkFastWest 5
+    WalkOnSpotFastSouth
 
     .balign 4, 0
 MtCoronet2F_Movement_LookerWalkToPlayerZ25:
-    WalkFastWest 4
-    EndMovement
 
     .balign 4, 0
 MtCoronet2F_Movement_LookerWalkToPlayerZ26:
-    WalkFastWest 4
-    WalkFastSouth
-    WalkOnSpotFastWest
     EndMovement
 
     .balign 4, 0
@@ -118,14 +137,29 @@ MtCoronet2F_Movement_LookerWalkOnSpotSouth:
     EndMovement
 
     .balign 4, 0
+MtCoronet2F_Movement_PokemonFollower5:
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+MtCoronet2F_Movement_PokemonFollower7:
+    WalkOnSpotNormalSouth
+
+    .balign 4, 0
 MtCoronet2F_Movement_LookerWalkOnSpotWest:
-    WalkOnSpotNormalWest
     EndMovement
 
     .balign 4, 0
 MtCoronet2F_Movement_PlayerFaceLooker:
     Delay8 4
-    WalkOnSpotNormalEast
+    WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+MtCoronet2F_Movement_PokemonFollower11:
+    Delay8 4
+    WalkOnSpotNormalNorth
+
     EndMovement
 
 MtCoronet2F_Looker:

@@ -5018,6 +5018,82 @@
     .short \destVarID
     .endm
 
+    .macro SetAllowTwoPokemonCries allow
+    .short SCRCMD_SETALLOWTWOPOKEMONCRIES
+    .short \allow
+    .endm
+
+    .macro PokemonFollowerStartCutscene
+    .short SCRCMD_POKEMONFOLLOWERSTARTCUTSCENE
+    .endm
+
+    .macro PokemonFollowerSetPaused paused
+    .short SCRCMD_POKEMONFOLLOWERSETPAUSED
+    .short \paused
+    .endm
+
+    .macro WaitForPokemonFollower
+    .short SCRCMD_WAITFORPOKEMONFOLLOWER
+    .endm
+
+    .macro PokemonFollowerSetMovementType movementType
+    .short SCRCMD_POKEMONFOLLOWERSETMOVEMENTTYPE
+    .short \movementType
+    .endm
+
+    .macro PokemonFollowerPlaceNearPlayer xOffset, zOffset
+    .short SCRCMD_POKEMONFOLLOWERPLACENEARPLAYER
+    .byte \xOffset
+    .byte \zOffset
+    .endm
+
+    .macro PokemonFollowerEndCutscene
+    .short SCRCMD_POKEMONFOLLOWERENDCUTSCENE
+    .endm
+
+    .macro PokemonFollowerResumeFollowing
+    .short SCRCMD_POKEMONFOLLOWERRESUMEFOLLOWING
+    .endm
+
+    .macro PokemonFollowerRespawn
+    .short SCRCMD_POKEMONFOLLOWERRESPAWN
+    .endm
+
+    .macro HidePokemonFollower
+    .short SCRCMD_HIDEPOKEMONFOLLOWER
+    .endm
+
+    .macro ShowPokemonFollower
+    .short SCRCMD_SHOWPOKEMONFOLLOWER
+    .endm
+
+    .macro PlayPokeBallAnimation localID, partySlot, mode
+    .short SCRCMD_PLAYPOKEBALLANIMATION
+    .short \localID
+    .short \partySlot
+    .short \mode
+    .endm
+
+    .macro PokemonFollowerHappyHop
+    .short SCRCMD_POKEMONFOLLOWERHAPPYHOP
+    .endm
+
+    .macro GetPartyMonFollowerGfx partySlot, destVarID
+    .short SCRCMD_GETPARTYMONFOLLOWERGFX
+    .short \partySlot
+    .short \destVarID
+    .endm
+
+    .macro CheckPokemonFollowerActive destVarID
+    .short SCRCMD_CHECKPOKEMONFOLLOWERACTIVE
+    .short \destVarID
+    .endm
+
+    .macro GetPokemonFollowerDirFromPlayer destVarID
+    .short SCRCMD_GETPOKEMONFOLLOWERDIRFROMPLAYER
+    .short \destVarID
+    .endm
+
 
 
     .macro GoToIfLt varID, valueOrVarID, offset

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/sunyshore_city.h"
 #include "res/field/events/events_sunyshore_city.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry SunyshoreCity_OnFrame_Flint
     ScriptEntry SunyshoreCity_Dummy2
@@ -44,18 +44,20 @@ SunyshoreCity_SetFlintPositionAtGate:
 SunyshoreCity_CoordEvent_RivalAndJasmine:
     LockAll
     ApplyMovement LOCALID_JASMINE, SunyshoreCity_Movement_JasmineNoticePlayer
-    WaitMovement
     ClearFlag FLAG_HIDE_SUNYSHORE_CITY_RIVAL
     AddObject LOCALID_RIVAL
     LockObject LOCALID_RIVAL
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    GoToIfEq VAR_0x8004, 853, SunyshoreCity_RivalEnterX853
-    GoToIfEq VAR_0x8004, 854, SunyshoreCity_RivalEnterX854
-    GoToIfEq VAR_0x8004, 855, SunyshoreCity_RivalEnterX855
-    GoToIfEq VAR_0x8004, 856, SunyshoreCity_RivalEnterX856
-    GoToIfEq VAR_0x8004, 857, SunyshoreCity_RivalEnterX857
+    GoToIfEq VAR_0x8004, 853, SunyshoreCity_PokemonFollower1
+    GoToIfEq VAR_0x8004, 854, SunyshoreCity_PokemonFollower2
+    GoToIfEq VAR_0x8004, 855, SunyshoreCity_PokemonFollower3
+    GoToIfEq VAR_0x8004, 856, SunyshoreCity_PokemonFollower4
+    GoToIfEq VAR_0x8004, 857, SunyshoreCity_PokemonFollower5
     End
 
+SunyshoreCity_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower6
+    WaitTime 46, VAR_RESULT
 SunyshoreCity_RivalEnterX853:
     ApplyMovement LOCALID_RIVAL, SunyshoreCity_Movement_RivalEnterX853
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchRivalEnterWest
@@ -63,6 +65,9 @@ SunyshoreCity_RivalEnterX853:
     GoTo SunyshoreCity_RivalAndJasmine
     End
 
+SunyshoreCity_PokemonFollower2:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower6
+    WaitTime 46, VAR_RESULT
 SunyshoreCity_RivalEnterX854:
     ApplyMovement LOCALID_RIVAL, SunyshoreCity_Movement_RivalEnterX854
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchRivalEnterWest
@@ -70,6 +75,9 @@ SunyshoreCity_RivalEnterX854:
     GoTo SunyshoreCity_RivalAndJasmine
     End
 
+SunyshoreCity_PokemonFollower3:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower7
+    WaitTime 46, VAR_RESULT
 SunyshoreCity_RivalEnterX855:
     ApplyMovement LOCALID_RIVAL, SunyshoreCity_Movement_RivalEnterX855
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchRivalEnterX855
@@ -77,6 +85,9 @@ SunyshoreCity_RivalEnterX855:
     GoTo SunyshoreCity_RivalAndJasmine
     End
 
+SunyshoreCity_PokemonFollower4:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower7
+    WaitTime 46, VAR_RESULT
 SunyshoreCity_RivalEnterX856:
     ApplyMovement LOCALID_RIVAL, SunyshoreCity_Movement_RivalEnterX856
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchRivalEnterEast
@@ -84,12 +95,51 @@ SunyshoreCity_RivalEnterX856:
     GoTo SunyshoreCity_RivalAndJasmine
     End
 
+SunyshoreCity_PokemonFollower5:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower7
+    WaitTime 46, VAR_RESULT
 SunyshoreCity_RivalEnterX857:
     ApplyMovement LOCALID_RIVAL, SunyshoreCity_Movement_RivalEnterX857
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchRivalEnterEast
     WaitMovement
     GoTo SunyshoreCity_RivalAndJasmine
     End
+
+    .balign 4, 0
+SunyshoreCity_Movement_PokemonFollower6:
+    Delay4
+    JumpOnSpotFastSouth
+    FollowerEmoteExclamation
+    WalkFastEast
+    WalkFastNorth 2
+    WalkFastWest
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+SunyshoreCity_Movement_PokemonFollower7:
+    Delay4
+    JumpOnSpotFastSouth
+    FollowerEmoteExclamation
+    WalkFastWest
+    WalkFastNorth 2
+    WalkFastEast
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+SunyshoreCity_Movement_PokemonFollower11:
+    WalkNormalEast
+    WalkNormalSouth
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+SunyshoreCity_Movement_PokemonFollower12:
+    WalkNormalWest
+    WalkNormalSouth
+    FaceNorth
+    EndMovement
 
 SunyshoreCity_RivalAndJasmine:
     BufferRivalName 0
@@ -113,9 +163,9 @@ SunyshoreCity_RivalAndJasmine:
     RemoveObject LOCALID_RIVAL
     CallIfEq VAR_0x8004, 853, SunyshoreCity_JasmineWalkToPlayerX853
     CallIfEq VAR_0x8004, 854, SunyshoreCity_JasmineWalkToPlayerX854
-    CallIfEq VAR_0x8004, 855, SunyshoreCity_JasmineWalkToPlayerX855
-    CallIfEq VAR_0x8004, 856, SunyshoreCity_JasmineWalkToPlayerX856
-    CallIfEq VAR_0x8004, 857, SunyshoreCity_JasmineWalkToPlayerX857
+    CallIfEq VAR_0x8004, 855, SunyshoreCity_PokemonFollower8
+    CallIfEq VAR_0x8004, 856, SunyshoreCity_PokemonFollower9
+    CallIfEq VAR_0x8004, 857, SunyshoreCity_PokemonFollower10
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWalkOnSpotNorth
     WaitMovement
     Message SunyshoreCity_Text_HaveThisAsMyThanks
@@ -186,24 +236,37 @@ SunyshoreCity_RivalLeaveX857:
 
 SunyshoreCity_JasmineWalkToPlayerX853:
     ApplyMovement LOCALID_JASMINE, SunyshoreCity_Movement_JasmineWalkToPlayerX853
+    WaitTime 4, VAR_RESULT
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower11
     WaitMovement
     Return
 
 SunyshoreCity_JasmineWalkToPlayerX854:
     ApplyMovement LOCALID_JASMINE, SunyshoreCity_Movement_JasmineWalkToPlayerX854
+    WaitTime 4, VAR_RESULT
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower11
     WaitMovement
     Return
 
+SunyshoreCity_PokemonFollower8:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower11
+    WaitTime 4, VAR_RESULT
 SunyshoreCity_JasmineWalkToPlayerX855:
     ApplyMovement LOCALID_JASMINE, SunyshoreCity_Movement_JasmineWalkToPlayerX855
     WaitMovement
     Return
 
+SunyshoreCity_PokemonFollower9:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower12
+    WaitTime 4, VAR_RESULT
 SunyshoreCity_JasmineWalkToPlayerX856:
     ApplyMovement LOCALID_JASMINE, SunyshoreCity_Movement_JasmineWalkToPlayerX856
     WaitMovement
     Return
 
+SunyshoreCity_PokemonFollower10:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SunyshoreCity_Movement_PokemonFollower12
+    WaitTime 8, VAR_RESULT
 SunyshoreCity_JasmineWalkToPlayerX857:
     ApplyMovement LOCALID_JASMINE, SunyshoreCity_Movement_JasmineWalkToPlayerX857
     WaitMovement
@@ -636,25 +699,37 @@ SunyshoreCity_VolknerFinallyCameBack:
     CloseMessage
     WaitTime 15, VAR_RESULT
     GetPlayerDir VAR_RESULT
-    GoToIfEq VAR_RESULT, DIR_NORTH, SunyshoreCity_FlintLeaveNorth
-    GoToIfEq VAR_RESULT, DIR_WEST, SunyshoreCity_FlintLeaveWest
-    GoToIfEq VAR_RESULT, DIR_EAST, SunyshoreCity_FlintLeaveEast
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    CompareVarToValue VAR_RESULT, 0
+    GoToIf 1, SunyshoreCity_PokemonFollower13
+    GoToIfEq VAR_RESULT, DIR_WEST, SunyshoreCity_PokemonFollower14
+    GoToIfEq VAR_RESULT, DIR_EAST, SunyshoreCity_PokemonFollower15
     End
 
-SunyshoreCity_FlintLeaveNorth:
+SunyshoreCity_PokemonFollower13:
+    GoToIfEq VAR_0x8004, 846, SunyshoreCity_PokemonFollower16
     ApplyMovement LOCALID_FLINT, SunyshoreCity_Movement_FlintLeaveNorth
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchFlintLeaveNorthEast
     WaitMovement
     GoTo SunyshoreCity_RemoveVolkner
 
-SunyshoreCity_FlintLeaveWest:
-    ApplyMovement LOCALID_FLINT, SunyshoreCity_Movement_FlintLeaveWestEast
+SunyshoreCity_PokemonFollower16:
+    ApplyMovement LOCALID_FLINT, SunyshoreCity_Movement_PokemonFollower17
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchFlintLeaveWest
+SunyshoreCity_FlintLeaveNorth:
     WaitMovement
     GoTo SunyshoreCity_RemoveVolkner
 
+SunyshoreCity_PokemonFollower14:
+    ApplyMovement LOCALID_FLINT, SunyshoreCity_Movement_PokemonFollower18
+    ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PokemonFollower19
+SunyshoreCity_FlintLeaveWest:
+    WaitMovement
+    GoTo SunyshoreCity_RemoveVolkner
+
+SunyshoreCity_PokemonFollower15:
+    ApplyMovement LOCALID_FLINT, SunyshoreCity_Movement_PokemonFollower20
 SunyshoreCity_FlintLeaveEast:
-    ApplyMovement LOCALID_FLINT, SunyshoreCity_Movement_FlintLeaveWestEast
     ApplyMovement LOCALID_PLAYER, SunyshoreCity_Movement_PlayerWatchFlintLeaveNorthEast
     WaitMovement
     GoTo SunyshoreCity_RemoveVolkner
@@ -667,14 +742,34 @@ SunyshoreCity_RemoveVolkner:
     .balign 4, 0
 SunyshoreCity_Movement_FlintLeaveNorth:
     WalkNormalEast
-    WalkNormalSouth 2
-    WalkNormalEast 8
+    WalkNormalSouth
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast 7
     EndMovement
 
     .balign 4, 0
-SunyshoreCity_Movement_FlintLeaveWestEast:
-    WalkNormalSouth 2
+SunyshoreCity_Movement_PokemonFollower17:
+    WalkNormalWest
+    WalkNormalSouth 3
     WalkNormalEast 9
+    EndMovement
+
+    .balign 4, 0
+SunyshoreCity_Movement_PokemonFollower18:
+    WalkNormalSouth 3
+    WalkNormalEast 9
+    EndMovement
+
+    .balign 4, 0
+SunyshoreCity_Movement_PokemonFollower20:
+    WalkNormalEast
+
+    WalkNormalSouth 2
+    WalkNormalEast 8
+
+    .balign 4, 0
+SunyshoreCity_Movement_FlintLeaveWestEast:
     EndMovement
 
     .balign 4, 0
@@ -686,6 +781,17 @@ SunyshoreCity_Movement_PlayerWatchFlintLeaveNorthEast:
     .balign 4, 0
 SunyshoreCity_Movement_PlayerWatchFlintLeaveWest:
     Delay8
+    WalkOnSpotNormalWest
+    Delay8 3
+    WalkOnSpotNormalSouth
+    Delay8 2
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+SunyshoreCity_Movement_PokemonFollower19:
+    Delay8
+
     WalkOnSpotNormalSouth
     WalkOnSpotNormalEast
     EndMovement

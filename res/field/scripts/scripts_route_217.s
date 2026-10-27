@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_217.h"
 #include "res/field/events/events_route_217.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route217_IceRock
     ScriptEntry Route217_ArrowSignpostLakeAcuity
@@ -32,8 +32,7 @@ Route217_CoordEvent_Maylene:
     Message Route217_Text_OhPlayer
     CloseMessage
     ApplyMovement LOCALID_PLAYER, Route217_Movement_PlayerWalkOnSpotSouth
-    WaitMovement
-    ApplyMovement LOCALID_MAYLENE, Route217_Movement_MayleneWalkNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route217_Movement_PokemonFollower1
     WaitMovement
     Message Route217_Text_GoingToSnowpointCity
     CloseMessage
@@ -58,12 +57,14 @@ Route217_MayleneEnterX303:
 
 Route217_MayleneLeaveX302:
     ApplyMovement LOCALID_PLAYER, Route217_Movement_PlayerWatchMayleneLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route217_Movement_PokemonFollower2
     ApplyMovement LOCALID_MAYLENE, Route217_Movement_MayleneLeaveX302
     WaitMovement
     Return
 
 Route217_MayleneLeaveX303:
     ApplyMovement LOCALID_PLAYER, Route217_Movement_PlayerWatchMayleneLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route217_Movement_PokemonFollower2
     ApplyMovement LOCALID_MAYLENE, Route217_Movement_MayleneLeaveX303
     WaitMovement
     Return
@@ -71,12 +72,30 @@ Route217_MayleneLeaveX303:
     .balign 4, 0
 Route217_Movement_PlayerWalkOnSpotSouth:
     WalkOnSpotNormalSouth
+    Delay4
+    WalkNormalSouth
+    EndMovement
+
+    .balign 4, 0
+Route217_Movement_PokemonFollower1:
+    Delay8
+    Delay4
+    WalkNormalNorth
+    FaceSouth
+
     EndMovement
 
     .balign 4, 0
 Route217_Movement_PlayerWatchMayleneLeave:
     Delay8 2
     Delay4
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+Route217_Movement_PokemonFollower2:
+    Delay8 3
+
     WalkOnSpotNormalNorth
     EndMovement
 
@@ -98,13 +117,12 @@ Route217_Movement_MayleneEnterX303:
 
     .balign 4, 0
 Route217_Movement_MayleneWalkNorth:
-    WalkNormalNorth
-    EndMovement
 
     .balign 4, 0
 Route217_Movement_MayleneLeaveX302:
     WalkNormalEast
-    WalkNormalNorth 3
+    WalkNormalNorth 4
+
     WalkNormalEast 2
     WalkNormalNorth 9
     EndMovement
@@ -112,7 +130,8 @@ Route217_Movement_MayleneLeaveX302:
     .balign 4, 0
 Route217_Movement_MayleneLeaveX303:
     WalkNormalWest
-    WalkNormalNorth 3
+    WalkNormalNorth 4
+
     WalkNormalEast 3
     WalkNormalNorth 9
     EndMovement

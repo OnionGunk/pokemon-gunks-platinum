@@ -2,7 +2,7 @@
 #include "res/text/bank/eterna_city.h"
 #include "res/text/bank/special_met_location_names.h"
 #include "res/field/events/events_eterna_city.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry EternaCity_CoordEvent_CynthiaGiveCut
     ScriptEntry EternaCity_GruntM1
@@ -171,7 +171,7 @@ EternaCity_CynthiaGiveCut:
     AddObject LOCALID_CYNTHIA
     LockObject LOCALID_CYNTHIA
     CallIfEq VAR_0x8005, 522, EternaCity_EnterCynthiaForGiveCutZ522
-    CallIfNe VAR_0x8005, 522, EternaCity_EnterCynthiaForGiveCutNotZ522
+    CallIfNe VAR_0x8005, 522, EternaCity_PokemonFollower1
     BufferPlayerName 0
     Message EternaCity_Text_OhYouHaveAPokedex
     CloseMessage
@@ -187,7 +187,7 @@ EternaCity_CynthiaGiveCut:
     GoToIfEq VAR_0x8005, 522, EternaCity_CynthiaLeaveAfterCutZ522
     GoToIfEq VAR_0x8005, 523, EternaCity_CynthiaLeaveAfterCutZ523
     GoToIfEq VAR_0x8005, 524, EternaCity_CynthiaLeaveAfterCutZ524
-    GoToIfEq VAR_0x8005, 525, EternaCity_CynthiaLeaveAfterCutZ525
+    GoToIfEq VAR_0x8005, 525, EternaCity_PokemonFollower2
     End
 
 EternaCity_CynthiaLeaveAfterCutZ522:
@@ -198,13 +198,22 @@ EternaCity_CynthiaLeaveAfterCutZ522:
 
 EternaCity_EnterCynthiaForGiveCutZ522:
     ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_CynthiaNoticeAndWalkUpToPlayerZ522
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    GoToIfNe VAR_0x8007, 523, EternaCity_PokemonFollower3
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower4
+EternaCity_PokemonFollower3:
     WaitMovement
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWalkOnSpotSouth
     WaitMovement
     Return
 
+EternaCity_PokemonFollower1:
+    GetPlayerDir VAR_RESULT
 EternaCity_EnterCynthiaForGiveCutNotZ522:
     ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_CynthiaNoticeAndWalkUpToPlayerNotZ522
+    GoToIfEq VAR_RESULT, 3, EternaCity_PokemonFollower5
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower6
+EternaCity_PokemonFollower5:
     WaitMovement
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWalkOnSpotEast
     WaitMovement
@@ -255,8 +264,9 @@ EternaCity_CynthiaLeaveAfterCutZ524:
     GoTo EternaCity_CynthiaGiveCutEnd
     End
 
+EternaCity_PokemonFollower2:
+    ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_PokemonFollower7
 EternaCity_CynthiaLeaveAfterCutZ525:
-    ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_CynthiaLeaveAfterCutZ525
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWatchCynthiaLeaveAfterCutNotZ522
     WaitMovement
     GoTo EternaCity_CynthiaGiveCutEnd
@@ -330,10 +340,14 @@ EternaCity_Movement_CynthiaLeaveAfterCutZ524:
     EndMovement
 
     .balign 4, 0
+EternaCity_Movement_PokemonFollower7:
+    WalkNormalNorth 2
+
+    .balign 4, 0
 EternaCity_Movement_CynthiaLeaveAfterCutZ525:
-    WalkNormalNorth
     WalkNormalWest 6
-    WalkNormalSouth 11
+    WalkNormalSouth 12
+
     EndMovement
 
     .balign 4, 0
@@ -344,6 +358,27 @@ EternaCity_Movement_PlayerWalkOnSpotSouth:
     .balign 4, 0
 EternaCity_Movement_PlayerWalkOnSpotEast:
     WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower4:
+    Delay8 6
+    FaceEast
+    Delay8 4
+    WalkNormalEast
+    WalkNormalNorth
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower6:
+    Delay8 6
+    FaceEast
+    Delay8 3
+    WalkNormalNorth
+    WalkNormalWest
+    FaceEast
+
     EndMovement
 
     .balign 4, 0
@@ -413,6 +448,7 @@ EternaCity_CoordEvent_BlockExitSouth:
     CallIfEq VAR_0x8004, 306, EternaCity_PokemonBreederFMoveBackX306
     CallIfEq VAR_0x8004, 307, EternaCity_PokemonBreederFMoveBackX307
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWalkNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower8
     WaitMovement
     ReleaseAll
     End
@@ -542,6 +578,11 @@ EternaCity_Movement_PlayerWalkNorth:
     WalkNormalNorth
     EndMovement
 
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower8:
+    WalkNormalSouth
+    EndMovement
+
 EternaCity_BugCatcher2:
     PlaySE SE_CONFIRM_sseq_3
     LockAll
@@ -599,18 +640,21 @@ EternaCity_BugCatcher2BlockExitWestZ534:
 EternaCity_PushBackPlayerZ532:
     ApplyMovement LOCALID_BUG_CATCHER_2, EternaCity_Movement_BugCatcher2PushPlayerAndMoveBackZ532
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerGetPushedBack
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower9
     WaitMovement
     Return
 
 EternaCity_PushBackPlayerZ533:
     ApplyMovement LOCALID_BUG_CATCHER_2, EternaCity_Movement_BugCatcher2PushPlayerAndMoveBackZ533
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerGetPushedBack
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower9
     WaitMovement
     Return
 
 EternaCity_PushBackPlayerZ534:
     ApplyMovement LOCALID_BUG_CATCHER_2, EternaCity_Movement_BugCatcher2PushPlayerAndMoveBackZ534
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerGetPushedBack
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower9
     WaitMovement
     Return
 
@@ -618,6 +662,12 @@ EternaCity_PushBackPlayerZ534:
 EternaCity_Movement_PlayerGetPushedBack:
     WalkNormalEast
     WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower9:
+    WalkNormalEast
+
     EndMovement
 
     .balign 4, 0
@@ -719,21 +769,27 @@ EternaCity_CoordEvent_Rival:
 EternaCity_RivalRunIntoPlayerZ523:
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalRunIntoPlayerZ523
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerGetPushedByRivalZ523
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower10
     WaitMovement
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower11
     GoTo EternaCity_YouCameToSeeStatue
     End
 
 EternaCity_RivalRunIntoPlayerZ524:
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalRunIntoPlayerZ524
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerGetPushedByRivalZ524
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower12
     WaitMovement
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower13
     GoTo EternaCity_YouCameToSeeStatue
     End
 
 EternaCity_RivalRunIntoPlayerZ525:
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalRunIntoPlayerZ525
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerGetPushedByRivalZ525
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower14
     WaitMovement
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower13
     GoTo EternaCity_YouCameToSeeStatue
     End
 
@@ -748,8 +804,8 @@ EternaCity_YouCameToSeeStatue:
     CloseMessage
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     GoToIfEq VAR_0x8005, 523, EternaCity_WalkToStatueZ523
-    GoToIfEq VAR_0x8005, 524, EternaCity_WalkToStatueZ524
-    GoToIfEq VAR_0x8005, 525, EternaCity_WalkToStatueZ525
+    GoToIfEq VAR_0x8005, 524, EternaCity_PokemonFollower15
+    GoToIfEq VAR_0x8005, 525, EternaCity_PokemonFollower16
     End
 
 EternaCity_WalkToStatueZ523:
@@ -758,26 +814,32 @@ EternaCity_WalkToStatueZ523:
     WaitMovement
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalWalkToStatueZ523Or525
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWalkToStatueZ523
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower17
     WaitMovement
     GoTo EternaCity_Cyrus
-    End
 
-EternaCity_WalkToStatueZ524:
+EternaCity_PokemonFollower15:
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalWalkInFrontOfPlayerZ524
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerFaceRivalZ524
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower18
     WaitMovement
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalWalkToStatueZ524
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWalkToStatueZ524
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower19
     WaitMovement
     GoTo EternaCity_Cyrus
     End
 
-EternaCity_WalkToStatueZ525:
+EternaCity_PokemonFollower16:
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalWalkInFrontOfPlayerZ525
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerFaceRivalZ525
+EternaCity_WalkToStatueZ524:
     WaitMovement
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalWalkToStatueZ523Or525
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWalkToStatueZ525
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower20
+
+EternaCity_WalkToStatueZ525:
     WaitMovement
     GoTo EternaCity_Cyrus
     End
@@ -804,6 +866,7 @@ EternaCity_Cyrus:
     ApplyMovement LOCALID_CYRUS, EternaCity_Movement_CyrusLeave
     ApplyMovement LOCALID_RIVAL, EternaCity_Movement_RivalWatchCyrusLeave
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerMoveAsideAndWatchCyrusLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower21
     WaitMovement
     RemoveObject LOCALID_CYRUS
     WaitTime 35, VAR_RESULT
@@ -921,6 +984,50 @@ EternaCity_Movement_PlayerGetPushedByRivalZ525:
     EndMovement
 
     .balign 4, 0
+EternaCity_Movement_PokemonFollower10:
+    Delay4 10
+    WalkFastEast
+    FaceNorth
+    LockDir
+    JumpNearFastSouth
+    UnlockDir
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower12:
+    Delay4 9
+    WalkFastEast
+    FaceSouth
+    LockDir
+    JumpNearFastNorth
+    UnlockDir
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower14:
+    Delay4 8
+    WalkFastEast
+    FaceSouth
+    LockDir
+    JumpNearFastNorth
+    UnlockDir
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower11:
+    WalkFastEast 2
+    WalkFastNorth
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower13:
+    WalkFastEast 2
+    WalkFastSouth
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
 EternaCity_Movement_PlayerFaceRivalZ523:
     Delay8
     Delay4
@@ -941,6 +1048,15 @@ EternaCity_Movement_PlayerFaceRivalZ525:
     Delay8
     Delay4
     WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower18:
+    Delay8 2
+    WalkNormalNorth
+    WalkNormalWest
+    FaceSouth
+
     EndMovement
 
     .balign 4, 0
@@ -967,11 +1083,46 @@ EternaCity_Movement_PlayerWalkToStatueZ525:
     EndMovement
 
     .balign 4, 0
+EternaCity_Movement_PokemonFollower17:
+    WalkNormalWest
+    WalkNormalSouth
+    WalkNormalEast 18
+    WalkNormalSouth 2
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower19:
+    WalkNormalSouth
+    WalkNormalEast 18
+    WalkNormalSouth 2
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower20:
+    WalkNormalWest
+    WalkNormalNorth
+    WalkNormalEast 18
+    WalkNormalSouth 2
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
 EternaCity_Movement_PlayerMoveAsideAndWatchCyrusLeave:
     WalkNormalSouth
     WalkOnSpotNormalEast
     Delay8 2
     WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower21:
+    FaceNorth
+    LockDir
+    WalkNormalSouth
+    UnlockDir
+
     EndMovement
 
     .balign 4, 0
@@ -1024,36 +1175,42 @@ EternaCity_CoordEvent_CynthiaTryGiveEgg:
 EternaCity_SetCynthiaPositionForGiveEggZ540:
     SetObjectEventPos LOCALID_CYNTHIA, 304, 548
     Call EternaCity_ShowCynthia
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower22
     GoTo EternaCity_CynthiaTryGiveEgg
     End
 
 EternaCity_SetCynthiaPositionForGiveEggZ541:
     SetObjectEventPos LOCALID_CYNTHIA, 304, 549
     Call EternaCity_ShowCynthia
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower22
     GoTo EternaCity_CynthiaTryGiveEgg
     End
 
 EternaCity_SetCynthiaPositionForGiveEggZ542:
     SetObjectEventPos LOCALID_CYNTHIA, 304, 550
     Call EternaCity_ShowCynthia
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower22
     GoTo EternaCity_CynthiaTryGiveEgg
     End
 
 EternaCity_SetCynthiaPositionForGiveEggZ543:
     SetObjectEventPos LOCALID_CYNTHIA, 304, 551
     Call EternaCity_ShowCynthia
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower23
     GoTo EternaCity_CynthiaTryGiveEgg
     End
 
 EternaCity_SetCynthiaPositionForGiveEggZ544:
     SetObjectEventPos LOCALID_CYNTHIA, 304, 552
     Call EternaCity_ShowCynthia
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower23
     GoTo EternaCity_CynthiaTryGiveEgg
     End
 
 EternaCity_SetCynthiaPositionForGiveEggZ545:
     SetObjectEventPos LOCALID_CYNTHIA, 304, 553
     Call EternaCity_ShowCynthia
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower23
     GoTo EternaCity_CynthiaTryGiveEgg
     End
 
@@ -1114,6 +1271,26 @@ EternaCity_Movement_CynthiaNoticeAndWalkUpToPlayer:
     EndMovement
 
     .balign 4, 0
+EternaCity_Movement_PokemonFollower22:
+    Delay8 10
+    FaceWest
+    Delay4
+    WalkNormalSouth
+    WalkNormalEast
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower23:
+    Delay8 10
+    FaceWest
+    Delay4
+    WalkNormalNorth
+    WalkNormalEast
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
 EternaCity_Movement_CynthiaLeaveAfterEgg:
     WalkNormalWest 3
     WalkNormalSouth 9
@@ -1143,7 +1320,7 @@ EternaCity_CynthiaTryAgainGiveEgg:
     GoToIfEq VAR_RESULT, DIR_NORTH, EternaCity_CynthiaLeaveAfterEggNorth
     GoToIfEq VAR_RESULT, DIR_SOUTH, EternaCity_CynthiaLeaveAfterEggSouth
     GoToIfEq VAR_RESULT, DIR_WEST, EternaCity_CynthiaLeaveAfterEggWest
-    GoToIfEq VAR_RESULT, DIR_EAST, EternaCity_CynthiaLeaveAfterEggEast
+    GoToIfEq VAR_RESULT, DIR_EAST, EternaCity_PokemonFollower24
     End
 
 EternaCity_CynthiaLeaveAfterEggNorth:
@@ -1164,10 +1341,17 @@ EternaCity_CynthiaLeaveAfterEggWest:
     ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_CynthiaLeaveNorthSouthWest
     WaitMovement
     GoTo EternaCity_RemoveCynthia
-    End
+
+EternaCity_PokemonFollower24:
+    ScrCmd_Unused_06A LOCALID_CYNTHIA, VAR_0x8004, VAR_0x8005
+    GoToIfEq VAR_0x8005, 544, EternaCity_PokemonFollower25
+    ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_PokemonFollower26
+    GoTo EternaCity_CynthiaLeaveAfterEggEast
+
+EternaCity_PokemonFollower25:
+    ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_PokemonFollower27
 
 EternaCity_CynthiaLeaveAfterEggEast:
-    ApplyMovement LOCALID_CYNTHIA, EternaCity_Movement_CynthiaLeaveNorthSouthEast
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWatchCynthiaLeaveEast
     WaitMovement
     GoTo EternaCity_RemoveCynthia
@@ -1257,6 +1441,7 @@ EternaCity_DontLeaveWithoutEgg:
     Message EternaCity_Text_DontLeaveWithoutEgg
     CloseMessage
     ApplyMovement LOCALID_PLAYER, EternaCity_Movement_PlayerWalkNormalWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaCity_Movement_PokemonFollower28
     WaitMovement
     ReleaseAll
     End
@@ -1273,15 +1458,32 @@ EternaCity_Movement_CynthiaLeaveNorthSouthWest:
     EndMovement
 
     .balign 4, 0
+EternaCity_Movement_PokemonFollower26:
+    WalkNormalSouth 2
+
+    .balign 4, 0
 EternaCity_Movement_CynthiaLeaveNorthSouthEast:
-    WalkNormalSouth
     WalkNormalWest 3
-    WalkNormalSouth 8
+    WalkNormalSouth 7
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower27:
+    WalkNormalNorth 2
+    WalkNormalWest 3
+    WalkNormalSouth 11
+
     EndMovement
 
     .balign 4, 0
 EternaCity_Movement_PlayerWalkNormalWest:
     WalkNormalWest
+    EndMovement
+
+    .balign 4, 0
+EternaCity_Movement_PokemonFollower28:
+    WalkNormalEast
+
     EndMovement
 
     .balign 4, 0

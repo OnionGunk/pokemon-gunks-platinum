@@ -99,6 +99,7 @@ CommonScript_PokecenterNurse:
     PlaySE SE_CONFIRM_sseq_3
     LockAll
     FacePlayer
+    GetPokemonFollowerPartySlot VAR_0x8008
     GetTrainerCardLevel VAR_RESULT
     GoToIfGe VAR_RESULT, TRAINER_CARD_LEVEL_GOLD, CommonScript_NurseGoldCard
     SetVar VAR_0x8004, CommonStrings_Text_PokecenterGreeting_Day
@@ -112,7 +113,7 @@ CommonScript_PokecenterNurse:
 CommonScript_NurseGreeting:
     MessageVar VAR_0x8004
     ShowYesNoMenu VAR_RESULT
-    GoToIfEq VAR_RESULT, MENU_YES, CommonScript_NurseAcceptHealPokemon
+    GoToIfEq VAR_RESULT, MENU_YES, CommonScript_PokemonFollower1
     GoToIfEq VAR_RESULT, MENU_NO, CommonScript_NurseDeclineHealPokemon
     End
 
@@ -124,6 +125,9 @@ CommonScript_NurseDeclineHealPokemon:
     ReturnCommonScript
     End
 
+CommonScript_PokemonFollower1:
+    PokemonFollowerStartCutscene
+    PokemonFollowerEndCutscene
 CommonScript_NurseAcceptHealPokemon:
     SetPlayerState PLAYER_TRANSITION_HEALING
     ChangePlayerState
@@ -161,6 +165,7 @@ CommonScript_NurseFarewellAfterHeal:
     WaitMovement
     SetPlayerState PLAYER_TRANSITION_WALKING
     ChangePlayerState
+    Call CommonScript_PokemonFollower2
     ApplyMovement VAR_0x8007, CommonScript_Movement_NurseBow
     WaitMovement
     Message CommonStrings_Text_PokecenterHopeToSeeYouAgain1
@@ -176,6 +181,7 @@ CommonScript_NurseFarewellAfterHealGoldCard:
     WaitMovement
     SetPlayerState PLAYER_TRANSITION_WALKING
     ChangePlayerState
+    Call CommonScript_PokemonFollower2
     ApplyMovement VAR_0x8007, CommonScript_Movement_NurseBow
     WaitMovement
     Message CommonStrings_Text_PokecenterHopeToSeeYouAgain2
@@ -184,6 +190,23 @@ CommonScript_NurseFarewellAfterHealGoldCard:
     ReleaseAll
     ReturnCommonScript
     End
+
+CommonScript_PokemonFollower2:
+    GetPokemonFollowerPartySlot VAR_RESULT
+    CallIfNe VAR_RESULT, VAR_0x8008, CommonScript_PokemonFollower3
+    Return
+
+CommonScript_PokemonFollower3:
+    FadeScreen 6, 1, 0, 0
+    WaitFadeScreen
+    CloseMessage
+    WaitForTransition
+    ReturnToField
+    FadeScreen 6, 1, 1, 0
+    WaitFadeScreen
+    BufferPartyMonSpecies 0, VAR_RESULT
+    Message CommonStrings_Text_PokemonFollowerFeelingBetter
+    Return
 
 CommonScript_NurseCheckPokerus:
     CheckPartyPokerus VAR_0x8006
@@ -232,7 +255,7 @@ CommonScript_NurseGoldCardPreviouslySeen:
 
 CommonScript_NurseAcceptHealPokemonGoldCard:
     SetVar VAR_0x8004, TRUE
-    GoTo CommonScript_NurseAcceptHealPokemon
+    GoTo CommonScript_PokemonFollower1
 
     .balign 4, 0
 CommonScript_Movement_NurseBow:
@@ -1408,7 +1431,9 @@ CommonScript_BikeParking:
     ShowYesNoMenu VAR_RESULT
     GoToIfEq VAR_RESULT, MENU_NO, CommonScript_BikeParkingCloseMessage
     SetPlayerBike TRUE
+    PokemonFollowerStartCutscene
     CloseMessage
+    WaitTime 8, VAR_RESULT
     ReleaseAll
     End
 
@@ -1417,6 +1442,7 @@ CommonScript_AskGetOffYourBike:
     ShowYesNoMenu VAR_RESULT
     GoToIfEq VAR_RESULT, MENU_NO, CommonScript_BikeParkingCloseMessage
     SetPlayerBike FALSE
+    PokemonFollowerEndCutscene
     CloseMessage
     ReleaseAll
     End

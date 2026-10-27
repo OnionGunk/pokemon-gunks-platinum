@@ -27,7 +27,7 @@
         },
         {
             "id": "LOCALID_CLEFAIRY",
-            "graphics_id": "OBJ_EVENT_GFX_CLEFAIRY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CLEFAIRY",
             "movement_type": "MOVEMENT_TYPE_LOOK_SOUTH_AND_WEST",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_TEAM_GALACTIC_ETERNA_BUILDING_4F_HOSTAGES",
@@ -57,7 +57,7 @@
         },
         {
             "id": "LOCALID_BUNEARY",
-            "graphics_id": "OBJ_EVENT_GFX_BUNEARY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_BUNEARY",
             "movement_type": "MOVEMENT_TYPE_LOOK_SOUTH_AND_EAST",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_TEAM_GALACTIC_ETERNA_BUILDING_4F_HOSTAGES",

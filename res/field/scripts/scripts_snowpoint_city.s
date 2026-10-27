@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/snowpoint_city.h"
 #include "res/field/events/events_snowpoint_city.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry SnowpointCity_OnTransition
     ScriptEntry SnowpointCity_TempleGuard
@@ -39,6 +39,7 @@ SnowpointCity_CoordEvent_TempleGuard:
 SnowpointCity_TempleGuardBlockPlayer:
     ApplyMovement LOCALID_TEMPLE_GUARD, SnowpointCity_Movement_TempleGuardWalkOnSpotSOuth
     ApplyMovement LOCALID_PLAYER, SnowpointCity_Movement_PlayerWalkSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SnowpointCity_Movement_PlayerWalkSouth
     WaitMovement
     ReleaseAll
     End
@@ -107,6 +108,7 @@ SnowpointCity_AllowEnterTemple:
     Message SnowpointCity_Text_LetThatPersonIn
     CloseMessage
     ApplyMovement LOCALID_PLAYER, SnowpointCity_Movement_PlayerWalkOnSpotSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SnowpointCity_Movement_PlayerWalkOnSpotSouth
     ApplyMovement LOCALID_TEMPLE_GUARD, SnowpointCity_Movement_TempleGuardFaceSouth
     WaitMovement
     SetVar VAR_SNOWPOINT_CITY_STATE, 1
@@ -205,7 +207,7 @@ SnowpointCity_TakeShipToBattleZone:
     CallIfUnset FLAG_SAILED_TO_BATTLE_ZONE, SnowpointCity_Cynthia
     Message SnowpointCity_Text_LetsSetSail
     CloseMessage
-    Call SnowpointCity_SailorEnterShip
+    Call SnowpointCity_PokemonFollower1
     Call SnowpointCity_PlayerEnterShip
     TakeShipFromSnowpoint DIR_EAST, MAP_HEADER_FIGHT_AREA, 623, 434
     ReleaseAll
@@ -216,7 +218,15 @@ SnowpointCity_Cynthia:
     AddObject LOCALID_CYNTHIA
     LockObject LOCALID_CYNTHIA
     CloseMessage
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
     ApplyMovement LOCALID_CYNTHIA, SnowpointCity_Movement_CynthiaEnter
+    GoToIfEq VAR_0x8005, 245, SnowpointCity_PokemonFollower2
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SnowpointCity_Movement_PokemonFollower3
+    GoTo SnowpointCity_PokemonFollower4
+
+SnowpointCity_PokemonFollower2:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SnowpointCity_Movement_PokemonFollower5
+SnowpointCity_PokemonFollower4:
     WaitMovement
     Message SnowpointCity_Text_ImGladIWaited
     ApplyMovement LOCALID_PLAYER, SnowpointCity_Movement_PlayerNoticeCynthia
@@ -259,6 +269,22 @@ SnowpointCity_Movement_CynthiaEnter:
     EndMovement
 
     .balign 4, 0
+SnowpointCity_Movement_PokemonFollower5:
+    Delay8 6
+    FaceNorth
+    Delay8 2
+    WalkNormalWest
+    WalkNormalSouth
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+SnowpointCity_Movement_PokemonFollower3:
+    Delay8 8
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
 SnowpointCity_Movement_CynthiaWalkEast:
     WalkNormalEast
     EndMovement
@@ -277,6 +303,8 @@ SnowpointCity_Movement_CynthiaLeave:
     WalkNormalEast 7
     EndMovement
 
+SnowpointCity_PokemonFollower1:
+    PokemonFollowerStartCutscene
 SnowpointCity_SailorEnterShip:
     ApplyMovement LOCALID_SAILOR_SS_SPIRAL, SnowpointCity_Movement_SailorSSSpiralFaceSouth
     WaitMovement

@@ -1,7 +1,6 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_227_house.h"
 
-
     ScriptEntry Route227House_ExpertF
     ScriptEntryEnd
 
@@ -23,6 +22,8 @@ Route227House_RestUp:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     Message Route227House_Text_RestUpAgain

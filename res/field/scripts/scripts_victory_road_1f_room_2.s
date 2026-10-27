@@ -2,7 +2,6 @@
 #include "res/text/bank/victory_road_1f_room_2.h"
 #include "res/field/events/events_victory_road_1f_room_2.h"
 
-
     ScriptEntry VictoryRoad1FRoom2_CoordEvent_MarleyStartFollowing
     ScriptEntry VictoryRoad1FRoom2_CoordEvent_PlayerLeaveMarley
     ScriptEntry VictoryRoad1FRoom2_CoordEvent_MarleyLeavePlayer
@@ -69,6 +68,7 @@ VictoryRoad1FRoom2_MarleyStartFollowing:
     PlayFanfare SEQ_GONIN_sseq
     Message VictoryRoad1FRoom2_Text_DecidedToGoWithMarley
     WaitFanfare
+    PokemonFollowerStartCutscene
     SetFlag FLAG_TALKED_TO_VICTORY_ROAD_1F_ROOM_2_MARLEY
     SetVar VAR_VICTORY_ROAD_1F_ROOM_2_FOLLOWER_MARLEY_STATE, 1
     Message VictoryRoad1FRoom2_Text_IllHealPokemon
@@ -151,32 +151,35 @@ VictoryRoad1FRoom2_CoordEvent_PlayerLeaveMarley:
 VictoryRoad1FRoom2_MarleyWalkBackZ55:
     ApplyMovement LOCALID_MARLEY, VictoryRoad1FRoom2_Movement_MarleyWalkBackZ55
     WaitMovement
-    GoTo VictoryRoad1FRoom2_PlayerLeaveMarleyEnd
+    GoTo VictoryRoad1FRoom2_PokemonFollower1
 
 VictoryRoad1FRoom2_MarleyWalkBackZ56:
     ApplyMovement LOCALID_MARLEY, VictoryRoad1FRoom2_Movement_MarleyWalkBackZ56
     WaitMovement
-    GoTo VictoryRoad1FRoom2_PlayerLeaveMarleyEnd
+    GoTo VictoryRoad1FRoom2_PokemonFollower1
 
 VictoryRoad1FRoom2_MarleyWalkBackZ57:
     ApplyMovement LOCALID_MARLEY, VictoryRoad1FRoom2_Movement_MarleyWalkBackZ57
     WaitMovement
-    GoTo VictoryRoad1FRoom2_PlayerLeaveMarleyEnd
+    GoTo VictoryRoad1FRoom2_PokemonFollower1
 
 VictoryRoad1FRoom2_MarleyWalkBackZ58:
     ApplyMovement LOCALID_MARLEY, VictoryRoad1FRoom2_Movement_MarleyWalkBackZ58
     WaitMovement
-    GoTo VictoryRoad1FRoom2_PlayerLeaveMarleyEnd
+    GoTo VictoryRoad1FRoom2_PokemonFollower1
 
 VictoryRoad1FRoom2_MarleyWalkBackZ59:
     ApplyMovement LOCALID_MARLEY, VictoryRoad1FRoom2_Movement_MarleyWalkBackZ59
     WaitMovement
-    GoTo VictoryRoad1FRoom2_PlayerLeaveMarleyEnd
+    GoTo VictoryRoad1FRoom2_PokemonFollower1
 
 VictoryRoad1FRoom2_MarleyWalkBackZ60:
     ApplyMovement LOCALID_MARLEY, VictoryRoad1FRoom2_Movement_MarleyWalkBackZ60
     WaitMovement
-    GoTo VictoryRoad1FRoom2_PlayerLeaveMarleyEnd
+    GoTo VictoryRoad1FRoom2_PokemonFollower1
+
+VictoryRoad1FRoom2_PokemonFollower1:
+    PokemonFollowerEndCutscene
 
 VictoryRoad1FRoom2_PlayerLeaveMarleyEnd:
     ReleaseAll
@@ -280,6 +283,7 @@ VictoryRoad1FRoom2_RemoveMarley:
     RemoveObject LOCALID_MARLEY
     SetFlag FLAG_TRAVELED_WITH_MARLEY
     SetVar VAR_VICTORY_ROAD_1F_ROOM_2_FOLLOWER_MARLEY_STATE, 2
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 

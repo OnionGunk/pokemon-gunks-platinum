@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_213.h"
 #include "res/field/events/events_route_213.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route213_OnTransition
     ScriptEntry Route213_GruntM
@@ -95,7 +95,9 @@ Route213_GruntMEast:
     Message Route213_Text_YoureAPersistentPest
     CloseMessage
     GetPlayerDir VAR_0x8004
-    GoToIfEq VAR_0x8004, DIR_WEST, Route213_GruntMEastLeaveWest
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    CompareVarToValue VAR_0x8004, 2
+    GoToIf 1, Route213_PokemonFollower1
     GoTo Route213_GruntMEastLeaveNorthSouthEast
     End
 
@@ -106,12 +108,25 @@ Route213_GruntMEastLeaveNorthSouthEast:
     GoTo Route213_Looker
     End
 
+Route213_PokemonFollower1:
+    CallIfEq VAR_0x8007, 832, Route213_PokemonFollower2
 Route213_GruntMEastLeaveWest:
     ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchGruntMEastLeave
     ApplyMovement LOCALID_GRUNT_M, Route213_Movement_GruntMEastLeaveWest
     WaitMovement
     GoTo Route213_Looker
     End
+
+Route213_PokemonFollower2:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower3
+    Return
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower3:
+    WalkFastEast
+    WalkFastSouth
+    FaceEast
+    EndMovement
 
 Route213_Looker:
     RemoveObject LOCALID_GRUNT_M
@@ -122,19 +137,19 @@ Route213_Looker:
     GetOverworldWeather VAR_RESULT
     CallIfEq VAR_RESULT, OVERWORLD_WEATHER_RAINING, _0261
     CallIfEq VAR_0x8004, DIR_WEST, Route213_LookerEnterWest
-    CallIfEq VAR_0x8004, DIR_EAST, Route213_LookerEnterEast
-    CallIfEq VAR_0x8004, DIR_NORTH, Route213_LookerEnterNorth
-    CallIfEq VAR_0x8004, DIR_SOUTH, Route213_LookerEnterSouth
+    CallIfEq VAR_0x8004, DIR_EAST, Route213_PokemonFollower4
+    CallIfEq VAR_0x8004, DIR_NORTH, Route213_PokemonFollower5
+    CallIfEq VAR_0x8004, DIR_SOUTH, Route213_PokemonFollower6
     Message Route213_Text_ThatIsTeamGalactic
     ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerWalkOnSpotSouth
     WaitMovement
     Message Route213_Text_HowDidIMissIt
     Message Route213_Text_ThisWillNotDo
     CloseMessage
-    CallIfEq VAR_0x8004, DIR_WEST, Route213_LookerLeaveWest
-    CallIfEq VAR_0x8004, DIR_EAST, Route213_LookerLeaveEast
-    CallIfEq VAR_0x8004, DIR_NORTH, Route213_LookerLeaveNorth
-    CallIfEq VAR_0x8004, DIR_SOUTH, Route213_LookerLeaveSouth
+    CallIfEq VAR_0x8004, DIR_WEST, Route213_PokemonFollower7
+    CallIfEq VAR_0x8004, DIR_EAST, Route213_PokemonFollower8
+    CallIfEq VAR_0x8004, DIR_NORTH, Route213_PokemonFollower9
+    CallIfEq VAR_0x8004, DIR_SOUTH, Route213_PokemonFollower10
     RemoveObject LOCALID_LOOKER
     Common_FadeToDefaultMusic4
     GetOverworldWeather VAR_RESULT
@@ -154,47 +169,142 @@ Route213_LookerEnterWest:
     WaitMovement
     Return
 
-Route213_LookerEnterEast:
-    ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerEnterEast
+Route213_PokemonFollower14:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower11
+    Return
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower11:
+    Delay8
+    FaceWest
+    Delay8 2
+    WalkNormalEast
+    WalkNormalSouth
+    FaceWest
+    EndMovement
+
+Route213_PokemonFollower15:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower12
+    Return
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower12:
+    Delay8
+    FaceWest
+    Delay8 2
+    WalkNormalEast
+    WalkNormalNorth
+    FaceWest
+    EndMovement
+
+Route213_PokemonFollower4:
+    CallIfEq VAR_0x8006, 681, Route213_PokemonFollower13
+    CallIfEq VAR_0x8007, 832, Route213_PokemonFollower14
+    CallIfEq VAR_0x8007, 834, Route213_PokemonFollower15
+    ApplyMovement LOCALID_LOOKER, Route213_Movement_PokemonFollower16
     ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerEnterNorthWestEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PlayerWatchLookerEnterNorthWestEast
     WaitMovement
     Return
 
-Route213_LookerEnterNorth:
+Route213_PokemonFollower13:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower17
+    Return
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower17:
+    Delay8
+    FaceWest
+    Delay8 2
+    WalkNormalSouth
+    WalkNormalEast 2
+    WalkNormalNorth
+    FaceWest
+    EndMovement
+
+Route213_PokemonFollower5:
+    CallIfEq VAR_0x8006, 682, Route213_PokemonFollower18
     ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerEnterNorth
+Route213_LookerEnterEast:
     ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerEnterNorthWestEast
     WaitMovement
     Return
 
-Route213_LookerEnterSouth:
+Route213_PokemonFollower18:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower19
+    Return
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower19:
+    Delay8
+    FaceWest
+    Delay8 2
+    WalkNormalNorth
+    WalkNormalEast 2
+    WalkNormalSouth
+    FaceWest
+    EndMovement
+
+Route213_PokemonFollower6:
+    CallIfEq VAR_0x8006, 682, Route213_PokemonFollower20
     ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerEnterSouth
     ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerEnterSouth
+Route213_LookerEnterNorth:
     WaitMovement
     Return
 
-Route213_LookerLeaveWest:
+Route213_PokemonFollower20:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower21
+    Return
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower21:
+    Delay8
+    FaceWest
+    Delay8 2
+    WalkNormalSouth
+    WalkNormalEast 2
+    WalkNormalNorth
+    FaceWest
+    EndMovement
+
+Route213_PokemonFollower7:
     ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerLeaveWest
     ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower22
+Route213_LookerEnterSouth:
     WaitMovement
     Return
 
-Route213_LookerLeaveEast:
+Route213_PokemonFollower8:
     ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerLeaveEast
+Route213_LookerLeaveWest:
     ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower22
     WaitMovement
     Return
 
-Route213_LookerLeaveNorth:
+Route213_PokemonFollower9:
     ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerLeaveNorth
+Route213_LookerLeaveEast:
     ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower22
     WaitMovement
     Return
+
+Route213_PokemonFollower10:
+    ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerLeaveSouth
+Route213_LookerLeaveNorth:
+    ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route213_Movement_PokemonFollower22
+    WaitMovement
+    Return
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower16:
+    Delay4
 
 Route213_LookerLeaveSouth:
-    ApplyMovement LOCALID_LOOKER, Route213_Movement_LookerLeaveSouth
-    ApplyMovement LOCALID_PLAYER, Route213_Movement_PlayerWatchLookerLeave
-    WaitMovement
-    Return
 
     .balign 4, 0
 Route213_Movement_LookerEnterEast:
@@ -305,6 +415,12 @@ Route213_Movement_PlayerWatchLookerEnterSouth:
     .balign 4, 0
 Route213_Movement_PlayerWatchLookerLeave:
     Delay4 3
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+Route213_Movement_PokemonFollower22:
+    Delay4 5
     WalkOnSpotNormalEast
     EndMovement
 

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pokemon_mansion_office.h"
 #include "res/field/events/events_pokemon_mansion_office.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PokemonMansionOffice_OnTransition
     ScriptEntry PokemonMansionOffice_MrBacklot
@@ -273,8 +273,16 @@ PokemonMansionOffice_CoordEvent_BlockStatue:
     WaitMovement
     Message PokemonMansionOffice_Text_SorryDontTouchStatue
     CloseMessage
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8000, VAR_0x8001
     ApplyMovement LOCALID_PLAYER, PokemonMansionOffice_Movement_PlayerWalkBackFromStatue
     ApplyMovement LOCALID_POLICEMAN, PokemonMansionOffice_Movement_PolicemanFaceSouth
+    GoToIfEq VAR_0x8001, 5, PokemonMansionOffice_PokemonFollower1
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonMansionOffice_Movement_PlayerWalkBackFromStatue
+    GoTo PokemonMansionOffice_PokemonFollower2
+
+PokemonMansionOffice_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonMansionOffice_Movement_PokemonFollower3
+PokemonMansionOffice_PokemonFollower2:
     WaitMovement
     ReleaseAll
     End
@@ -283,6 +291,12 @@ PokemonMansionOffice_CoordEvent_BlockStatue:
 PokemonMansionOffice_Movement_PlayerWalkBackFromStatue:
     WalkNormalSouth
     FaceNorth
+    EndMovement
+
+    .balign 4, 0
+PokemonMansionOffice_Movement_PokemonFollower3:
+    WalkNormalWest
+
     EndMovement
 
 PokemonMansionOffice_Statue:

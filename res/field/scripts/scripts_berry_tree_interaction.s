@@ -3,7 +3,6 @@
 #include "constants/items.h"
 #include "generated/berry_growth_stages.h"
 
-
     ScriptEntry BerryTree_Main
     ScriptEntry BerryTree_PlantBerry
     ScriptEntry BerryTree_UseSprayduck
@@ -118,7 +117,9 @@ BerryTree_OfferWatering:
     Message BerryTrees_Text_ThereAllHappy
     WaitButton
     SetBerryWateringState BERRY_WATERING_END
-    GoTo BerryTree_CloseAndEnd
+    CloseMessage
+    WaitForPokemonFollower
+    GoTo BerryTree_ReleaseAndEnd
 
 BerryTree_FruitState:
     BufferNumber 1, VAR_0x8001
@@ -324,6 +325,7 @@ BerryTree_UseSprayduck:
     WaitButton
     SetBerryWateringState BERRY_WATERING_END
     CloseMessage
+    WaitForPokemonFollower
     ReleaseAll
     End
 

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/twinleaf_town_player_house_1f.h"
 #include "res/field/events/events_twinleaf_town_player_house_1f.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry TwinleafTownPlayerHouse1F_OnTransition
     ScriptEntry TwinleafTownPlayerHouse1F_OnFrame_RivalAlreadyLeft
@@ -121,6 +121,7 @@ TwinleafTownPlayerHouse1F_OnFrame_CutsceneAfterRivalBattle:
     WaitTime 30, VAR_RESULT
     ApplyMovement LOCALID_PLAYER_HOUSE_MOM, TwinleafTownPlayerHouse1F_Movement_MomWalkFromKitchenToCouch
     ApplyMovement LOCALID_PLAYER, TwinleafTownPlayerHouse1F_Movement_PlayerFollowMomToCouch
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, TwinleafTownPlayerHouse1F_Movement_PokemonFollower1
     WaitMovement
     WaitTime 30, VAR_RESULT
     BufferRivalName 0
@@ -138,6 +139,15 @@ TwinleafTownPlayerHouse1F_OnFrame_CutsceneAfterRivalBattle:
     Message TwinleafTownPlayerHouse1F_Text_LetMeReadTheInstructions
     WaitButton
     CloseMessage
+    SetVarFromValue VAR_RESULT, 0
+    GetPartyMonSpecies VAR_RESULT, VAR_0x8004
+    PlayCry VAR_0x8004, 0
+    WaitCry
+    ApplyMovement LOCALID_PLAYER, TwinleafTownPlayerHouse1F_Movement_PokemonFollower2
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, TwinleafTownPlayerHouse1F_Movement_PokemonFollower3
+    WaitMovement
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, TwinleafTownPlayerHouse1F_Movement_PokemonFollower4
+    WaitMovement
     SetVar VAR_PLAYER_HOUSE_STATE, 4
     ReleaseAll
     End
@@ -164,6 +174,49 @@ TwinleafTownPlayerHouse1F_Movement_PlayerFollowMomToCouch:
     WalkNormalEast
     EndMovement
 
+    .balign 4, 0
+TwinleafTownPlayerHouse1F_Movement_PokemonFollower1:
+    Delay16
+    FaceSouth
+    Delay8
+    FaceWest
+    Delay16
+    FaceSouth
+    Delay8
+    FaceNorth
+    Delay16
+    Delay8
+    Delay2
+    WalkNormalEast 4
+    WalkNormalSouth 2
+    FaceEast
+    EndMovement
+
+    .balign 4, 0
+TwinleafTownPlayerHouse1F_Movement_PokemonFollower3:
+    LockDir
+    JumpOnSpotSlowNorth 2
+    UnlockDir
+    WalkNormalSouth 2
+    WalkNormalEast
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+TwinleafTownPlayerHouse1F_Movement_PokemonFollower2:
+    FaceWest
+    Delay32
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+TwinleafTownPlayerHouse1F_Movement_PokemonFollower4:
+    FollowerEmoteHeart
+    Delay8
+    WalkNormalNorth
+
+    EndMovement
+
 TwinleafTownPlayerHouse1F_Mom:
     PlaySE SE_CONFIRM_sseq_3
     LockAll
@@ -171,7 +224,7 @@ TwinleafTownPlayerHouse1F_Mom:
     GoToIfSet FLAG_MAP_LOCAL_0x02, TwinleafTownPlayerHouse1F_DoMomMessage
     GoToIfGe VAR_PLAYER_HOUSE_STATE, 7, TwinleafTownPlayerHouse1F_CallTakeAQuickRest2
     GoToIfEq VAR_PLAYER_HOUSE_STATE, 6, TwinleafTownPlayerHouse1F_EnjoyYourAdventure
-    GoToIfSet FLAG_HAS_POKEDEX, TwinleafTownPlayerHouse1F_MomGiveJournal
+    GoToIfSet FLAG_HAS_POKEDEX, TwinleafTownPlayerHouse1F_PokemonFollower5
     GoToIfGe VAR_PLAYER_HOUSE_STATE, 5, TwinleafTownPlayerHouse1F_CallTakeAQuickRest
     GoToIfGe VAR_PLAYER_HOUSE_STATE, 4, TwinleafTownPlayerHouse1F_IllReadTheInstructions
     GoToIfSet FLAG_MOM_WARNED_PLAYER, TwinleafTownPlayerHouse1F_IsntRivalWaiting
@@ -254,8 +307,9 @@ TwinleafTownPlayerHouse1F_EnjoyYourAdventure:
     ReleaseAll
     End
 
+TwinleafTownPlayerHouse1F_PokemonFollower5:
+    Call TwinleafTownPlayerHouse1F_PokemonFollower6
 TwinleafTownPlayerHouse1F_MomGiveJournal:
-    Call TwinleafTownPlayerHouse1F_TakeAQuickRest
     BufferPlayerName 0
     Message TwinleafTownPlayerHouse1F_Text_YourMomsGotYourBack
     SetVar VAR_0x8004, ITEM_JOURNAL
@@ -447,6 +501,7 @@ TwinleafTownPlayerHouse1F_RemoveRivalsMom:
     PlaySE SEQ_SE_DP_KAIDAN2_sseq
     RemoveObject LOCALID_RIVAL_MOM
     SetVar VAR_PLAYER_HOUSE_STATE, 6
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -464,6 +519,31 @@ TwinleafTownPlayerHouse1F_TakeAQuickRest:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
+    FadeScreen 6, 1, 1, 0
+    WaitFadeScreen
+    SetFlag FLAG_MAP_LOCAL_0x02
+    Return
+
+TwinleafTownPlayerHouse1F_PokemonFollower6:
+    BufferPlayerName 0
+    GetTimeOfDay VAR_RESULT
+    CallIfEq VAR_RESULT, 0, TwinleafTownPlayerHouse1F_MorningTakeAQuickRest
+    CallIfEq VAR_RESULT, 1, TwinleafTownPlayerHouse1F_DayTakeAQuickRest
+    CallIfEq VAR_RESULT, 2, TwinleafTownPlayerHouse1F_TwilightTakeAQuickRest
+    CallIfEq VAR_RESULT, 3, TwinleafTownPlayerHouse1F_NightTakeAQuickRest
+    CallIfEq VAR_RESULT, 4, TwinleafTownPlayerHouse1F_LateNightTakeAQuickRest
+    CloseMessage
+    PokemonFollowerStartCutscene
+    WaitTime 4, VAR_RESULT
+    FadeScreen 6, 1, 0, 0
+    WaitFadeScreen
+    PlayFanfare 1166
+    WaitFanfare
+    HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     SetFlag FLAG_MAP_LOCAL_0x02

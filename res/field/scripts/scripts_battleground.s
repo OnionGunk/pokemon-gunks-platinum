@@ -1,6 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/battleground.h"
 #include "res/field/events/events_battleground.h"
+#define LOCALID_POKEMON_FOLLOWER 253
 
 #define LOCAL_FLAG_DECLINED_BATTLE_TRAINER_1 FLAG_MAP_LOCAL_0x01
 #define LOCAL_FLAG_DECLINED_BATTLE_TRAINER_2 FLAG_MAP_LOCAL_0x02
@@ -137,13 +138,13 @@ Battleground_BuckLeaveZ7:
 
 Battleground_BuckLeaveZ8:
     ApplyMovement LOCALID_PLAYER, Battleground_Movement_PlayerWatchBuckLeaveZ8
-    ApplyMovement LOCALID_BUCK, Battleground_Movement_BuckLeaveZ8
+    ApplyMovement LOCALID_BUCK, Battleground_Movement_PokemonFollower1
     WaitMovement
     Return
 
 Battleground_BuckLeaveZ9:
     ApplyMovement LOCALID_PLAYER, Battleground_Movement_PlayerWatchBuckLeaveZ9
-    ApplyMovement LOCALID_BUCK, Battleground_Movement_BuckLeaveZ9
+    ApplyMovement LOCALID_BUCK, Battleground_Movement_PokemonFollower2
     WaitMovement
     Return
 
@@ -176,17 +177,24 @@ Battleground_Movement_BuckLeaveZ7:
     EndMovement
 
     .balign 4, 0
+Battleground_Movement_PokemonFollower1:
+    WalkNormalSouth 2
+    WalkNormalWest 4
+
+    .balign 4, 0
 Battleground_Movement_BuckLeaveZ8:
     WalkNormalSouth
-    WalkNormalWest 4
-    WalkNormalSouth 2
     EndMovement
 
     .balign 4, 0
+Battleground_Movement_PokemonFollower2:
+    WalkNormalWest 2
+
+    .balign 4, 0
 Battleground_Movement_BuckLeaveZ9:
-    WalkNormalWest
     WalkNormalSouth
-    WalkNormalWest 3
+    WalkNormalWest 2
+
     WalkNormalSouth 2
     EndMovement
 
@@ -195,7 +203,9 @@ Battleground_OnFrame_Welcome:
     SetVar VAR_BATTLEGROUND_STATE, 1
     ApplyMovement LOCALID_EXPERT_M, Battleground_Movement_ExpertFExclamationMark
     WaitMovement
+    ShowPokemonFollower
     ApplyMovement LOCALID_PLAYER, Battleground_Movement_PlayerWalkToExpertF
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Battleground_Movement_PokemonFollower3
     WaitMovement
     Message Battleground_Text_WelcomeToBattleground
     WaitButton
@@ -212,6 +222,14 @@ Battleground_Movement_ExpertFExclamationMark:
 Battleground_Movement_PlayerWalkToExpertF:
     WalkNormalNorth 2
     WalkNormalEast 4
+    EndMovement
+
+    .balign 4, 0
+Battleground_Movement_PokemonFollower3:
+    Delay8
+    WalkNormalNorth 2
+    WalkNormalEast 3
+
     EndMovement
 
 Battleground_Trainer1:

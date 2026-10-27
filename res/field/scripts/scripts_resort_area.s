@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/resort_area.h"
 #include "res/field/events/events_resort_area.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry ResortArea_Beauty1
     ScriptEntry ResortArea_Beauty2
@@ -124,6 +124,7 @@ ResortArea_CoordEvent_SchoolKidM:
     LoadDoorAnimation 25, 14, 22, 21, ANIMATION_TAG_DOOR_1
     PlayDoorOpenAnimation ANIMATION_TAG_DOOR_1
     WaitForAnimation ANIMATION_TAG_DOOR_1
+    PokemonFollowerStartCutscene
     ApplyMovement LOCALID_SCHOOL_KID_M, ResortArea_Movement_SchoolKidMEnterVilla
     ApplyMovement LOCALID_PLAYER, ResortArea_Movement_PlayerEnterVilla
     WaitMovement
@@ -156,18 +157,21 @@ ResortArea_SchoolKidMWalkToPlayerZ474:
 ResortArea_WalkToVillaZ472:
     ApplyMovement LOCALID_SCHOOL_KID_M, ResortArea_Movement_SchoolKidMWalkToVillaZ472
     ApplyMovement LOCALID_PLAYER, ResortArea_Movement_PlayerWalkToVillaZ472
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ResortArea_Movement_PokemonFollower1
     WaitMovement
     Return
 
 ResortArea_WalkToVillaZ473:
     ApplyMovement LOCALID_SCHOOL_KID_M, ResortArea_Movement_SchoolKidMWalkToVillaZ473
     ApplyMovement LOCALID_PLAYER, ResortArea_Movement_PlayerWalkToVillaZ473
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ResortArea_Movement_PokemonFollower2
     WaitMovement
     Return
 
 ResortArea_WalkToVillaZ474:
     ApplyMovement LOCALID_SCHOOL_KID_M, ResortArea_Movement_SchoolKidMWalkToVillaZ474
     ApplyMovement LOCALID_PLAYER, ResortArea_Movement_PlayerWalkToVillaZ474
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ResortArea_Movement_PokemonFollower3
     WaitMovement
     Return
 
@@ -184,17 +188,20 @@ ResortArea_DeclinedVilla:
 ResortArea_WalkBackZ472:
     ApplyMovement LOCALID_SCHOOL_KID_M, ResortArea_Movement_SchoolKidMWalkBackZ472
     ApplyMovement LOCALID_PLAYER, ResortArea_Movement_PlayerWalkWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ResortArea_Movement_PlayerWalkWest
     WaitMovement
     Return
 
 ResortArea_WalkBackZ473:
     ApplyMovement LOCALID_PLAYER, ResortArea_Movement_PlayerWalkWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ResortArea_Movement_PlayerWalkWest
     WaitMovement
     Return
 
 ResortArea_WalkBackZ474:
     ApplyMovement LOCALID_SCHOOL_KID_M, ResortArea_Movement_SchoolKidMWalkBackZ474
     ApplyMovement LOCALID_PLAYER, ResortArea_Movement_PlayerWalkWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ResortArea_Movement_PlayerWalkWest
     WaitMovement
     Return
 
@@ -270,6 +277,25 @@ ResortArea_Movement_PlayerWalkToVillaZ473:
 ResortArea_Movement_PlayerWalkToVillaZ474:
     WalkNormalEast 7
     WalkNormalNorth 3
+    EndMovement
+
+    .balign 4, 0
+ResortArea_Movement_PokemonFollower1:
+    WalkNormalEast 8
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+ResortArea_Movement_PokemonFollower2:
+    WalkNormalEast 8
+    WalkNormalNorth
+    EndMovement
+
+    .balign 4, 0
+ResortArea_Movement_PokemonFollower3:
+    WalkNormalEast 8
+    WalkNormalNorth 2
+
     EndMovement
 
     .balign 4, 0

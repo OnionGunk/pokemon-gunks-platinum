@@ -12,6 +12,7 @@
 #include "field_map_change.h"
 #include "overlay005/field_effect_manager.h"
 #include "overlay005/ov5_021F3D00.h"
+#include "overlay005/pokemon_follower_ball.h"
 
 #include "map_object.h"
 #include "map_object_move.h"
@@ -346,11 +347,17 @@ static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
         }
     }
 
-    MapObject_SetDataAt(mapObj, flags & ~POKEMON_FOLLOWER_FLAG_ARRIVING, POKEMON_FOLLOWER_DATA_FLAGS);
+    MapObject_SetDataAt(mapObj, flags & ~(POKEMON_FOLLOWER_FLAG_ARRIVING | POKEMON_FOLLOWER_FLAG_RELEASE), POKEMON_FOLLOWER_DATA_FLAGS);
 
     int species = MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_SPECIES);
 
-    if (PokemonFollower_CanSpawn(species, fieldSystem->location->mapHeaderID)) {
+    if (!PokemonFollower_CanSpawn(species, fieldSystem->location->mapHeaderID)) {
+        return;
+    }
+
+    if (flags & POKEMON_FOLLOWER_FLAG_RELEASE) {
+        PokemonFollowerBall_Play(mapObj, POKE_BALL_ANIMATION_RELEASE, species);
+    } else {
         MapObject_SetHidden(mapObj, FALSE);
     }
 }

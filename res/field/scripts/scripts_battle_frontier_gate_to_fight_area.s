@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/battle_frontier_gate_to_fight_area.h"
 #include "res/field/events/events_battle_frontier_gate_to_fight_area.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry BattleFrontierGateToFightArea_OnFrame_FirstEntry
     ScriptEntry BattleFrontierGateToFightArea_AttendantGeneral
@@ -255,6 +255,8 @@ BattleFrontierGateToFightArea_PlayerWalkToAttendant:
     ApplyMovement LOCALID_ATTENDANT_BATTLE_HALL, BattleFrontierGateToFightArea_Movement_AttendantFaceWest
     ApplyMovement LOCALID_ATTENDANT_BATTLE_TOWER, BattleFrontierGateToFightArea_Movement_AttendantFaceWest
     ApplyMovement LOCALID_PLAYER, BattleFrontierGateToFightArea_Movement_PlayerWalkToAttendant
+    ShowPokemonFollower
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, BattleFrontierGateToFightArea_Movement_PokemonFollower1
     WaitMovement
     Return
 
@@ -276,6 +278,14 @@ BattleFrontierGateToFightArea_Movement_AttendantFaceWest:
     .balign 4, 0
 BattleFrontierGateToFightArea_Movement_PlayerWalkToAttendant:
     WalkNormalNorth 3
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+BattleFrontierGateToFightArea_Movement_PokemonFollower1:
+    Delay8
+    WalkNormalNorth 2
+
     WalkOnSpotNormalWest
     EndMovement
 

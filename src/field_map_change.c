@@ -469,6 +469,26 @@ BOOL PokemonFollower_CanSpawn(int species, enum MapHeaderID mapHeaderID)
     return TRUE;
 }
 
+MapObject *PokemonFollower_GetMapObject(FieldSystem *fieldSystem)
+{
+    return MapObjMan_LocalMapObjByIndex(fieldSystem->mapObjMan, POKEMON_FOLLOWER_LOCAL_ID);
+}
+
+void PokemonFollower_SetFlag(MapObject *follower, int flag, BOOL set)
+{
+    int flags = MapObject_GetDataAt(follower, POKEMON_FOLLOWER_DATA_FLAGS);
+
+    MapObject_SetDataAt(follower, set ? (flags | flag) : (flags & ~flag), POKEMON_FOLLOWER_DATA_FLAGS);
+}
+
+// Following Platinum's hide helper (fp_023c864c): hidden, status 19 and its own flag move together
+void PokemonFollower_SetScriptHidden(MapObject *follower, BOOL hidden)
+{
+    MapObject_SetHidden(follower, hidden);
+    sub_02062DB4(follower, hidden);
+    PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_SCRIPT_HIDDEN, hidden);
+}
+
 // Ported from Following Platinum's spawn routine: the lead Pokemon follows the player, starting
 // hidden on the player's own tile.
 static void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
@@ -644,6 +664,8 @@ static BOOL FieldTask_LoadNewGameSpawn(FieldTask *task)
 #include "generated/vars_flags.h"
 #include "data/test_save_postgame_vars.h"
 
+extern u16 gTestSaveMode;
+
 // Test saves start post-game: game cleared, and every story variable at its final value so no
 // cutscene auto-starts. Runs after the new-game script, which resets some of these variables.
 static void TestSave_ApplyPostgame(VarsFlags *varsFlags)
@@ -661,7 +683,9 @@ void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem)
     fieldSystem->mapLoadType = MAP_LOAD_TYPE_OVERWORLD;
     FieldSystem_InitNewGameState(fieldSystem);
 #ifdef TEST_SKIP_INTRO
-    TestSave_ApplyPostgame(SaveData_GetVarsFlags(fieldSystem->saveData));
+    if (gTestSaveMode == 0) {
+        TestSave_ApplyPostgame(SaveData_GetVarsFlags(fieldSystem->saveData));
+    }
 #endif
     FieldSystem_CreateTask(fieldSystem, FieldTask_LoadNewGameSpawn, NULL);
 }

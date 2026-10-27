@@ -8,7 +8,6 @@
 #define LOCAL_VAR_MOVE_TO_LEARN VAR_0x8001
 #define LOCAL_VAR_ROTOM_FORM    VAR_0x8004
 
-
     ScriptEntry RotomsRoom_Microwave
     ScriptEntry RotomsRoom_Refrigerator
     ScriptEntry RotomsRoom_WashingMachine
@@ -167,16 +166,49 @@ RotomsRoom_RecallRotom:
     CallIfEq LOCAL_VAR_ROTOM_FORM, ROTOM_FORM_FROST, RotomsRoom_AddRefrigerator
     CallIfEq LOCAL_VAR_ROTOM_FORM, ROTOM_FORM_WASH, RotomsRoom_AddWashingMachine
     CallIfEq LOCAL_VAR_ROTOM_FORM, ROTOM_FORM_MOW, RotomsRoom_AddLawnMower
-    GoTo RotomsRoom_WarpInPlace
-    End
+    GoTo RotomsRoom_PokemonFollower1
+
+RotomsRoom_PokemonFollower1:
+    CheckPokemonFollowerActive VAR_RESULT
+    GoToIfEq VAR_RESULT, 0, RotomsRoom_WarpInPlace
+    GetPokemonFollowerDirFromPlayer VAR_0x8005
 
 RotomsRoom_WarpInPlace:
     GetPlayerMapPos VAR_0x8006, VAR_0x8007
     GetPlayerDir VAR_RESULT
     Warp MAP_HEADER_ROTOMS_ROOM, VAR_0x8006, VAR_0x8007, VAR_RESULT
+    GoToIfEq VAR_0x8005, 0, RotomsRoom_PokemonFollower2
+    GoToIfEq VAR_0x8005, 1, RotomsRoom_PokemonFollower3
+    GoToIfEq VAR_0x8005, 2, RotomsRoom_PokemonFollower4
+    GoToIfEq VAR_0x8005, 3, RotomsRoom_PokemonFollower5
+RotomsRoom_PokemonFollower6:
     FadeScreenIn
     WaitFadeScreen
     End
+
+RotomsRoom_PokemonFollower2:
+    PokemonFollowerPlaceNearPlayer 0, 1
+    ShowPokemonFollower
+    WaitTime 2, VAR_RESULT
+    GoTo RotomsRoom_PokemonFollower6
+
+RotomsRoom_PokemonFollower3:
+    PokemonFollowerPlaceNearPlayer 1, 1
+    ShowPokemonFollower
+    WaitTime 2, VAR_RESULT
+    GoTo RotomsRoom_PokemonFollower6
+
+RotomsRoom_PokemonFollower4:
+    PokemonFollowerPlaceNearPlayer 2, 1
+    ShowPokemonFollower
+    WaitTime 2, VAR_RESULT
+    GoTo RotomsRoom_PokemonFollower6
+
+RotomsRoom_PokemonFollower5:
+    PokemonFollowerPlaceNearPlayer 3, 1
+    ShowPokemonFollower
+    WaitTime 2, VAR_RESULT
+    GoTo RotomsRoom_PokemonFollower6
 
 RotomsRoom_AddMicrowave:
     ClearFlag FLAG_HIDE_ROTOMS_ROOM_MICROWAVE
@@ -357,7 +389,7 @@ RotomsRoom_SetRotomForm:
     CallIfEq LOCAL_VAR_ROTOM_FORM, ROTOM_FORM_WASH, RotomsRoom_RemoveWashingMachine
     CallIfEq LOCAL_VAR_ROTOM_FORM, ROTOM_FORM_MOW, RotomsRoom_RemoveLawnMower
     GoToIfUnset FLAG_USED_ROTOM_APPLIANCE, RotomsRoom_SetStateEnterProfRowan
-    GoTo RotomsRoom_WarpInPlace
+    GoTo RotomsRoom_PokemonFollower1
     End
 
 RotomsRoom_RemoveMicrowave:
@@ -514,7 +546,7 @@ RotomsRoom_ThereWasAnApplianceHere:
 RotomsRoom_SetStateEnterProfRowan:
     SetFlag FLAG_USED_ROTOM_APPLIANCE
     SetVar VAR_ROTOMS_ROOM_STATE, 1
-    GoTo RotomsRoom_WarpInPlace
+    GoTo RotomsRoom_PokemonFollower1
     End
 
 RotomsRoom_OnFrame_ProfRowan:

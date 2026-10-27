@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pokemon_center_b1f_common.h"
 #include "res/text/bank/menu_entries.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PokemonCenterB1FCommon_OnFrame_ReceivePalPad
     ScriptEntry PokemonCenterB1FCommon_AttendantInfo
@@ -16,6 +16,7 @@ PokemonCenterB1FCommon_OnFrame_ReceivePalPad:
     Message PokemonCenterB1FCommon_Text_HelloRightThisWay
     CloseMessage
     ApplyMovement LOCALID_PLAYER, PokemonCenterB1FCommon_Movement_PlayerWalkToAttendantEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonCenterB1FCommon_Movement_PokemonFollower1
     WaitMovement
     Message PokemonCenterB1FCommon_Text_GuideToWiFiClub
     SetVar VAR_0x8004, ITEM_PAL_PAD
@@ -65,6 +66,16 @@ PokemonCenterB1FCommon_Movement_PlayerWalkToAttendantEast:
     WalkNormalNorth 4
     WalkNormalWest
     FaceNorth
+    Delay8 2
+    EndMovement
+
+    .balign 4, 0
+PokemonCenterB1FCommon_Movement_PokemonFollower1:
+    Delay8 3
+    SetVisible
+    Delay8
+    WalkNormalNorth 4
+
     Delay8 2
     EndMovement
 
@@ -190,10 +201,13 @@ PokemonCenterB1FCommon_EnterWiFiClub:
     Message PokemonCenterB1FCommon_Text_RightThisWay
     CloseMessage
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
+    PokemonFollowerStartCutscene
     ApplyMovement LOCALID_PLAYER, PokemonCenterB1FCommon_Movement_PlayerWalkEastToGate
     WaitMovement
-    GoTo PokemonCenterB1FCommon_PlayerEnterWiFiClub
-    End
+    GoTo PokemonCenterB1FCommon_PokemonFollower2
+
+PokemonCenterB1FCommon_PokemonFollower2:
+    PokemonFollowerStartCutscene
 
 PokemonCenterB1FCommon_PlayerEnterWiFiClub:
     LoadDoorAnimation 0, 0, 9, 5, ANIMATION_TAG_DOOR_1
@@ -249,6 +263,7 @@ PokemonCenterB1FCommon_ReturnToPokemonCenter:
     ApplyMovement LOCALID_PLAYER, PokemonCenterB1FCommon_Movement_PlayerExitThroughGate
     WaitMovement
     Call PokemonCenterB1FCommon_DoorCloseAnimation
+    PokemonFollowerEndCutscene
     End
 
     .balign 4, 0
@@ -391,6 +406,7 @@ PokemonCenterB1FCommon_GoToWiFiPlaza:
     GoToIfEq VAR_RESULT, 0, PokemonCenterB1FCommon_WiFiPlazaExit
     Message PokemonCenterB1FCommon_Text_PleaseEnterThisWay
     CloseMessage
+    PokemonFollowerStartCutscene
     ApplyMovement LOCALID_PLAYER, PokemonCenterB1FCommon_Movement_PlayerWalkEastToGate
     WaitMovement
     LoadDoorAnimation 0, 0, 5, 5, ANIMATION_TAG_DOOR_1
@@ -454,6 +470,7 @@ PokemonCenterB1FCommon_OnFrame_ExitWiFiClub:
     ApplyMovement LOCALID_PLAYER, PokemonCenterB1FCommon_Movement_PlayerExitThroughGate
     WaitMovement
     Call PokemonCenterB1FCommon_DoorCloseAnimation
+    PokemonFollowerEndCutscene
     SetVar VAR_ENTERED_WIFI_PLAZA, 0
     ReleaseAll
     End

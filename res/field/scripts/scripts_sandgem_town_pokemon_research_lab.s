@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/sandgem_town_pokemon_research_lab.h"
 #include "res/field/events/events_sandgem_town_pokemon_research_lab.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry SandgemTownLab_OnTransition
     ScriptEntry SandgemTownLab_OnFrame_GetPokedex
@@ -128,18 +128,21 @@ SandgemTownLab_Dummy4:
 
 SandgemTownLab_OnFrame_GetPokedex:
     LockAll
+    WaitTime 16, VAR_RESULT
+    ShowPokemonFollower
     ApplyMovement LOCALID_COUNTERPART, SandgemTownLab_Movement_CounterpartWalkToProfRowan
     ApplyMovement LOCALID_PLAYER, SandgemTownLab_Movement_PlayerWalkToProfRowan
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTownLab_Movement_PokemonFollower1
     WaitMovement
     BufferPlayerName 0
     Message SandgemTownLab_Text_LookAtYourPokemon
     CloseMessage
-    SetPlayerState PLAYER_TRANSITION_HEALING
-    ChangePlayerState
-    ApplyMovement LOCALID_PLAYER, SandgemTownLab_Movement_PlayerGive
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTownLab_Movement_PokemonFollower2
+    ApplyMovement LOCALID_PROF_ROWAN, SandgemTownLab_Movement_PokemonFollower3
     WaitMovement
     SetVar VAR_0x8004, 0
     GetPartyMonSpecies VAR_0x8004, VAR_RESULT
+    PlayCry VAR_RESULT, 0
     SetVar VAR_0x8008, VAR_RESULT
     GoToIfEq VAR_0x8008, SPECIES_TURTWIG, SandgemTownLab_PokemonSeemsRatherHappy
     GoToIfEq VAR_0x8008, SPECIES_CHIMCHAR, SandgemTownLab_PokemonSeemsRatherHappy
@@ -156,15 +159,16 @@ SandgemTownLab_PokemonEvolvedAlready:
 
 SandgemTownLab_GiveItANickname:
     CloseMessage
-    ApplyMovement LOCALID_PLAYER, SandgemTownLab_Movement_PlayerReceive
+    ApplyMovement LOCALID_PROF_ROWAN, SandgemTownLab_Movement_PokemonFollower4
     WaitMovement
-    SetPlayerState PLAYER_TRANSITION_WALKING
-    ChangePlayerState
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTownLab_Movement_PokemonFollower5
     BufferPartyMonSpecies 0, 0
     Message SandgemTownLab_Text_EntrustingWasNoMistake
     Message SandgemTownLab_Text_GiveItANickname
     ShowYesNoMenu VAR_RESULT
-    GoToIfEq VAR_RESULT, MENU_NO, SandgemTownLab_CherishThatStarter
+    WaitMovement
+    CompareVarToValue VAR_RESULT, 1
+    GoToIf 1, SandgemTownLab_PokemonFollower6
     GoTo SandgemTownLab_NicknameStarter
     End
 
@@ -181,13 +185,15 @@ SandgemTownLab_NicknameStarter:
     ShowYesNoMenu VAR_RESULT
     GoToIfEq VAR_RESULT, MENU_NO, SandgemTownLab_NicknameStarter
     CallIfNe VAR_0x8002, 1, SandgemTownLab_IncrementRecordPokemonNicknamed
-    GoTo SandgemTownLab_CherishThatStarter
+    GoTo SandgemTownLab_PokemonFollower6
     End
 
 SandgemTownLab_IncrementRecordPokemonNicknamed:
     IncrementGameRecord RECORD_POKEMON_NICKNAMED
     Return
 
+SandgemTownLab_PokemonFollower6:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTownLab_Movement_PokemonFollower7
 SandgemTownLab_CherishThatStarter:
     BufferPartyMonSpecies 0, 0
     BufferRivalName 1
@@ -227,6 +233,7 @@ SandgemTownLab_RecordDataOnAllPokemon:
     ApplyMovement LOCALID_PLAYER, SandgemTownLab_Movement_PlayerFaceProfRowan
     WaitMovement
     WaitTime 35, VAR_RESULT
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTownLab_Movement_PokemonFollower8
     SetFlag FLAG_ALT_MUSIC_ROWANS_LAB
     PlayMusic SEQ_OPENING_sseq_1
     Message SandgemTownLab_Text_SomethingIWantYouToDo
@@ -250,6 +257,7 @@ SandgemTownLab_ObtainPokedex:
     SetFlag FLAG_HAS_POKEDEX
     BufferPlayerName 0
     Message SandgemTownLab_Text_PlayerObtainedThePokedex
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTownLab_Movement_PokemonFollower9
     PlayFanfare SEQ_FANFA4_sseq
     WaitFanfare
     BufferPlayerName 0
@@ -266,14 +274,18 @@ SandgemTownLab_ObtainPokedex:
 SandgemTownLab_DawnIveGotOneToo:
     BufferCounterpartName 0
     Message SandgemTownLab_Text_DawnIveGotOneToo
-    GoTo SandgemTownLab_GrandAdventureBeginsNow
+    GoTo SandgemTownLab_PokemonFollower10
     End
 
 SandgemTownLab_LucasIveGotTheSamePokedex:
     BufferCounterpartName 0
     Message SandgemTownLab_Text_LucasIveGotTheSamePokedex
-    GoTo SandgemTownLab_GrandAdventureBeginsNow
-    End
+    GoTo SandgemTownLab_PokemonFollower10
+
+SandgemTownLab_PokemonFollower10:
+    LoadPCAnimation 90
+    PlayPCBootUpAnimation 90
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, SandgemTownLab_Movement_PokemonFollower11
 
 SandgemTownLab_GrandAdventureBeginsNow:
     BufferPlayerName 0
@@ -306,6 +318,10 @@ SandgemTownLab_CounterpartLeave:
     CloseMessage
     ApplyMovement LOCALID_PLAYER, SandgemTownLab_Movement_PlayerWatchCounterpartLeave
     ApplyMovement LOCALID_COUNTERPART, SandgemTownLab_Movement_CounterpartLeave
+    WaitTime 20, VAR_RESULT
+    PlayPCShutDownAnimation 90
+    WaitForAnimation 90
+    UnloadAnimation 90
     WaitMovement
     RemoveObject LOCALID_COUNTERPART
     ClearFlag FLAG_HIDE_SANDGEM_TOWN_COUNTERPART
@@ -325,7 +341,6 @@ SandgemTownLab_Movement_ProfRowanWalkOnSpotSouth:
 
     .balign 4, 0
 SandgemTownLab_Movement_CounterpartWalkToProfRowan:
-    Delay16
     WalkNormalNorth 8
     WalkNormalEast
     WalkOnSpotNormalWest
@@ -343,8 +358,14 @@ SandgemTownLab_Movement_CounterpartWalkOnSpotWest3:
 
     .balign 4, 0
 SandgemTownLab_Movement_PlayerWalkToProfRowan:
-    Delay16
     WalkNormalNorth 9
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower1:
+    Delay8
+    WalkNormalNorth 8
+
     EndMovement
 
     .balign 4, 0
@@ -371,16 +392,12 @@ SandgemTownLab_Movement_CounterpartWalkOnSpotWest2:
     .balign 4, 0
 SandgemTownLab_Movement_CounterpartLeave:
     WalkNormalSouth 10
-    EndMovement
 
     .balign 4, 0
 SandgemTownLab_Movement_PlayerGive:
-    PlayerGive
-    EndMovement
 
     .balign 4, 0
 SandgemTownLab_Movement_PlayerReceive:
-    PlayerReceive
     EndMovement
 
 SandgemTownLab_ScientistM:
@@ -512,6 +529,7 @@ SandgemTownLab_SoYouveSeenAllPokemon:
 
 SandgemTownLab_EnableNationalDex:
     GetPlayerDir VAR_0x8007
+    PokemonFollowerStartCutscene
     CallIfEq VAR_0x8007, DIR_NORTH, SandgemTownLab_PlayerWalkFromSouthToSouthFromProfRowan
     CallIfEq VAR_0x8007, DIR_SOUTH, SandgemTownLab_PlayerWalkFromNorthToSouthFromProfRowan
     CallIfEq VAR_0x8007, DIR_WEST, SandgemTownLab_PlayerWalkFromEastToSouthFromProfRowan
@@ -565,6 +583,7 @@ SandgemTownLab_EnableNationalDex:
     Message SandgemTownLab_Text_ThatsThePokemonRadar
     WaitButton
     CloseMessage
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -705,3 +724,67 @@ SandgemTownLab_SetVarArrivedInSunyshoreCity:
     Return
 
     .balign 4, 0
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower3:
+    Delay8
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower4:
+    WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower2:
+    WalkFastWest
+    WalkFastNorth 2
+    FaceEast
+    JumpOnSpotFastEast 2
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower5:
+    WalkSlowNorth 2
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower7:
+    WalkNormalWest 2
+    FaceNorth
+    Delay16
+    Delay8
+    WalkNormalWest
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower8:
+    Delay32
+    WalkFastEast 5
+    WalkFastSouth
+    WalkFastEast 8
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower9:
+    Delay32
+    Delay4
+    WalkSlowWest 5
+    WalkSlowNorth
+    EndMovement
+
+    .balign 4, 0
+SandgemTownLab_Movement_PokemonFollower11:
+    LockDir
+    Delay4 2
+    JumpNearFastSouth
+    UnlockDir
+    WalkFastSouth 2
+    WalkFastWest 2
+    WalkFastSouth
+    WalkFastWest 3
+    WalkFastNorth
+    FaceEast
+    EndMovement

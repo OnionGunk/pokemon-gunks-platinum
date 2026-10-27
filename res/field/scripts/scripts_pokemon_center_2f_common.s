@@ -3,7 +3,6 @@
 #include "res/text/bank/menu_entries.h"
 #include "constants/map_object.h"
 
-
     ScriptEntry PokemonCenter2FCommon_OnResume
     ScriptEntry PokemonCenter2FCommon_AttendantColosseum
     ScriptEntry _051E
@@ -60,6 +59,7 @@ PokemonCenter2FCommon_PlayerEnter:
     ApplyMovement LOCALID_PLAYER, PokemonCenter2FCommon_Movement_PlayerExitThroughGate
     WaitMovement
     Call PokemonCenter2FCommon_DoorCloseAnimation
+    PokemonFollowerEndCutscene
     ClearFlag FLAG_COMMUNICATION_CLUB_ACCESSIBLE
     SetVar VAR_COMMUNICATION_LOAD_ACTION, 0
     ReleaseAll
@@ -313,6 +313,7 @@ PokemonCenter2FCommon_EnterColosseum:
     WaitABPressTime 45
     ScrCmd_135 96
     CloseMessage
+    PokemonFollowerStartCutscene
     LoadDoorAnimation 0, 0, 13, 5, ANIMATION_TAG_DOOR_1
     Call PokemonCenter2FCommon_DoorOpenAnimation
     ApplyMovement LOCALID_PLAYER, PokemonCenter2FCommon_Movement_PlayerEnterThroughGate
@@ -422,6 +423,7 @@ PokemonCenter2FCommon_EnterUnionRoom:
     SetFlag FLAG_COMMUNICATION_CLUB_ACCESSIBLE
     Message PokemonCenter2FCommon_Text_EnjoyUnionRoom
     CloseMessage
+    PokemonFollowerStartCutscene
     LoadDoorAnimation 0, 0, 8, 5, ANIMATION_TAG_DOOR_1
     Call PokemonCenter2FCommon_DoorOpenAnimation
     ApplyMovement LOCALID_PLAYER, PokemonCenter2FCommon_Movement_PlayerEnterThroughGate

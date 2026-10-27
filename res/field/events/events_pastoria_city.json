@@ -179,7 +179,7 @@
         },
         {
             "id": "LOCALID_CLEFAIRY",
-            "graphics_id": "OBJ_EVENT_GFX_CLEFAIRY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CLEFAIRY",
             "movement_type": "MOVEMENT_TYPE_NONE",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -446,7 +446,7 @@
         },
         {
             "id": "LOCALID_CROAGUNK",
-            "graphics_id": "OBJ_EVENT_GFX_CROAGUNK",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CROAGUNK",
             "movement_type": "MOVEMENT_TYPE_LOOK_NORTH",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_PASTORIA_CITY_CROAGUNK",

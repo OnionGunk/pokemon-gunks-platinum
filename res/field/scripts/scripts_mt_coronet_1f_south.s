@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/mt_coronet_1f_south.h"
 #include "res/field/events/events_mt_coronet_1f_south.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry MtCoronet1FSouth_CoordEvent_Cyrus
     ScriptEntryEnd
@@ -21,8 +21,9 @@ MtCoronet1FSouth_CoordEvent_Cyrus:
     WaitMovement
     Message MtCoronet1FSouth_Text_ButWhatBecameOfThatWorld
     CloseMessage
-    ApplyMovement LOCALID_PLAYER, MtCoronet1FSouth_Movement_PlayerMoveAsideAndWatchCyrusLeave
-    ApplyMovement LOCALID_CYRUS, MtCoronet1FSouth_Movement_CyrusLeave
+    ApplyMovement LOCALID_PLAYER, MtCoronet1FSouth_Movement_PokemonFollower1
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, MtCoronet1FSouth_Movement_PokemonFollower2
+    ApplyMovement LOCALID_CYRUS, MtCoronet1FSouth_Movement_PokemonFollower3
     WaitMovement
     RemoveObject LOCALID_CYRUS
     SetVar VAR_MT_CORONET_1F_SOUTH_STATE, 1
@@ -46,8 +47,11 @@ MtCoronet1FSouth_Movement_CyrusWalkOnSpotWest:
     EndMovement
 
     .balign 4, 0
+MtCoronet1FSouth_Movement_PokemonFollower3:
+    Delay8 4
+
+    .balign 4, 0
 MtCoronet1FSouth_Movement_CyrusLeave:
-    Delay8 3
     WalkNormalWest 10
     EndMovement
 
@@ -67,9 +71,18 @@ MtCoronet1FSouth_Movement_PlayerWalkOnSpotNorthEast:
     EndMovement
 
     .balign 4, 0
+MtCoronet1FSouth_Movement_PokemonFollower1:
+    WalkNormalSouth 2
+
+    .balign 4, 0
 MtCoronet1FSouth_Movement_PlayerMoveAsideAndWatchCyrusLeave:
-    WalkNormalSouth
     WalkOnSpotNormalNorth
     Delay8 2
     WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+MtCoronet1FSouth_Movement_PokemonFollower2:
+    WalkNormalEast
+    WalkNormalSouth
     EndMovement

@@ -1,7 +1,6 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pokemon_mansion_maids_room.h"
 
-
     ScriptEntry PokemonMansionMaidsRoom_MaidMiddle
     ScriptEntry PokemonMansionMaidsRoom_MaidEast
     ScriptEntry PokemonMansionMaidsRoom_Bed
@@ -57,6 +56,8 @@ PokemonMansionMaidsRoom_Rest:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     BufferPlayerName 0

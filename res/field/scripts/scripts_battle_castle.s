@@ -3,13 +3,13 @@
 #include "res/text/bank/menu_entries.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_castle_functions.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry BattleCastle_SingleAttendant
     ScriptEntry BattleCastle_OnFrame_ResumeChallenge
     ScriptEntry BattleCastle_OnFrame_DidntSaveBeforeQuit
     ScriptEntry BattleCastle_OnFrame_ChallengeEndedCompletedRound
-    ScriptEntry BattleCastle_OnFrame_ChallengeEnded
+    ScriptEntry BattleCastle_PokemonFollower4
     ScriptEntry BattleCastle_MultiAttendant
     ScriptEntry BattleCastle_Artist
     ScriptEntry BattleCastle_Socialite
@@ -161,7 +161,7 @@ BattleCastle_HealAndSaveBeforeChallenge:
     SetVar VAR_RESULT, VAR_MAP_LOCAL_0x00
     GoToIfEq VAR_RESULT, 0, BattleCastle_EndChallenge
     GoToIfEq VAR_BATTLE_CASTLE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleCastle_BecomeLeaderOrJoinGroup
-    GoTo BattleCastle_WalkIntoCorridor
+    GoTo BattleCastle_PokemonFollower1
     End
 
 BattleCastle_BecomeLeaderOrJoinGroup:
@@ -233,7 +233,7 @@ BattleCastle_StartMultiChallenge:
     Message BattleCastle_Text_MustSaveFirst
     CallIfEq VAR_BATTLE_CASTLE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleCastle_SetChallengeInProgress
     Call BattleCastle_SaveGame
-    GoTo BattleCastle_WalkIntoCorridor
+    GoTo BattleCastle_PokemonFollower1
     End
 
 BattleCastle_SetChallengeInProgress:
@@ -272,6 +272,8 @@ BattleCastle_EndCommunicationSamePokemon:
     EndCommunication
     Return
 
+BattleCastle_PokemonFollower1:
+    PokemonFollowerStartCutscene
 BattleCastle_WalkIntoCorridor:
     CallIfEq VAR_BATTLE_CASTLE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_SINGLE, BattleCastle_WalkToCorridorSingleChallenge
     CallIfEq VAR_BATTLE_CASTLE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleCastle_WalkToCorridorDoubleChallenge
@@ -447,7 +449,7 @@ BattleCastle_OnFrame_ResumeChallenge:
     Message BattleCastle_Text_MustSaveBeforeResuming
     Call BattleCastle_SetChallengeInProgress
     Call BattleCastle_SaveGame
-    GoTo BattleCastle_WalkIntoCorridor
+    GoTo BattleCastle_PokemonFollower1
     End
 
 BattleCastle_SaveGame:
@@ -461,6 +463,7 @@ BattleCastle_SaveGame:
 BattleCastle_OnFrame_DidntSaveBeforeQuit:
     Message BattleCastle_Text_DidntSaveBeforeQuit
     DeleteActiveBattleCastleStreak VAR_BATTLE_CASTLE_CHALLENGE_TYPE
+    Call BattleCastle_PokemonFollower2
     GoTo BattleCastle_EndChallenge
     End
 
@@ -469,6 +472,7 @@ BattleCastle_OnFrame_ChallengeEndedCompletedRound:
     CallIfEq VAR_BATTLE_CASTLE_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleCastle_IncrementTrainerScoreRoundCompleted
     CallIfEq VAR_BATTLE_CASTLE_PRINT_STATE, 1, BattleCastle_EarnedSilverPrint
     CallIfEq VAR_BATTLE_CASTLE_PRINT_STATE, 3, BattleCastle_EarnedGoldPrint
+    Call BattleCastle_PokemonFollower2
     GoTo BattleCastle_EndChallenge
     End
 
@@ -495,6 +499,8 @@ BattleCastle_EarnedGoldPrint:
     Common_CheckAllFrontierGoldPrintsObtained
     Return
 
+BattleCastle_PokemonFollower4:
+    Call BattleCastle_PokemonFollower2
 BattleCastle_OnFrame_ChallengeEnded:
     GoTo BattleCastle_EndChallenge
     End
@@ -540,3 +546,11 @@ BattleCastle_BlackBelt:
     End
 
     .balign 4, 0
+
+BattleCastle_PokemonFollower2:
+    GetMovementType VAR_RESULT, LOCALID_POKEMON_FOLLOWER
+    GoToIfEq VAR_RESULT, 68, BattleCastle_PokemonFollower3
+    PokemonFollowerEndCutscene
+
+BattleCastle_PokemonFollower3:
+    Return

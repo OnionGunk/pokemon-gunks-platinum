@@ -2,7 +2,6 @@
 #include "res/text/bank/resort_area_ribbon_syndicate_2f.h"
 #include "res/field/events/events_resort_area_ribbon_syndicate_2f.h"
 
-
     ScriptEntry ResortAreaRibbonSyndicate2F_Receptionist3
     ScriptEntry ResortAreaRibbonSyndicate2F_Receptionist1
     ScriptEntry ResortAreaRibbonSyndicate2F_Receptionist2
@@ -33,7 +32,7 @@ ResortAreaRibbonSyndicate2F_SeeYouAgain:
 ResortAreaRibbonSyndicate2F_RightThisWayPlease:
     Message ResortAreaRibbonSyndicate2F_Text_RightThisWayPlease
     CloseMessage
-    Call ResortAreaRibbonSyndicate2F_WalkToChair
+    Call ResortAreaRibbonSyndicate2F_PokemonFollower1
     GoTo ResortAreaRibbonSyndicate2F_ReadyToBegin
 
 ResortAreaRibbonSyndicate2F_ReadyToBegin:
@@ -66,6 +65,7 @@ ResortAreaRibbonSyndicate2F_TreatmentEnd:
     Call ResortAreaRibbonSyndicate2F_IncreaseFriendship
     WaitButton
     CloseMessage
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -108,6 +108,8 @@ ResortAreaRibbonSyndicate2F_FinishTreatment:
     WaitMovement
     Return
 
+ResortAreaRibbonSyndicate2F_PokemonFollower1:
+    PokemonFollowerStartCutscene
 ResortAreaRibbonSyndicate2F_WalkToChair:
     GetPlayerMapPos VAR_0x8005, VAR_0x8006
     GoToIfEq VAR_0x8005, 11, ResortAreaRibbonSyndicate2F_WalkToChairX11

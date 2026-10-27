@@ -6,6 +6,16 @@
 #include "savedata.h"
 
 #ifdef TEST_SKIP_INTRO
+extern u16 gTestSaveMode;
+
+static const Location sStoryStartLocation = {
+    .mapHeaderID = MAP_HEADER_TWINLEAF_TOWN_PLAYER_HOUSE_2F,
+    .warpId = WARP_ID_NONE,
+    .x = 4,
+    .z = 6,
+    .faceDirection = FACE_UP,
+};
+
 // test builds start on Twinleaf's north road: Route 201's grass and the map border are a few steps north
 static const Location sPlayerStartLocation = {
     .mapHeaderID = MAP_HEADER_TWINLEAF_TOWN,
@@ -34,6 +44,12 @@ static const Location sPlayerFirstRespawnLocation = {
 
 void SetPlayerStartLocation(Location *outLocation)
 {
+#ifdef TEST_SKIP_INTRO
+    if (gTestSaveMode == 1) {
+        *outLocation = sStoryStartLocation;
+        return;
+    }
+#endif
     *outLocation = sPlayerStartLocation;
 }
 

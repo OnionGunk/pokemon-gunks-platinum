@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/stark_mountain_room_2.h"
 #include "res/field/events/events_stark_mountain_room_2.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry StarkMountainRoom2_CoordEvent_BuckStartFollowing
     ScriptEntry StarkMountainRoom2_CoordEvent_PlayerLeaveBuck
@@ -28,6 +28,7 @@ StarkMountainRoom2_CoordEvent_BuckStartFollowing:
     PlayFanfare SEQ_GONIN_sseq
     Message StarkMountainRoom2_Text_DecidedToGoWithBuck
     WaitFanfare
+    PokemonFollowerStartCutscene
     SetFlag FLAG_TALKED_TO_STARK_MOUNTAIN_ROOM_2_BUCK
     SetVar VAR_STARK_MOUNTAIN_ROOM_2_FOLLOWER_BUCK_STATE, 1
     Message StarkMountainRoom2_Text_IllKeepPokemonHealthy
@@ -49,6 +50,8 @@ StarkMountainRoom2_BuckEnterStartFollowing:
     ClearFlag FLAG_HIDE_STARK_MOUNTAIN_ROOM_2_BUCK
     AddObject LOCALID_BUCK
     ApplyMovement LOCALID_BUCK, StarkMountainRoom2_Movement_BuckEnter
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, StarkMountainRoom2_Movement_PokemonFollower1
+    ApplyMovement LOCALID_PLAYER, StarkMountainRoom2_Movement_PokemonFollower2
     WaitMovement
     ApplyMovement LOCALID_PLAYER, StarkMountainRoom2_Movement_PlayerWalkOnSpotSouth
     WaitMovement
@@ -96,6 +99,7 @@ StarkMountainRoom2_CoordEvent_PlayerLeaveBuck:
     SetMovementType LOCALID_BUCK, MOVEMENT_TYPE_LOOK_SOUTH
     ApplyMovement LOCALID_BUCK, StarkMountainRoom2_Movement_BuckWalkNorth
     WaitMovement
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -155,6 +159,7 @@ StarkMountainRoom2_HereWeAre:
     RemoveObject LOCALID_BUCK
     WaitSE SEQ_SE_DP_KAIDAN2_sseq
     SetVar VAR_STARK_MOUNTAIN_ROOM_2_FOLLOWER_BUCK_STATE, 2
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -196,3 +201,23 @@ StarkMountainRoom2_Dummy5:
     End
 
     .balign 4, 0
+
+    .balign 4, 0
+StarkMountainRoom2_Movement_PokemonFollower1:
+    FaceSouth
+    Delay8 2
+    WalkNormalNorth
+    WalkNormalEast
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+StarkMountainRoom2_Movement_PokemonFollower2:
+    Delay8 2
+    WalkNormalWest
+    WalkOnSpotNormalEast
+    Delay8
+    Delay4
+    WalkNormalEast
+    WalkOnSpotNormalSouth
+    EndMovement

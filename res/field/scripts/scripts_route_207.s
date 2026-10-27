@@ -2,7 +2,7 @@
 #include "res/text/bank/menu_entries.h"
 #include "res/text/bank/route_207.h"
 #include "res/field/events/events_route_207.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route207_OnTransition
     ScriptEntry Route207_CoordEvent_Counterpart
@@ -35,9 +35,9 @@ Route207_CoordEvent_Counterpart:
     ApplyMovement LOCALID_COUNTERPART, Route207_Movement_CounterpartNoticePlayer
     WaitMovement
     Common_SetCounterpartBGM
-    ApplyMovement LOCALID_COUNTERPART, Route207_Movement_CounterpartWalkToPlayer
-    WaitMovement
-    ApplyMovement LOCALID_PLAYER, Route207_Movement_PlayerFaceCounterpart
+    ApplyMovement LOCALID_COUNTERPART, Route207_Movement_PokemonFollower1
+    ApplyMovement LOCALID_PLAYER, Route207_Movement_PokemonFollower2
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route207_Movement_PokemonFollower3
     WaitMovement
     GoTo Route207_Counterpart
     End
@@ -108,8 +108,6 @@ Route207_CounterpartLeave:
 
     .balign 4, 0
 Route207_Movement_PlayerFaceCounterpart:
-    WalkOnSpotNormalWest
-    EndMovement
 
 Route207_Movement_Unused:
     Delay8 8
@@ -128,8 +126,24 @@ Route207_Movement_CounterpartNoticePlayer:
     EndMovement
 
     .balign 4, 0
+Route207_Movement_PokemonFollower1:
+    WalkNormalEast 4
+    EndMovement
+
+    .balign 4, 0
+Route207_Movement_PokemonFollower2:
+    WalkOnSpotNormalWest
+    Delay8 2
+    WalkNormalWest
+    EndMovement
+
+    .balign 4, 0
+Route207_Movement_PokemonFollower3:
+    WalkOnSpotNormalWest 3
+    WalkNormalEast
+
+    .balign 4, 0
 Route207_Movement_CounterpartWalkToPlayer:
-    WalkNormalEast 5
     EndMovement
 
     .balign 4, 0

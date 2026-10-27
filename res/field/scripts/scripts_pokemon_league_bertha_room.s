@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pokemon_league_bertha_room.h"
 #include "res/field/events/events_pokemon_league_bertha_room.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PokemonLeagueBerthaRoom_Bertha
     ScriptEntry PokemonLeagueBerthaRoom_OnFrame_EnterRoom
@@ -60,7 +60,9 @@ PokemonLeagueBerthaRoom_BerthaPostBattle:
 
 PokemonLeagueBerthaRoom_OnFrame_EnterRoom:
     LockAll
+    ShowPokemonFollower
     ApplyMovement LOCALID_PLAYER, PokemonLeagueBerthaRoom_Movement_PlayerEnterRoom
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonLeagueBerthaRoom_Movement_PokemonFollower1
     WaitMovement
     PlaySE SEQ_SE_DP_KI_GASYAN_sseq
     ClearFlag FLAG_HIDE_POKEMON_LEAGUE_BERTHA_ROOM_ENTRANCE_DOOR
@@ -72,4 +74,10 @@ PokemonLeagueBerthaRoom_OnFrame_EnterRoom:
     .balign 4, 0
 PokemonLeagueBerthaRoom_Movement_PlayerEnterRoom:
     WalkNormalNorth 2
+    EndMovement
+
+    .balign 4, 0
+PokemonLeagueBerthaRoom_Movement_PokemonFollower1:
+    Delay8
+    WalkNormalNorth
     EndMovement

@@ -1,7 +1,6 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_205_house.h"
 
-
     ScriptEntry Route205House_PokefanF
     ScriptEntry Route205House_BugCatcher
     ScriptEntryEnd
@@ -23,6 +22,8 @@ Route205House_Rest:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     Message Route205House_Text_PokemonLookRefreshed

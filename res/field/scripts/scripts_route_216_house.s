@@ -1,7 +1,6 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_216_house.h"
 
-
     ScriptEntry Route216House_Hiker
     ScriptEntry Route216House_SnowpointNPCF
     ScriptEntry Route216House_Bed
@@ -24,6 +23,8 @@ Route216House_HikerRest:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     Message Route216House_Text_YourPokemonAreHealthy
@@ -61,6 +62,8 @@ Route216House_RestInBed:
     PlayFanfare SEQ_ASA_sseq
     WaitFanfare
     HealParty
+    WaitForTransition
+    ReturnToField
     FadeScreenIn
     WaitFadeScreen
     BufferPlayerName 0

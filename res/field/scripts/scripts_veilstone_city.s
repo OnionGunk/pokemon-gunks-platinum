@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/veilstone_city.h"
 #include "res/field/events/events_veilstone_city.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry VeilstoneCity_OnTransition
     ScriptEntry VeilstoneCity_Guitarist1
@@ -595,13 +595,15 @@ VeilstoneCity_Unused2:
 VeilstoneCity_EnterWarehouseZ595:
     ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_LookerEnterWarehouse
     ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PlayerEnterWarehouseZ595
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VeilstoneCity_Movement_PokemonFollower1
     WaitMovement
     GoTo VeilstoneCity_WarpToWarehouse
     End
 
 VeilstoneCity_EnterWarehouseZ597:
     ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_LookerEnterWarehouse
-    ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PlayerEnterWarehouseZ597
+    ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PokemonFollower2
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VeilstoneCity_Movement_PokemonFollower3
     WaitMovement
     GoTo VeilstoneCity_WarpToWarehouse
     End
@@ -649,18 +651,21 @@ VeilstoneCity_SetCounterpartPartnerTeamReturn:
 VeilstoneCity_PlayerAndCounterpartWalkToGruntsEast:
     ApplyMovement LOCALID_COUNTERPART, VeilstoneCity_Movement_CounterpartWalkToGruntEast
     ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PlayerWalkToGruntEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VeilstoneCity_Movement_PokemonFollower4
     WaitMovement
     Return
 
 VeilstoneCity_PlayerAndCounterpartWalkToGruntsSouth:
     ApplyMovement LOCALID_COUNTERPART, VeilstoneCity_Movement_CounterpartWalkToGruntSouth
     ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PlayerWalkToGruntSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VeilstoneCity_Movement_PlayerWalkToGruntSouth
     WaitMovement
     Return
 
 VeilstoneCity_PlayerAndCounterpartWalkToGruntsNorth:
     ApplyMovement LOCALID_COUNTERPART, VeilstoneCity_Movement_CounterpartWalkToGruntNorth
     ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PlayerWalkToGruntNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VeilstoneCity_Movement_PlayerWalkToGruntNorth
     WaitMovement
     Return
 
@@ -849,6 +854,13 @@ VeilstoneCity_Movement_PlayerWalkToGruntEast:
     EndMovement
 
     .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower4:
+    WalkNormalEast
+    WalkNormalNorth
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
 VeilstoneCity_Movement_PlayerWalkToGruntSouth:
     WalkOnSpotNormalEast
     EndMovement
@@ -909,6 +921,27 @@ VeilstoneCity_Movement_PlayerEnterWarehouseZ595:
     WalkNormalNorth 5
     SetInvisible
     EndMovement
+
+    .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower2:
+    WalkNormalNorth
+    WalkNormalEast 5
+    WalkNormalNorth 5
+    SetInvisible
+    EndMovement
+
+    .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower1:
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast 5
+    WalkNormalNorth 5
+    SetInvisible
+    EndMovement
+
+    .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower3:
+    WalkNormalEast
 
     .balign 4, 0
 VeilstoneCity_Movement_PlayerEnterWarehouseZ597:
@@ -1000,6 +1033,7 @@ VeilstoneCity_CoordEvent_GruntBlockWarehouse:
     CloseMessage
     ApplyMovement LOCALID_GRUNT_M_WAREHOUSE_NORTH, VeilstoneCity_Movement_GruntPushPlayerBack
     ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PlayerGetPushed
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VeilstoneCity_Movement_PlayerGetPushed
     WaitMovement
     ReleaseAll
     End
@@ -1082,20 +1116,41 @@ VeilstoneCity_GruntMStorageKey:
     ClearFlag FLAG_HIDE_VEILSTONE_CITY_LOOKER
     AddObject LOCALID_LOOKER
     GetPlayerDir VAR_RESULT
-    GoToIfEq VAR_RESULT, DIR_NORTH, VeilstoneCity_GruntMStorageKeyLeaveNorth
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    CompareVarToValue VAR_RESULT, 0
+    GoToIf 1, VeilstoneCity_PokemonFollower5
     GoToIfEq VAR_RESULT, DIR_SOUTH, VeilstoneCity_GruntMStorageKeyLeaveSouth
     GoToIfEq VAR_RESULT, DIR_WEST, VeilstoneCity_GruntMStorageKeyLeaveWest
     GoToIfEq VAR_RESULT, DIR_EAST, VeilstoneCity_GruntMStorageKeyLeaveEast
     End
 
-VeilstoneCity_GruntMStorageKeyLeaveNorth:
+VeilstoneCity_PokemonFollower5:
+    GoToIfEq VAR_0x8004, 722, VeilstoneCity_PokemonFollower6
     ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PlayerWatchGruntMStorageKeyLeaveNorth
     ApplyMovement LOCALID_GRUNT_M_STORAGE_KEY, VeilstoneCity_Movement_GruntMStorageKeyLeaveNorthSouthEast
+    GoTo VeilstoneCity_GruntMStorageKeyLeaveNorth
+
+VeilstoneCity_PokemonFollower6:
+    ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PokemonFollower7
+    ApplyMovement LOCALID_GRUNT_M_STORAGE_KEY, VeilstoneCity_Movement_PokemonFollower8
+VeilstoneCity_GruntMStorageKeyLeaveNorth:
     WaitMovement
     Common_SetLookerBGM
+    CallIfNe VAR_0x8005, 595, VeilstoneCity_PokemonFollower9
+    CallIfEq VAR_0x8005, 595, VeilstoneCity_PokemonFollower10
+    GoTo VeilstoneCity_RemoveGruntMStorageKey
+
+VeilstoneCity_PokemonFollower9:
     ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_LookerEnterNorth
     WaitMovement
-    GoTo VeilstoneCity_RemoveGruntMStorageKey
+    Return
+
+VeilstoneCity_PokemonFollower10:
+    ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_LookerEnterEast
+    ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PokemonFollower11
+    WaitMovement
+    Return
+
     End
 
 VeilstoneCity_GruntMStorageKeyLeaveSouth:
@@ -1112,7 +1167,8 @@ VeilstoneCity_GruntMStorageKeyLeaveEast:
     ApplyMovement LOCALID_GRUNT_M_STORAGE_KEY, VeilstoneCity_Movement_GruntMStorageKeyLeaveNorthSouthEast
     WaitMovement
     Common_SetLookerBGM
-    ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_LookerEnterEast
+    ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_LookerEnterWest
+    ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PokemonFollower11
     WaitMovement
     GoTo VeilstoneCity_RemoveGruntMStorageKey
     End
@@ -1122,7 +1178,8 @@ VeilstoneCity_GruntMStorageKeyLeaveWest:
     ApplyMovement LOCALID_GRUNT_M_STORAGE_KEY, VeilstoneCity_Movement_GruntMStorageKeyLeaveWest
     WaitMovement
     Common_SetLookerBGM
-    ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_LookerEnterWest
+    ApplyMovement LOCALID_LOOKER, VeilstoneCity_Movement_PokemonFollower12
+    ApplyMovement LOCALID_PLAYER, VeilstoneCity_Movement_PokemonFollower13
     WaitMovement
     GoTo VeilstoneCity_RemoveGruntMStorageKey
     End
@@ -1170,6 +1227,14 @@ VeilstoneCity_Movement_GruntMStorageKeyLeaveNorthSouthEast:
     EndMovement
 
     .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower8:
+    WalkFastWest
+    WalkFastSouth 2
+    WalkFastEast 3
+    WalkFastSouth 9
+    EndMovement
+
+    .balign 4, 0
 VeilstoneCity_Movement_GruntMStorageKeyLeaveWest:
     WalkFastSouth 2
     WalkFastEast 2
@@ -1180,6 +1245,14 @@ VeilstoneCity_Movement_GruntMStorageKeyLeaveWest:
 VeilstoneCity_Movement_PlayerWatchGruntMStorageKeyLeaveNorth:
     Delay8
     WalkOnSpotNormalEast
+    WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower7:
+    Delay8
+    WalkOnSpotNormalWest
+
     WalkOnSpotNormalSouth
     EndMovement
 
@@ -1212,15 +1285,40 @@ VeilstoneCity_Movement_LookerEnterNorth:
     .balign 4, 0
 VeilstoneCity_Movement_LookerEnterEast:
     WalkNormalNorth 6
-    WalkNormalWest 3
+    WalkNormalWest
+
     WalkNormalNorth
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower11:
+    Delay8 7
+    WalkOnSpotNormalEast
+
     EndMovement
 
     .balign 4, 0
 VeilstoneCity_Movement_LookerEnterWest:
     WalkNormalNorth 6
-    WalkNormalWest
-    WalkNormalNorth
+    WalkNormalWest 2
+    WalkNormalNorth 2
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower12:
+    WalkNormalNorth 6
+    WalkNormalWest 2
+    WalkNormalNorth 2
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+VeilstoneCity_Movement_PokemonFollower13:
+    Delay8 9
+    WalkOnSpotNormalWest
+
     EndMovement
 
 VeilstoneCity_Looker:
@@ -1285,6 +1383,7 @@ VeilstoneCity_DeoxysMeteoriteSpeed:
     CheckPartyHasSpecies2 SPECIES_DEOXYS, VAR_RESULT
     GoToIfEq VAR_RESULT, FALSE, VeilstoneCity_MeteoriteFromTheStars
     ChangeDeoxysForm DEOXYS_FORM_SPEED
+    Call VeilstoneCity_PokemonFollower14
     PlayCry SPECIES_DEOXYS
     Message VeilstoneCity_Text_MeteoriteSpeed
     WaitButton
@@ -1299,6 +1398,7 @@ VeilstoneCity_DeoxysMeteoriteDefense:
     CheckPartyHasSpecies2 SPECIES_DEOXYS, VAR_RESULT
     GoToIfEq VAR_RESULT, FALSE, VeilstoneCity_MeteoriteFromTheStars
     ChangeDeoxysForm DEOXYS_FORM_DEFENSE
+    Call VeilstoneCity_PokemonFollower14
     PlayCry SPECIES_DEOXYS
     Message VeilstoneCity_Text_MeteoriteDefense
     WaitButton
@@ -1313,6 +1413,7 @@ VeilstoneCity_DeoxysMeteoriteAttack:
     CheckPartyHasSpecies2 SPECIES_DEOXYS, VAR_RESULT
     GoToIfEq VAR_RESULT, FALSE, VeilstoneCity_MeteoriteFromTheStars
     ChangeDeoxysForm DEOXYS_FORM_ATTACK
+    Call VeilstoneCity_PokemonFollower14
     PlayCry SPECIES_DEOXYS
     Message VeilstoneCity_Text_MeteoriteAttack
     WaitButton
@@ -1327,6 +1428,7 @@ VeilstoneCity_DeoxysMeteoriteNormal:
     CheckPartyHasSpecies2 SPECIES_DEOXYS, VAR_RESULT
     GoToIfEq VAR_RESULT, FALSE, VeilstoneCity_MeteoriteFromTheStars
     ChangeDeoxysForm DEOXYS_FORM_NORMAL
+    Call VeilstoneCity_PokemonFollower14
     PlayCry SPECIES_DEOXYS
     Message VeilstoneCity_Text_MeteoriteNormal
     WaitButton
@@ -1341,6 +1443,21 @@ VeilstoneCity_MeteoriteFromTheStars:
     CloseMessage
     ReleaseAll
     End
+
+VeilstoneCity_PokemonFollower14:
+    GetPokemonFollowerPartySlot VAR_0x8004
+    GetPartyMonSpecies VAR_0x8004, VAR_RESULT
+    GoToIfEq VAR_RESULT, 386, VeilstoneCity_PokemonFollower15
+    Return
+
+VeilstoneCity_PokemonFollower15:
+    FadeScreen 6, 1, 0, 0
+    WaitFadeScreen
+    WaitForTransition
+    ReturnToField
+    FadeScreen 6, 1, 1, 0
+    WaitFadeScreen
+    Return
 
 VeilstoneCity_OnFrame_CounterpartNeedsHelp:
     LockAll

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/galactic_hq_hall.h"
 #include "res/field/events/events_galactic_hq_hall.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry GalacticHQHall_CoordEvent_Speech
     ScriptEntryEnd
@@ -104,12 +104,14 @@ GalacticHQHall_CoordEvent_Speech:
 GalacticHQHall_LookerPlayerWalkToSpeechZ12:
     ApplyMovement LOCALID_LOOKER, GalacticHQHall_Movement_LookerWalkOnSpotWest
     ApplyMovement LOCALID_PLAYER, GalacticHQHall_Movement_PlayerWalkSouthWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, GalacticHQHall_Movement_PokemonFollower1
     WaitMovement
     Return
 
 GalacticHQHall_LookerPlayerWalkToSpeechZ13:
     ApplyMovement LOCALID_LOOKER, GalacticHQHall_Movement_LookerWalkOnSpotWest
-    ApplyMovement LOCALID_PLAYER, GalacticHQHall_Movement_PlayerWalkWest
+    ApplyMovement LOCALID_PLAYER, GalacticHQHall_Movement_PokemonFollower2
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, GalacticHQHall_Movement_PlayerWalkWest
     WaitMovement
     Return
 
@@ -143,6 +145,19 @@ GalacticHQHall_Movement_CameraMoveSouthEast:
 GalacticHQHall_Movement_PlayerWalkSouthWest:
     WalkNormalSouth
     WalkNormalWest
+    EndMovement
+
+    .balign 4, 0
+GalacticHQHall_Movement_PokemonFollower2:
+    WalkNormalWest
+    EndMovement
+
+    .balign 4, 0
+GalacticHQHall_Movement_PokemonFollower1:
+    WalkNormalWest
+    WalkNormalSouth
+    FaceWest
+
     EndMovement
 
     .balign 4, 0

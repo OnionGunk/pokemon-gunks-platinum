@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pokemon_league_north_pokecenter_1f.h"
 #include "res/field/events/events_pokemon_league_north_pokecenter_1f.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PokemonLeagueNorthPokecenter1F_DoorGuard
     ScriptEntry PokemonLeagueNorthPokecenter1F_VendorCommon
@@ -109,12 +109,36 @@ PokemonLeagueNorthPokecenter1F_CoordEvent_Rival:
     LockAll
     ClearFlag FLAG_HIDE_POKEMON_LEAGUE_NORTH_POKECENTER_1F_RIVAL
     AddObject LOCALID_LEAGUE_NORTH_RIVAL
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    CallIfNe VAR_0x8005, 5, PokemonLeagueNorthPokecenter1F_PokemonFollower1
+    CallIfEq VAR_0x8005, 5, PokemonLeagueNorthPokecenter1F_PokemonFollower2
     Common_SetRivalBGM
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     GoToIfEq VAR_0x8004, 10, PokemonLeagueNorthPokecenter1F_RivalEnterWest
     GoToIfEq VAR_0x8004, 11, PokemonLeagueNorthPokecenter1F_RivalEnterNorth
     GoToIfEq VAR_0x8004, 12, PokemonLeagueNorthPokecenter1F_RivalEnterEast
     End
+
+PokemonLeagueNorthPokecenter1F_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonLeagueNorthPokecenter1F_Movement_PokemonFollower3
+    Return
+
+    .balign 4, 0
+PokemonLeagueNorthPokecenter1F_Movement_PokemonFollower3:
+    JumpOnSpotFastSouth
+    EndMovement
+
+PokemonLeagueNorthPokecenter1F_PokemonFollower2:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonLeagueNorthPokecenter1F_Movement_PokemonFollower4
+    Return
+
+    .balign 4, 0
+PokemonLeagueNorthPokecenter1F_Movement_PokemonFollower4:
+    JumpOnSpotFastSouth
+    WalkFastEast
+    WalkFastNorth
+    FaceSouth
+    EndMovement
 
 PokemonLeagueNorthPokecenter1F_RivalEnterWest:
     ApplyMovement LOCALID_LEAGUE_NORTH_RIVAL, PokemonLeagueNorthPokecenter1F_Movement_RivalEnterWest

@@ -2,7 +2,7 @@
 #include "res/text/bank/jubilife_city.h"
 #include "res/text/bank/menu_entries.h"
 #include "res/field/events/events_jubilife_city.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry JubilifeCity_OnTransition
     ScriptEntry JubilifeCity_CoordEvent_FirstArrival
@@ -186,6 +186,7 @@ JubilifeCity_LucasLessThanFourPokemon:
 JubilifeCity_CounterpartLeave:
     ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartLeaveFirstArrival
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWatchCounterpartLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower1
     WaitMovement
     RemoveObject LOCALID_COUNTERPART
     SetVar VAR_JUBILIFE_CITY_STATE, 1
@@ -203,18 +204,21 @@ JubilifeCity_PlayerAndCounterpartWalkNorth:
 JubilifeCity_PlayerAndCounterpartWalkNorthX173:
     ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartWalkNorthX173
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkNorthX173
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower2
     WaitMovement
     Return
 
 JubilifeCity_PlayerAndCounterpartWalkNorthX174:
     ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartWalkNorthX174
-    ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkNorthX174
+    ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PokemonFollower3
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PlayerWalkNorthX174
     WaitMovement
     Return
 
 JubilifeCity_PlayerAndCounterpartWalkNorthX175:
     ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartWalkNorthX175
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkNorthX175
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower4
     WaitMovement
     Return
 
@@ -224,6 +228,7 @@ JubilifeCity_LookerWalkAround:
     ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkEast
     ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartWalkToLooker
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkToLooker
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower5
     WaitMovement
     Return
 
@@ -277,6 +282,7 @@ JubilifeCity_LookerGiveVSRecorderAndLeave:
 JubilifeCity_CounterpartWalkToTrainersSchool:
     ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartWalkToTrainersSchool
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWatchCounterpartWalkToTrainersSchool
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PlayerWatchCounterpartWalkToTrainersSchool
     WaitMovement
     Return
 
@@ -356,10 +362,30 @@ JubilifeCity_Movement_PlayerWalkNorthX173:
     EndMovement
 
     .balign 4, 0
+JubilifeCity_Movement_PokemonFollower2:
+    WalkNormalNorth 2
+    WalkNormalEast
+    WalkNormalNorth 16
+    EndMovement
+
+    .balign 4, 0
 JubilifeCity_Movement_PlayerWalkNorthX175:
     WalkNormalNorth
     WalkNormalWest
     WalkNormalNorth 17
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower4:
+    WalkNormalNorth 2
+    WalkNormalWest
+    WalkNormalNorth 16
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower3:
+    WalkNormalNorth 18
+
     EndMovement
 
     .balign 4, 0
@@ -375,6 +401,13 @@ JubilifeCity_Movement_PlayerWalkToLooker:
     EndMovement
 
     .balign 4, 0
+JubilifeCity_Movement_PokemonFollower5:
+    WalkNormalNorth 3
+    WalkNormalEast
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
 JubilifeCity_Movement_PlayerWatchCounterpartWalkToTrainersSchool:
     Delay4
     WalkOnSpotNormalWest
@@ -384,6 +417,13 @@ JubilifeCity_Movement_PlayerWatchCounterpartWalkToTrainersSchool:
 JubilifeCity_Movement_PlayerWatchCounterpartLeave:
     Delay8
     WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower1:
+    Delay16
+    FaceSouth
+
     EndMovement
 
     .balign 4, 0
@@ -475,6 +515,7 @@ JubilifeCity_GTSGreeterBlockPlayerZ779:
     CloseMessage
     ApplyMovement LOCALID_ACE_TRAINER_M_3, JubilifeCity_Movement_GTSGreeterWalkBackZ779
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PlayerStepBackEast
     WaitMovement
     GoTo JubilifeCity_GTSGreeterBlockPlayerRelease
     End
@@ -486,6 +527,7 @@ JubilifeCity_GTSGreeterBlockPlayerZ780:
     CloseMessage
     ApplyMovement LOCALID_ACE_TRAINER_M_3, JubilifeCity_Movement_GTSGreeterWalkBackZ780
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PlayerStepBackEast
     WaitMovement
     GoTo JubilifeCity_GTSGreeterBlockPlayerRelease
     End
@@ -497,6 +539,7 @@ JubilifeCity_GTSGreeterBlockPlayerZ781:
     CloseMessage
     ApplyMovement LOCALID_ACE_TRAINER_M_3, JubilifeCity_Movement_GTSGreeterWalkBackZ781
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerStepBackEast
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PlayerStepBackEast
     WaitMovement
     GoTo JubilifeCity_GTSGreeterBlockPlayerRelease
     End
@@ -570,37 +613,61 @@ JubilifeCity_CoordEvent_LookerBlockRoute203:
 JubilifeCity_LookerWalkToPlayerZ757:
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkOnSpotWest
     ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkToPlayerZ757
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower6
     WaitMovement
-    GoTo JubilifeCity_LookerBlockPlayer
+    Call JubilifeCity_LookerBlockPlayerMessage
+    CloseMessage
+    ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkWestWithLooker
+    ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkWestWithPlayer
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower7
+    WaitMovement
+    GoTo JubilifeCity_PokemonFollower8
     End
 
 JubilifeCity_LookerWalkToPlayerZ758:
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkOnSpotWest
     ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkToPlayerZ758
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower6
     WaitMovement
-    GoTo JubilifeCity_LookerBlockPlayer
+    Call JubilifeCity_LookerBlockPlayerMessage
+    CloseMessage
+    ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkWestWithLooker
+    ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkWestWithPlayer
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower7
+    WaitMovement
+    GoTo JubilifeCity_PokemonFollower8
     End
 
 JubilifeCity_LookerWalkToPlayerZ759:
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkOnSpotWest
     ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkToPlayerZ759
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower9
     WaitMovement
-    GoTo JubilifeCity_LookerBlockPlayer
+    Call JubilifeCity_LookerBlockPlayerMessage
+    CloseMessage
+    ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkWestWithLooker
+    ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkWestWithPlayer
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower10
+    WaitMovement
+    GoTo JubilifeCity_PokemonFollower8
     End
 
 JubilifeCity_LookerWalkToPlayerZ760:
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkOnSpotWest
     ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkToPlayerZ760
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower9
     WaitMovement
-    GoTo JubilifeCity_LookerBlockPlayer
-    End
 
 JubilifeCity_LookerBlockPlayer:
     Call JubilifeCity_LookerBlockPlayerMessage
     CloseMessage
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkWestWithLooker
     ApplyMovement LOCALID_LOOKER, JubilifeCity_Movement_LookerWalkWestWithPlayer
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower10
     WaitMovement
+    GoTo JubilifeCity_PokemonFollower8
+
+JubilifeCity_PokemonFollower8:
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     GoToIfEq VAR_0x8005, 757, JubilifeCity_LookerWalkBackZ757
     GoToIfEq VAR_0x8005, 758, JubilifeCity_LookerWalkBackZ758
@@ -668,6 +735,33 @@ JubilifeCity_LookerEnd:
 JubilifeCity_Movement_PlayerWalkOnSpotWest:
     Delay8 5
     WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower9:
+    Delay32
+    WalkNormalNorth
+    WalkNormalEast
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower6:
+    Delay32
+    WalkNormalSouth
+    WalkNormalEast
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower10:
+    WalkNormalSouth
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower7:
+    WalkNormalNorth
+
     EndMovement
 
     .balign 4, 0
@@ -808,6 +902,7 @@ JubilifeCity_CoordEvent_TeamGalactic:
 JubilifeCity_PlayerWalkToProfRowanX173:
     ApplyMovement LOCALID_PROF_ROWAN, JubilifeCity_Movement_ProfRowanNoticePlayer
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkToProfRowanX173
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower11
     WaitMovement
     GoTo JubilifeCity_TeamGalacticBanter
     End
@@ -815,6 +910,7 @@ JubilifeCity_PlayerWalkToProfRowanX173:
 JubilifeCity_PlayerWalkToProfRowanX174:
     ApplyMovement LOCALID_PROF_ROWAN, JubilifeCity_Movement_ProfRowanNoticePlayer
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkToProfRowanX174
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower12
     WaitMovement
     GoTo JubilifeCity_TeamGalacticBanter
     End
@@ -822,6 +918,7 @@ JubilifeCity_PlayerWalkToProfRowanX174:
 JubilifeCity_PlayerWalkToProfRowanX175:
     ApplyMovement LOCALID_PROF_ROWAN, JubilifeCity_Movement_ProfRowanNoticePlayer
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkToProfRowanX175
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower13
     WaitMovement
     GoTo JubilifeCity_TeamGalacticBanter
     End
@@ -871,6 +968,7 @@ JubilifeCity_TeamGalacticBattle:
     WaitMovement
     ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartWalkToGrunt
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWalkToGrunt
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, JubilifeCity_Movement_PokemonFollower14
     WaitMovement
     Call JubilifeCity_SetPlayerCounterpartPartnerTeam
     StartTagBattle VAR_0x8004, TRAINER_GALACTIC_GRUNT_JUBILIFE_CITY_1, TRAINER_GALACTIC_GRUNT_JUBILIFE_CITY_2
@@ -943,8 +1041,8 @@ JubilifeCity_CounterpartAndProfRowanLeave:
     BufferPlayerName 0
     Message JubilifeCity_Text_CollectAllGymBadges
     CloseMessage
-    ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_CounterpartLeaveAfterGalacticBattle
-    ApplyMovement LOCALID_PROF_ROWAN, JubilifeCity_Movement_ProfRowanLeave
+    ApplyMovement LOCALID_COUNTERPART, JubilifeCity_Movement_PokemonFollower15
+    ApplyMovement LOCALID_PROF_ROWAN, JubilifeCity_Movement_PokemonFollower16
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWatchCounterpartAndProfRowanLeave
     WaitMovement
     GoTo JubilifeCity_CollectorJubilifeTV
@@ -1061,6 +1159,29 @@ JubilifeCity_Movement_PlayerWalkToProfRowanX175:
     EndMovement
 
     .balign 4, 0
+JubilifeCity_Movement_PokemonFollower11:
+    Delay8 2
+    WalkNormalNorth 2
+    WalkNormalEast 2
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower12:
+    Delay8 2
+    WalkNormalNorth 2
+    WalkNormalEast
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower13:
+    Delay8 2
+    WalkNormalNorth 2
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
 JubilifeCity_Movement_PlayerWatchCounterpartAndProfRowanLeave:
     Delay8
     WalkOnSpotNormalEast
@@ -1104,9 +1225,14 @@ JubilifeCity_Movement_CounterpartWalkOnSpotSouth2:
     EndMovement
 
     .balign 4, 0
+JubilifeCity_Movement_PokemonFollower15:
+    WalkNormalEast 2
+    WalkNormalSouth 2
+    WalkNormalWest
+    WalkNormalSouth 7
+
+    .balign 4, 0
 JubilifeCity_Movement_CounterpartLeaveAfterGalacticBattle:
-    WalkNormalEast
-    WalkNormalSouth 9
     EndMovement
 
 JubilifeCity_Movement_Unused3:
@@ -1163,8 +1289,14 @@ JubilifeCity_Movement_ProfRowanWalkOnSpotSouth:
     EndMovement
 
     .balign 4, 0
+JubilifeCity_Movement_PokemonFollower16:
+    WalkNormalEast
+    WalkNormalSouth 2
+    WalkNormalWest
+    WalkNormalSouth 7
+
+    .balign 4, 0
 JubilifeCity_Movement_ProfRowanLeave:
-    WalkNormalSouth 9
     EndMovement
 
 JubilifeCity_Movement_Unused5:
@@ -1211,6 +1343,13 @@ JubilifeCity_Movement_Unused11:
 JubilifeCity_Movement_PlayerWalkToGrunt:
     WalkNormalWest
     WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower14:
+    WalkNormalNorth
+    FaceWest
+
     EndMovement
 
 JubilifeCity_SchoolKidM1:
@@ -1441,7 +1580,7 @@ JubilifeCity_GivePoketch:
     CloseMessage
     GetPlayerDir VAR_RESULT
     GoToIfEq VAR_RESULT, DIR_NORTH, JubilifeCity_PoketchCoPresidentLeaveNorthWestEast
-    GoToIfEq VAR_RESULT, DIR_SOUTH, JubilifeCity_PoketchCoPresidentLeaveSouth
+    GoToIfEq VAR_RESULT, DIR_SOUTH, JubilifeCity_PokemonFollower17
     GoToIfEq VAR_RESULT, DIR_WEST, JubilifeCity_PoketchCoPresidentLeaveNorthWestEast
     GoToIfEq VAR_RESULT, DIR_EAST, JubilifeCity_PoketchCoPresidentLeaveNorthWestEast
     End
@@ -1453,9 +1592,18 @@ JubilifeCity_PoketchCoPresidentLeaveNorthWestEast:
     GoTo JubilifeCity_RemovePoketchCoPresident
     End
 
+JubilifeCity_PokemonFollower17:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    GoToIfEq VAR_0x8004, 173, JubilifeCity_PokemonFollower18
 JubilifeCity_PoketchCoPresidentLeaveSouth:
     ApplyMovement LOCALID_POKETCH_CO_PRESIDENT, JubilifeCity_Movement_PoketchCoPresidentLeaveSouth
     ApplyMovement LOCALID_PLAYER, JubilifeCity_Movement_PlayerWatchPoketchCoPresidentLeaveSouth
+    GoTo JubilifeCity_PokemonFollower19
+
+JubilifeCity_PokemonFollower18:
+    ApplyMovement LOCALID_POKETCH_CO_PRESIDENT, JubilifeCity_Movement_PokemonFollower20
+    ApplyMovement LOCALID_POKETCH_CO_PRESIDENT, JubilifeCity_Movement_PokemonFollower21
+JubilifeCity_PokemonFollower19:
     WaitMovement
     GoTo JubilifeCity_RemovePoketchCoPresident
     End
@@ -1481,6 +1629,12 @@ JubilifeCity_Movement_PoketchCoPresidentLeaveNorthWestEast:
     EndMovement
 
     .balign 4, 0
+JubilifeCity_Movement_PokemonFollower20:
+    WalkNormalEast
+    WalkNormalNorth 9
+    EndMovement
+
+    .balign 4, 0
 JubilifeCity_Movement_PlayerWatchPoketchCoPresidentLeaveSouth:
     Delay8
     WalkOnSpotNormalWest
@@ -1490,6 +1644,14 @@ JubilifeCity_Movement_PlayerWatchPoketchCoPresidentLeaveSouth:
     .balign 4, 0
 JubilifeCity_Movement_PlayerWatchPoketchCoPresidentLeaveNorthWestEast:
     Delay8
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+JubilifeCity_Movement_PokemonFollower21:
+    Delay8
+    WalkOnSpotNormalEast
+
     WalkOnSpotNormalNorth
     EndMovement
 

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/fight_area.h"
 #include "res/field/events/events_fight_area.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry FightArea_OnFrame_Rival
     ScriptEntry FightArea_AceTrainerM1
@@ -61,9 +61,12 @@ FightArea_ActivateRivalFight_Unused:
 FightArea_OnFrame_Rival:
     LockAll
     ScrCmd_32D
+    HidePokemonFollower
     ApplyMovement LOCALID_RIVAL, FightArea_Movement_RivalNoticePlayer
     WaitMovement
+    ShowPokemonFollower
     ApplyMovement LOCALID_PLAYER, FightArea_Movement_PlayerWalkToRival
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FightArea_Movement_PokemonFollower1
     WaitMovement
     BufferRivalName 0
     BufferPlayerName 1
@@ -72,16 +75,20 @@ FightArea_OnFrame_Rival:
     Common_SetFollowMeBGM
     ApplyMovement LOCALID_PLAYER, FightArea_Movement_PlayerWalkToVolknerFlint
     ApplyMovement LOCALID_RIVAL, FightArea_Movement_RivalWalkToVolknerFlint
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FightArea_Movement_PokemonFollower2
     WaitMovement
     Common_FadeToDefaultMusic3
     SetVar VAR_FIGHT_AREA_STATE, 1
     ScrCmd_32E
     Message FightArea_Text_LetsTeamUp
     ShowYesNoMenu VAR_RESULT
-    GoToIfEq VAR_RESULT, MENU_NO, FightArea_INeedYourHelp
+    CompareVarToValue VAR_RESULT, 1
+    GoToIf 1, FightArea_PokemonFollower3
+    PokemonFollowerStartCutscene
     Call FightArea_BattleVolknerFlint
     GoToIfEq VAR_RESULT, FALSE, FightArea_LostBattleVolknerFlint
     Call FightArea_PostBattleVolknerFlint
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -193,6 +200,17 @@ FightArea_INeedYourHelp:
     Message FightArea_Text_INeedYourHelp
     WaitButton
     CloseMessage
+    PokemonFollowerEndCutscene
+    ReleaseAll
+    End
+
+FightArea_PokemonFollower3:
+    ApplyMovement LOCALID_RIVAL, FightArea_Movement_RivalWalkOnSpotWest
+    WaitMovement
+    BufferRivalName 0
+    Message FightArea_Text_INeedYourHelp
+    WaitButton
+    CloseMessage
     ReleaseAll
     End
 
@@ -295,11 +313,26 @@ FightArea_Movement_PlayerWalkToRival:
     EndMovement
 
     .balign 4, 0
+FightArea_Movement_PokemonFollower1:
+    Delay8
+    WalkNormalEast 3
+    EndMovement
+
+    .balign 4, 0
 FightArea_Movement_PlayerWalkToVolknerFlint:
     WalkNormalEast 18
     WalkNormalNorth 2
     WalkNormalEast 9
     WalkNormalNorth 6
+    EndMovement
+
+    .balign 4, 0
+FightArea_Movement_PokemonFollower2:
+    WalkNormalEast 19
+    WalkNormalNorth 2
+    WalkNormalEast 9
+    WalkNormalNorth 5
+
     EndMovement
 
     .balign 4, 0
@@ -487,7 +520,7 @@ FightArea_YoudRatherFly:
 FightArea_SailToSnowpointCity:
     Message FightArea_Text_AnchorsAweigh
     CloseMessage
-    Call FightArea_SailorEnterShip
+    Call FightArea_PokemonFollower4
     CallIfEq VAR_0x8004, DIR_SOUTH, FightArea_PlayerEnterShipSouth
     CallIfEq VAR_0x8004, DIR_EAST, FightArea_PlayerEnterShipEast
     CallIfEq VAR_0x8004, DIR_WEST, FightArea_PlayerEnterShipWest
@@ -495,6 +528,8 @@ FightArea_SailToSnowpointCity:
     ReleaseAll
     End
 
+FightArea_PokemonFollower4:
+    PokemonFollowerStartCutscene
 FightArea_SailorEnterShip:
     ApplyMovement LOCALID_SAILOR_2, FightArea_Movement_Sailor2WalkToShip
     WaitMovement
@@ -564,6 +599,7 @@ FightArea_Rival:
     FacePlayer
     ApplyMovement LOCALID_RIVAL, FightArea_Movement_RivalWalkOnSpotNorth
     WaitMovement
+    PokemonFollowerStartCutscene
     GetPlayerDir VAR_0x8004
     CallIfEq VAR_0x8004, DIR_EAST, FightArea_PlayerWalkToBattlePositionEast
     CallIfEq VAR_0x8004, DIR_WEST, FightArea_PlayerWalkToBattlePositionWest
@@ -576,6 +612,7 @@ FightArea_Rival:
     Call FightArea_BattleVolknerFlint
     GoToIfEq VAR_RESULT, FALSE, FightArea_LostBattleVolknerFlint
     Call FightArea_PostBattleVolknerFlint
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 

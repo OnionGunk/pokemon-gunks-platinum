@@ -2,7 +2,6 @@
 #include "res/text/bank/villa.h"
 #include "res/field/events/events_villa.h"
 
-
     ScriptEntry Villa_OnTransition
     ScriptEntry Villa_Rival
     ScriptEntry Villa_Counterpart
@@ -1119,6 +1118,7 @@ Villa_OrderTable:
     WaitButton
     CloseMessage
     HideMoney
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -1199,6 +1199,7 @@ Villa_WarpAndShowDeliveryGuyAndBook:
     Warp MAP_HEADER_VILLA, 10, 6, DIR_SOUTH
     FadeScreenIn
     WaitFadeScreen
+    PokemonFollowerEndCutscene
     GoToIfEq VAR_0x8002, VILLA_FURNITURE_TABLE, Villa_DeliverFreeTable
     GoToIfNe VAR_0x8002, VILLA_FURNITURE_TABLE, Villa_DeliveringOrder
     End
@@ -1451,6 +1452,7 @@ Villa_OrderTable2:
     WaitButton
     CloseMessage
     HideMoney
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 

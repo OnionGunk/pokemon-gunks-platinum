@@ -1,6 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/eterna_forest.h"
 #include "res/field/events/events_eterna_forest.h"
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry EternaForest_CoordEvent_CherylStartFollowing
     ScriptEntry EternaForest_CoordEvent_PlayerLeaveCheryl
@@ -49,6 +50,7 @@ EternaForest_CherylStartFollowing:
     PlayFanfare SEQ_GONIN_sseq
     Message EternaForest_Text_PlayerDecidedToGoWithCheryl
     WaitFanfare
+    PokemonFollowerStartCutscene
     SetFlag FLAG_TALKED_TO_ETERNA_FOREST_CHERYL
     SetVar VAR_ETERNA_FOREST_FOLLOWER_CHERYL_STATE, 1
     Message EternaForest_Text_IllKeepPokemonHealthy
@@ -211,6 +213,7 @@ EternaForest_CherylLeave:
     WaitSE SEQ_SE_DP_KAIDAN2_sseq
     SetFlag FLAG_TRAVELED_WITH_CHERYL
     SetVar VAR_ETERNA_FOREST_FOLLOWER_CHERYL_STATE, 2
+    PokemonFollowerEndCutscene
     ReleaseAll
     End
 
@@ -350,32 +353,42 @@ EternaForest_Gardenia:
     Message EternaForest_Text_GoodLuckWithInvestigation
     CloseMessage
     GetPlayerDir VAR_RESULT
-    GoToIfEq VAR_RESULT, DIR_NORTH, EternaForest_GardeniaLeaveNorth
-    GoToIfEq VAR_RESULT, DIR_SOUTH, EternaForest_GardeniaLeaveSouth
-    GoToIfEq VAR_RESULT, DIR_WEST, EternaForest_GardeniaLeaveWest
-    GoToIfEq VAR_RESULT, DIR_EAST, EternaForest_GardeniaLeaveEast
+    GoToIfEq VAR_RESULT, DIR_NORTH, EternaForest_PokemonFollower1
+    GoToIfEq VAR_RESULT, DIR_SOUTH, EternaForest_PokemonFollower2
+    GoToIfEq VAR_RESULT, DIR_WEST, EternaForest_PokemonFollower3
+    GoToIfEq VAR_RESULT, DIR_EAST, EternaForest_PokemonFollower4
     End
 
+EternaForest_PokemonFollower1:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    CallIfEq VAR_0x8004, 72, EternaForest_PokemonFollower5
+    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_PokemonFollower6
 EternaForest_GardeniaLeaveNorth:
-    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_GardeniaLeaveNorth
     WaitMovement
     GoTo EternaForest_RemoveGardenia
     End
 
+EternaForest_PokemonFollower5:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, EternaForest_Movement_PokemonFollower7
+    Return
+
+EternaForest_PokemonFollower2:
+    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_PokemonFollower8
 EternaForest_GardeniaLeaveSouth:
-    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_GardeniaLeaveSouthWestEast
     WaitMovement
     GoTo EternaForest_RemoveGardenia
     End
 
+EternaForest_PokemonFollower3:
+    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_PokemonFollower8
 EternaForest_GardeniaLeaveWest:
-    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_GardeniaLeaveSouthWestEast
     WaitMovement
     GoTo EternaForest_RemoveGardenia
     End
 
+EternaForest_PokemonFollower4:
+    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_PokemonFollower8
 EternaForest_GardeniaLeaveEast:
-    ApplyMovement LOCALID_GARDENIA, EternaForest_Movement_GardeniaLeaveSouthWestEast
     WaitMovement
     GoTo EternaForest_RemoveGardenia
     End
@@ -391,16 +404,32 @@ EternaForest_Movement_GardeniaWalkOnSpotNorth:
     EndMovement
 
     .balign 4, 0
+EternaForest_Movement_PokemonFollower8:
+    WalkNormalSouth 3
+
+    .balign 4, 0
 EternaForest_Movement_GardeniaLeaveSouthWestEast:
-    WalkNormalSouth 2
     WalkNormalEast 9
     EndMovement
 
     .balign 4, 0
+EternaForest_Movement_PokemonFollower6:
+    Delay4
+
+    .balign 4, 0
 EternaForest_Movement_GardeniaLeaveNorth:
     WalkNormalWest
-    WalkNormalSouth 2
+    WalkNormalSouth 4
+
     WalkNormalEast 10
+    EndMovement
+
+    .balign 4, 0
+EternaForest_Movement_PokemonFollower7:
+    WalkNormalSouth
+    WalkNormalEast
+    FaceWest
+
     EndMovement
 
 EternaForest_SignboardEternaForest:

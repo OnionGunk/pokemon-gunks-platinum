@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/contest_hall_lobby.h"
 #include "res/field/events/events_contest_hall_lobby.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry ContestHallLobby_OnFrame_FirstEntry
     ScriptEntry ContestHallLobby_Frame0
@@ -27,7 +27,9 @@ ContestHallLobby_OnFrame_FirstEntry:
     BufferPlayerName 0
     Message ContestHallLobby_Text_OhHiPlayer
     CloseMessage
+    ShowPokemonFollower
     ApplyMovement LOCALID_PLAYER, ContestHallLobby_Movement_PlayerWalkNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ContestHallLobby_Movement_PokemonFollower1
     WaitMovement
     ApplyMovement LOCALID_KEIRA, ContestHallLobby_Movement_KeiraWalkOnSpotWestSouth
     WaitMovement
@@ -92,6 +94,12 @@ ContestHallLobby_Movement_PlayerWalkNorth:
     EndMovement
 
     .balign 4, 0
+ContestHallLobby_Movement_PokemonFollower1:
+    Delay8
+    WalkNormalNorth
+    EndMovement
+
+    .balign 4, 0
 ContestHallLobby_Movement_KeiraNoticePlayer:
     WalkOnSpotNormalSouth
     EmoteExclamationMark
@@ -151,9 +159,9 @@ ContestHallLobby_Movement_Unused4:
     .balign 4, 0
 ContestHallLobby_Movement_MomLeave:
     WalkNormalWest
-    WalkNormalSouth 2
+    WalkNormalSouth 3
+
     WalkNormalEast
-    WalkNormalSouth
     WalkOnSpotNormalSouth
     EndMovement
 
@@ -381,7 +389,7 @@ ContestHallLobby_FantinaLeave:
     GoToIfEq VAR_0x8004, DIR_SOUTH, ContestHallLobby_FantinaLeaveSouth
     GoToIfEq VAR_0x8004, DIR_NORTH, ContestHallLobby_FantinaLeaveNorth
     GoToIfEq VAR_0x8004, DIR_WEST, ContestHallLobby_FantinaLeaveWest
-    GoToIfEq VAR_0x8004, DIR_EAST, ContestHallLobby_FantinaLeaveEast
+    GoToIfEq VAR_0x8004, DIR_EAST, ContestHallLobby_PokemonFollower2
     End
 
 ContestHallLobby_FantinaSpinNorth:
@@ -428,8 +436,15 @@ ContestHallLobby_FantinaLeaveWest:
     GoTo ContestHallLobby_RemoveFantina
     End
 
-ContestHallLobby_FantinaLeaveEast:
+ContestHallLobby_PokemonFollower2:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    GoToIfEq VAR_0x8005, 8, ContestHallLobby_PokemonFollower3
     ApplyMovement LOCALID_FANTINA, ContestHallLobby_Movement_FantinaLeaveEast
+    GoTo ContestHallLobby_FantinaLeaveEast
+
+ContestHallLobby_PokemonFollower3:
+    ApplyMovement LOCALID_FANTINA, ContestHallLobby_Movement_PokemonFollower4
+ContestHallLobby_FantinaLeaveEast:
     ApplyMovement LOCALID_PLAYER, ContestHallLobby_Movement_PlayerWatchFantinaLeaveEast
     WaitMovement
     GoTo ContestHallLobby_RemoveFantina
@@ -454,6 +469,14 @@ ContestHallLobby_Movement_FantinaLeaveEast:
     WalkNormalNorth
     WalkNormalWest 6
     WalkNormalSouth 5
+    EndMovement
+
+    .balign 4, 0
+ContestHallLobby_Movement_PokemonFollower4:
+    WalkNormalNorth 2
+    WalkNormalWest 6
+    WalkNormalSouth 6
+
     EndMovement
 
     .balign 4, 0

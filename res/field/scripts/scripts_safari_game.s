@@ -3,7 +3,6 @@
 #include "res/text/bank/safari_game.h"
 #include "res/text/bank/menu_entries.h"
 
-
     ScriptEntry SafariGame_InitTram
     ScriptEntry SafariGame_OutOfSteps
     ScriptEntry SafariGame_OutOfSafariBalls_Field
@@ -125,10 +124,10 @@ SafariGame_QuickTramStationArea1:
     SetVar VAR_0x8005, GREAT_MARSH_TRAM_LOCATION_AREA_1_2
     CallIfEq VAR_0x8004, GREAT_MARSH_TRAM_NOT_AT_LOCATION, SafariGame_CallQuickTramToLocation
     SetPlayerHeightCalculationEnabled FALSE
-    CallIfEq VAR_RESULT, 0, SafariGame_BoardQuickTramFromWestGoingToOddArea
-    CallIfEq VAR_RESULT, 1, SafariGame_BoardQuickTramFromWestGoingToEvenArea
-    CallIfEq VAR_RESULT, 2, SafariGame_BoardQuickTramFromWestGoingToOddArea
-    CallIfEq VAR_RESULT, 3, SafariGame_BoardQuickTramFromWestGoingToEvenArea
+    CallIfEq VAR_RESULT, 0, SafariGame_PokemonFollower1
+    CallIfEq VAR_RESULT, 1, SafariGame_PokemonFollower2
+    CallIfEq VAR_RESULT, 2, SafariGame_PokemonFollower1
+    CallIfEq VAR_RESULT, 3, SafariGame_PokemonFollower2
     CallIfEq VAR_RESULT, 0, SafariGame_RideQuickTramToArea3
     CallIfEq VAR_RESULT, 1, SafariGame_RideQuickTramToArea4
     CallIfEq VAR_RESULT, 2, SafariGame_RideQuickTramToArea5
@@ -154,10 +153,10 @@ SafariGame_QuickTramStationArea2:
     SetVar VAR_0x8005, GREAT_MARSH_TRAM_LOCATION_AREA_1_2
     CallIfEq VAR_0x8004, GREAT_MARSH_TRAM_NOT_AT_LOCATION, SafariGame_CallQuickTramToLocation
     SetPlayerHeightCalculationEnabled FALSE
-    CallIfEq VAR_RESULT, 0, SafariGame_BoardQuickTramFromEastGoingToOddArea
-    CallIfEq VAR_RESULT, 1, SafariGame_BoardQuickTramFromEastGoingToEvenArea
-    CallIfEq VAR_RESULT, 2, SafariGame_BoardQuickTramFromEastGoingToOddArea
-    CallIfEq VAR_RESULT, 3, SafariGame_BoardQuickTramFromEastGoingToEvenArea
+    CallIfEq VAR_RESULT, 0, SafariGame_PokemonFollower3
+    CallIfEq VAR_RESULT, 1, SafariGame_PokemonFollower4
+    CallIfEq VAR_RESULT, 2, SafariGame_PokemonFollower3
+    CallIfEq VAR_RESULT, 3, SafariGame_PokemonFollower4
     CallIfEq VAR_RESULT, 0, SafariGame_RideQuickTramToArea3
     CallIfEq VAR_RESULT, 1, SafariGame_RideQuickTramToArea4
     CallIfEq VAR_RESULT, 2, SafariGame_RideQuickTramToArea5
@@ -183,10 +182,10 @@ SafariGame_QuickTramStationArea3:
     SetVar VAR_0x8005, GREAT_MARSH_TRAM_LOCATION_AREA_3_4
     CallIfEq VAR_0x8004, GREAT_MARSH_TRAM_NOT_AT_LOCATION, SafariGame_CallQuickTramToLocation
     SetPlayerHeightCalculationEnabled FALSE
-    CallIfEq VAR_RESULT, 0, SafariGame_BoardQuickTramFromWestGoingToOddArea
-    CallIfEq VAR_RESULT, 1, SafariGame_BoardQuickTramFromWestGoingToEvenArea
-    CallIfEq VAR_RESULT, 2, SafariGame_BoardQuickTramFromWestGoingToOddArea
-    CallIfEq VAR_RESULT, 3, SafariGame_BoardQuickTramFromWestGoingToEvenArea
+    CallIfEq VAR_RESULT, 0, SafariGame_PokemonFollower1
+    CallIfEq VAR_RESULT, 1, SafariGame_PokemonFollower2
+    CallIfEq VAR_RESULT, 2, SafariGame_PokemonFollower1
+    CallIfEq VAR_RESULT, 3, SafariGame_PokemonFollower2
     CallIfEq VAR_RESULT, 0, SafariGame_RideQuickTramToArea1
     CallIfEq VAR_RESULT, 1, SafariGame_RideQuickTramToArea2
     CallIfEq VAR_RESULT, 2, SafariGame_RideQuickTramToArea5
@@ -212,10 +211,10 @@ SafariGame_QuickTramStationArea4:
     SetVar VAR_0x8005, GREAT_MARSH_TRAM_LOCATION_AREA_3_4
     CallIfEq VAR_0x8004, GREAT_MARSH_TRAM_NOT_AT_LOCATION, SafariGame_CallQuickTramToLocation
     SetPlayerHeightCalculationEnabled FALSE
-    CallIfEq VAR_RESULT, 0, SafariGame_BoardQuickTramFromEastGoingToOddArea
-    CallIfEq VAR_RESULT, 1, SafariGame_BoardQuickTramFromEastGoingToEvenArea
-    CallIfEq VAR_RESULT, 2, SafariGame_BoardQuickTramFromEastGoingToOddArea
-    CallIfEq VAR_RESULT, 3, SafariGame_BoardQuickTramFromEastGoingToEvenArea
+    CallIfEq VAR_RESULT, 0, SafariGame_PokemonFollower3
+    CallIfEq VAR_RESULT, 1, SafariGame_PokemonFollower4
+    CallIfEq VAR_RESULT, 2, SafariGame_PokemonFollower3
+    CallIfEq VAR_RESULT, 3, SafariGame_PokemonFollower4
     CallIfEq VAR_RESULT, 0, SafariGame_RideQuickTramToArea1
     CallIfEq VAR_RESULT, 1, SafariGame_RideQuickTramToArea2
     CallIfEq VAR_RESULT, 2, SafariGame_RideQuickTramToArea5
@@ -241,10 +240,10 @@ SafariGame_QuickTramStationArea5:
     SetVar VAR_0x8005, GREAT_MARSH_TRAM_LOCATION_AREA_5_6
     CallIfEq VAR_0x8004, GREAT_MARSH_TRAM_NOT_AT_LOCATION, SafariGame_CallQuickTramToLocation
     SetPlayerHeightCalculationEnabled FALSE
-    CallIfEq VAR_RESULT, 0, SafariGame_BoardQuickTramFromWestGoingToOddArea
-    CallIfEq VAR_RESULT, 1, SafariGame_BoardQuickTramFromWestGoingToEvenArea
-    CallIfEq VAR_RESULT, 2, SafariGame_BoardQuickTramFromWestGoingToOddArea
-    CallIfEq VAR_RESULT, 3, SafariGame_BoardQuickTramFromWestGoingToEvenArea
+    CallIfEq VAR_RESULT, 0, SafariGame_PokemonFollower1
+    CallIfEq VAR_RESULT, 1, SafariGame_PokemonFollower2
+    CallIfEq VAR_RESULT, 2, SafariGame_PokemonFollower1
+    CallIfEq VAR_RESULT, 3, SafariGame_PokemonFollower2
     CallIfEq VAR_RESULT, 0, SafariGame_RideQuickTramToArea1
     CallIfEq VAR_RESULT, 1, SafariGame_RideQuickTramToArea2
     CallIfEq VAR_RESULT, 2, SafariGame_RideQuickTramToArea3
@@ -270,10 +269,10 @@ SafariGame_QuickTramStationArea6:
     SetVar VAR_0x8005, GREAT_MARSH_TRAM_LOCATION_AREA_5_6
     CallIfEq VAR_0x8004, GREAT_MARSH_TRAM_NOT_AT_LOCATION, SafariGame_CallQuickTramToLocation
     SetPlayerHeightCalculationEnabled FALSE
-    CallIfEq VAR_RESULT, 0, SafariGame_BoardQuickTramFromEastGoingToOddArea
-    CallIfEq VAR_RESULT, 1, SafariGame_BoardQuickTramFromEastGoingToEvenArea
-    CallIfEq VAR_RESULT, 2, SafariGame_BoardQuickTramFromEastGoingToOddArea
-    CallIfEq VAR_RESULT, 3, SafariGame_BoardQuickTramFromEastGoingToEvenArea
+    CallIfEq VAR_RESULT, 0, SafariGame_PokemonFollower3
+    CallIfEq VAR_RESULT, 1, SafariGame_PokemonFollower4
+    CallIfEq VAR_RESULT, 2, SafariGame_PokemonFollower3
+    CallIfEq VAR_RESULT, 3, SafariGame_PokemonFollower4
     CallIfEq VAR_RESULT, 0, SafariGame_RideQuickTramToArea1
     CallIfEq VAR_RESULT, 1, SafariGame_RideQuickTramToArea2
     CallIfEq VAR_RESULT, 2, SafariGame_RideQuickTramToArea3
@@ -307,32 +306,32 @@ SafariGame_RideQuickTramToAreas5And6:
 
 SafariGame_RideQuickTramToArea1:
     Call SafariGame_RideQuickTramToAreas1And2
-    Call SafariGame_LeaveQuickTramWest
+    Call SafariGame_PokemonFollower5
     Return
 
 SafariGame_RideQuickTramToArea2:
     Call SafariGame_RideQuickTramToAreas1And2
-    Call SafariGame_LeaveQuickTramEast
+    Call SafariGame_PokemonFollower6
     Return
 
 SafariGame_RideQuickTramToArea3:
     Call SafariGame_RideQuickTramToAreas3And4
-    Call SafariGame_LeaveQuickTramWest
+    Call SafariGame_PokemonFollower5
     Return
 
 SafariGame_RideQuickTramToArea4:
     Call SafariGame_RideQuickTramToAreas3And4
-    Call SafariGame_LeaveQuickTramEast
+    Call SafariGame_PokemonFollower6
     Return
 
 SafariGame_RideQuickTramToArea5:
     Call SafariGame_RideQuickTramToAreas5And6
-    Call SafariGame_LeaveQuickTramWest
+    Call SafariGame_PokemonFollower5
     Return
 
 SafariGame_RideQuickTramToArea6:
     Call SafariGame_RideQuickTramToAreas5And6
-    Call SafariGame_LeaveQuickTramEast
+    Call SafariGame_PokemonFollower6
     Return
 
 SafariGame_ExitQuickTramMenu:
@@ -343,31 +342,43 @@ SafariGame_ExitQuickTramMenu:
     ReleaseAll
     End
 
+SafariGame_PokemonFollower1:
+    PokemonFollowerStartCutscene
 SafariGame_BoardQuickTramFromWestGoingToOddArea:
     ApplyMovement LOCALID_PLAYER, SafariGame_Movement_BoardQuickTramFromWestGoingToOddArea
     WaitMovement
     Return
 
+SafariGame_PokemonFollower2:
+    PokemonFollowerStartCutscene
 SafariGame_BoardQuickTramFromWestGoingToEvenArea:
     ApplyMovement LOCALID_PLAYER, SafariGame_Movement_BoardQuickTramFromWestGoingToEvenArea
     WaitMovement
     Return
 
+SafariGame_PokemonFollower4:
+    PokemonFollowerStartCutscene
 SafariGame_BoardQuickTramFromEastGoingToEvenArea:
     ApplyMovement LOCALID_PLAYER, SafariGame_Movement_BoardQuickTramFromEastGoingToEvenArea
     WaitMovement
     Return
 
+SafariGame_PokemonFollower3:
+    PokemonFollowerStartCutscene
 SafariGame_BoardQuickTramFromEastGoingToOddArea:
     ApplyMovement LOCALID_PLAYER, SafariGame_Movement_BoardQuickTramFromEastGoingToOddArea
     WaitMovement
     Return
 
+SafariGame_PokemonFollower6:
+    PokemonFollowerEndCutscene
 SafariGame_LeaveQuickTramEast:
     ApplyMovement LOCALID_PLAYER, SafariGame_Movement_LeaveQuickTramEast
     WaitMovement
     Return
 
+SafariGame_PokemonFollower5:
+    PokemonFollowerEndCutscene
 SafariGame_LeaveQuickTramWest:
     ApplyMovement LOCALID_PLAYER, SafariGame_Movement_LeaveQuickTramWest
     WaitMovement

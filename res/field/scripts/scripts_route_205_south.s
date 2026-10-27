@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_205_south.h"
 #include "res/field/events/events_route_205_south.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route205South_OnTransition
     ScriptEntry Route205South_BugCatcher
@@ -57,6 +57,7 @@ Route205South_CoordEvent_Grunts:
     CloseMessage
     ApplyMovement LOCALID_GRUNT_M_WEST, Route205South_Movement_GruntMWestPushBackPlayer
     ApplyMovement LOCALID_PLAYER, Route205South_Movement_PlayerGetPushedBack
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route205South_Movement_PokemonFollower1
     WaitMovement
     ApplyMovement LOCALID_GRUNT_M_EAST, Route205South_Movement_GruntMEastTurnBackSouth
     WaitMovement
@@ -96,6 +97,12 @@ Route205South_Movement_GruntMEastTurnBackSouth:
 Route205South_Movement_PlayerGetPushedBack:
     WalkNormalSouth
     WalkOnSpotFastNorth
+    EndMovement
+
+    .balign 4, 0
+Route205South_Movement_PokemonFollower1:
+    WalkNormalSouth
+
     EndMovement
 
 Route205South_BugCatcher:

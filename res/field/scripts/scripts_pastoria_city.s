@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pastoria_city.h"
 #include "res/field/events/events_pastoria_city.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PastoriaCity_OnTransition
     ScriptEntry PastoriaCity_Collector1
@@ -153,7 +153,14 @@ PastoriaCity_StopChasingMe:
 
 PastoriaCity_GruntMLeaveWest:
     SetVar VAR_0x8007, 2
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    GoToIfEq VAR_0x8005, 813, PastoriaCity_PokemonFollower1
     ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_GruntMLeaveWest
+    GoTo PastoriaCity_PokemonFollower2
+
+PastoriaCity_PokemonFollower1:
+    ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_PokemonFollower3
+PastoriaCity_PokemonFollower2:
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerWatchGruntMLeaveWest
     WaitMovement
     GoTo PastoriaCity_RemoveGruntM
@@ -279,6 +286,15 @@ PastoriaCity_Movement_GruntMLeaveNorthSouthEast:
     WalkOnSpotFastEast
     EndMovement
 
+    .balign 4, 0
+PastoriaCity_Movement_PokemonFollower3:
+    WalkFastSouth 2
+    WalkFastEast 2
+    WalkFastNorth
+
+    WalkOnSpotFastEast
+    EndMovement
+
 PastoriaCity_Movement_Unused14:
     WalkFastSouth
     WalkFastEast 2
@@ -378,6 +394,11 @@ PastoriaCity_CoordEvent_RivalBattle:
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalEnterForBattle
     WaitMovement
     Common_SetRivalBGM
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    GoToIfNe VAR_0x8004, 590, PastoriaCity_PokemonFollower4
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PokemonFollower5
+    WaitTime 12, VAR_RESULT
+PastoriaCity_PokemonFollower4:
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalWalkToPlayerForBattle
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerFaceRivalForBattle
     WaitMovement
@@ -428,6 +449,17 @@ PastoriaCity_BlackOut:
 PastoriaCity_Movement_PlayerFaceRivalForBattle:
     Delay4 13
     WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+PastoriaCity_Movement_PokemonFollower5:
+    FaceEast
+    Delay8
+    WalkFastSouth
+    WalkFastWest 2
+    WalkFastNorth
+    FaceEast
+
     EndMovement
 
     .balign 4, 0
@@ -522,6 +554,7 @@ PastoriaCity_OnFrame_ExitGym:
     ClearFlag FLAG_HIDE_PASTORIA_CITY_RIVAL
     SetPosition LOCALID_RIVAL, 608, 0, 814, DIR_SOUTH
     SetVar VAR_PASTORIA_CITY_STATE, 4
+    PokemonFollowerResumeFollowing
     ReleaseAll
     End
 
@@ -619,15 +652,24 @@ PastoriaCity_Movement_PlayerWatchCrasherWakeLeave:
 PastoriaCity_CoordEvent_Bomb:
     LockAll
     Call PastoriaCity_Explosion
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
     ApplyMovement LOCALID_CRASHER_WAKE, PastoriaCity_Movement_CrasherWakeWatchGruntMExitGreatMarsh
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalWatchGruntMExitGreatMarsh
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerWatchGruntMExitGreatMarsh
     ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_GruntMExitGreatMarsh
+    GoToIfEq VAR_0x8004, 610, PastoriaCity_PokemonFollower6
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PokemonFollower7
+    GoTo PastoriaCity_PokemonFollower8
+
+PastoriaCity_PokemonFollower6:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PokemonFollower9
+PastoriaCity_PokemonFollower8:
     WaitMovement
     Call PastoriaCity_GruntMPushedTheButton
     ApplyMovement LOCALID_CRASHER_WAKE, PastoriaCity_Movement_CrasherWakeWatchGruntMLeave
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalWatchGruntMLeave
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerWatchGruntMLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PlayerWatchGruntMLeave
     ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_GruntMLeave
     WaitMovement
     Call PastoriaCity_MoveGruntMEast
@@ -727,11 +769,13 @@ PastoriaCity_CrasherWake:
     LockAll
     FacePlayer
     Call PastoriaCity_Explosion
-    GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    CallIfEq VAR_0x8004, 611, PastoriaCity_GruntMExitGreatMarshX611
-    CallIfEq VAR_0x8004, 612, PastoriaCity_GruntMExitGreatMarshX612
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    CallIfEq VAR_0x8004, 610, PastoriaCity_GruntMExitGreatMarshX611
+    CallIfEq VAR_0x8004, 611, PastoriaCity_GruntMExitGreatMarshX612
+    CallIfEq VAR_0x8004, 612, PastoriaCity_PokemonFollower10
     Call PastoriaCity_GruntMPushedTheButton
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerWatchGruntMLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PlayerWatchGruntMLeave
     ApplyMovement LOCALID_CRASHER_WAKE, PastoriaCity_Movement_CrasherWakeWatchGruntMLeave
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalWatchGruntMLeave
     ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_GruntMLeave
@@ -750,6 +794,7 @@ PastoriaCity_GruntMExitGreatMarshX611:
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerWatchGruntMExitGreatMarsh2
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalWatchGruntMExitGreatMarsh2
     ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_GruntMExitGreatMarsh
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PokemonFollower9
     WaitMovement
     Return
 
@@ -758,6 +803,16 @@ PastoriaCity_GruntMExitGreatMarshX612:
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerWatchGruntMExitGreatMarsh2
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalWatchGruntMExitGreatMarsh2
     ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_GruntMExitGreatMarsh
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PokemonFollower11
+    WaitMovement
+    Return
+
+PastoriaCity_PokemonFollower10:
+    ApplyMovement LOCALID_CRASHER_WAKE, PastoriaCity_Movement_CrasherWakeWatchGruntMExitGreatMarsh
+    ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerWatchGruntMExitGreatMarsh2
+    ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalWatchGruntMExitGreatMarsh2
+    ApplyMovement LOCALID_GRUNT_M, PastoriaCity_Movement_GruntMExitGreatMarsh
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PokemonFollower12
     WaitMovement
     Return
 
@@ -786,9 +841,39 @@ PastoriaCity_Movement_PlayerWatchGruntMExitGreatMarsh:
     EndMovement
 
     .balign 4, 0
+PastoriaCity_Movement_PokemonFollower7:
+    WalkFastEast
+    WalkFastSouth 2
+    WalkFastEast 2
+    WalkFastNorth
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
 PastoriaCity_Movement_PlayerWatchGruntMExitGreatMarsh2:
     Delay8
     WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+PastoriaCity_Movement_PokemonFollower9:
+    WalkFastSouth
+    WalkFastEast 2
+    WalkFastNorth
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+PastoriaCity_Movement_PokemonFollower11:
+    WalkFastEast
+    WalkFastNorth
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+PastoriaCity_Movement_PokemonFollower12:
+    FaceWest
+
     EndMovement
 
     .balign 4, 0
@@ -911,6 +996,7 @@ PastoriaCity_CoordEvent_BlockGreatMarsh:
     Message PastoriaCity_Text_WhyArentYouGone
     CloseMessage
     ApplyMovement LOCALID_PLAYER, PastoriaCity_Movement_PlayerGetPushedSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PastoriaCity_Movement_PlayerGetPushedSouth
     ApplyMovement LOCALID_RIVAL, PastoriaCity_Movement_RivalPushBackPlayer
     WaitMovement
     ReleaseAll

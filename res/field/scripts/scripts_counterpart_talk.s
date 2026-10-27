@@ -2,7 +2,6 @@
 #include "res/text/bank/counterpart_talk.h"
 #include "res/field/events/events_sandgem_town.h"
 
-
     ScriptEntry CounterpartTalk_Counterpart
     ScriptEntryEnd
 
@@ -113,7 +112,7 @@ CounterpartTalk_StartPokeRadarTutorial:
     GetPlayerDir VAR_RESULT
     GoToIfEq VAR_RESULT, DIR_NORTH, CounterpartTalk_CounterpartLeaveNorth
     GoToIfEq VAR_RESULT, DIR_SOUTH, CounterpartTalk_CounterpartLeaveSouth
-    GoToIfEq VAR_RESULT, DIR_WEST, CounterpartTalk_CounterpartLeaveWest
+    GoToIfEq VAR_RESULT, DIR_WEST, CounterpartTalk_PokemonFollower1
     GoToIfEq VAR_RESULT, DIR_EAST, CounterpartTalk_CounterpartLeaveEast
     End
 
@@ -131,8 +130,9 @@ CounterpartTalk_CounterpartLeaveSouth:
     GoTo CounterpartTalk_RemoveCounterpart
     End
 
+CounterpartTalk_PokemonFollower1:
+    ApplyMovement LOCALID_SANDGEM_COUNTERPART, CounterpartTalk_Movement_PokemonFollower2
 CounterpartTalk_CounterpartLeaveWest:
-    ApplyMovement LOCALID_SANDGEM_COUNTERPART, CounterpartTalk_Movement_CounterpartLeaveWest
     ApplyMovement LOCALID_PLAYER, CounterpartTalk_Movement_PlayerWatchCounterpartLeaveWest
     WaitMovement
     GoTo CounterpartTalk_RemoveCounterpart
@@ -323,8 +323,11 @@ CounterpartTalk_Movement_CounterpartLeaveNorthSouthEast:
     EndMovement
 
     .balign 4, 0
+CounterpartTalk_Movement_PokemonFollower2:
+    WalkNormalSouth 2
+
+    .balign 4, 0
 CounterpartTalk_Movement_CounterpartLeaveWest:
-    WalkNormalNorth
     WalkNormalEast 10
     EndMovement
 

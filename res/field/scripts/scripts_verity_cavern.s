@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/verity_cavern.h"
 #include "res/field/events/events_verity_cavern.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry VerityCavern_OnTransition
     ScriptEntry VerityCavern_Mesprit
@@ -73,9 +73,25 @@ VerityCavern_EnterProfRowanEast:
     GoTo VerityCavern_EnterProfRowan
     End
 
+VerityCavern_PokemonFollower2:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VerityCavern_Movement_PokemonFollower1
+    Return
+
+    .balign 4, 0
+VerityCavern_Movement_PokemonFollower1:
+    Delay8
+    FaceSouth
+    Delay8 2
+    WalkNormalEast
+    WalkNormalNorth
+    FaceSouth
+    EndMovement
+
 VerityCavern_EnterProfRowan:
     ClearFlag FLAG_HIDE_VERITY_CAVERN_PROF_OAK
     AddObject LOCALID_PROF_ROWAN
+    GetPokemonFollowerDirFromPlayer VAR_RESULT
+    CallIfEq VAR_RESULT, 1, VerityCavern_PokemonFollower2
     ApplyMovement LOCALID_PROF_ROWAN, VerityCavern_Movement_ProfRowanEnter
     WaitMovement
     ApplyMovement LOCALID_PLAYER, VerityCavern_Movement_PlayerFaceSouth

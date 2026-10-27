@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/valor_lakefront.h"
 #include "res/field/events/events_valor_lakefront.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry ValorLakefront_OnTransition
     ScriptEntry ValorLakefront_OnLoad
@@ -53,13 +53,21 @@ ValorLakefront_GruntM:
     Message ValorLakefront_Text_YouWereEavesdropping
     CloseMessage
     GetPlayerDir VAR_0x8004
-    GoToIfEq VAR_0x8004, DIR_SOUTH, ValorLakefront_GruntMLeaveSouth
+    GoToIfEq VAR_0x8004, DIR_SOUTH, ValorLakefront_PokemonFollower1
     GoToIfEq VAR_0x8004, DIR_NORTH, ValorLakefront_GruntMLeaveNorth
     GoTo ValorLakefront_GruntMLeaveWestEast
 
-ValorLakefront_GruntMLeaveSouth:
+ValorLakefront_PokemonFollower1:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    GoToIfEq VAR_0x8006, 720, ValorLakefront_PokemonFollower2
     ApplyMovement LOCALID_GRUNT_M, ValorLakefront_Movement_GruntMLeaveSouth
     ApplyMovement LOCALID_PLAYER, ValorLakefront_Movement_PlayerWatchGruntMLeaveSouth
+    GoTo ValorLakefront_GruntMLeaveSouth
+
+ValorLakefront_PokemonFollower2:
+    ApplyMovement LOCALID_GRUNT_M, ValorLakefront_Movement_PokemonFollower3
+    ApplyMovement LOCALID_PLAYER, ValorLakefront_Movement_PokemonFollower4
+ValorLakefront_GruntMLeaveSouth:
     WaitMovement
     GoTo ValorLakefront_MoveGruntMNorth
 
@@ -82,6 +90,7 @@ ValorLakefront_MoveGruntMNorth:
 
 ValorLakefront_GruntMNorth:
     GetPlayerDir VAR_0x8000
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
     FacePlayer
     Message ValorLakefront_Text_MyPokemonWillKOYou
     CloseMessage
@@ -91,13 +100,21 @@ ValorLakefront_GruntMNorth:
     Message ValorLakefront_Text_ICantBattleAnymore
     CloseMessage
     GetPlayerDir VAR_0x8004
-    GoToIfEq VAR_0x8004, DIR_SOUTH, ValorLakefront_GruntMNorthLeaveSouth
+    GoToIfEq VAR_0x8004, DIR_SOUTH, ValorLakefront_PokemonFollower5
     GoToIfEq VAR_0x8004, DIR_NORTH, ValorLakefront_GruntMNorthLeaveNorth
     GoTo ValorLakefront_GruntMNorthLeaveWestEast
 
-ValorLakefront_GruntMNorthLeaveSouth:
+ValorLakefront_PokemonFollower5:
+    GoToIfEq VAR_0x8006, 724, ValorLakefront_PokemonFollower6
     ApplyMovement LOCALID_GRUNT_M, ValorLakefront_Movement_GruntMNorthLeaveSouth
     ApplyMovement LOCALID_PLAYER, ValorLakefront_Movement_PlayerWatchGruntMNorthLeaveSouth
+    GoTo ValorLakefront_GruntMNorthLeaveSouth
+
+ValorLakefront_PokemonFollower6:
+    ApplyMovement LOCALID_GRUNT_M, ValorLakefront_Movement_PokemonFollower7
+    ApplyMovement LOCALID_PLAYER, ValorLakefront_Movement_PokemonFollower8
+
+ValorLakefront_GruntMNorthLeaveSouth:
     WaitMovement
     GoTo ValorLakefront_RemoveGruntM
 
@@ -131,6 +148,12 @@ ValorLakefront_Movement_PlayerWatchGruntMLeaveSouth:
     EndMovement
 
     .balign 4, 0
+ValorLakefront_Movement_PokemonFollower4:
+    WalkOnSpotNormalWest
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
 ValorLakefront_Movement_PlayerWatchGruntMLeaveWestEast:
     WalkOnSpotNormalNorth
     EndMovement
@@ -139,6 +162,15 @@ ValorLakefront_Movement_PlayerWatchGruntMLeaveWestEast:
 ValorLakefront_Movement_PlayerWatchGruntMNorthLeaveSouth:
     Delay8
     WalkOnSpotNormalEast
+    Delay8
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower8:
+    Delay8
+    WalkOnSpotNormalWest
+
     Delay8
     WalkOnSpotNormalNorth
     EndMovement
@@ -161,6 +193,12 @@ ValorLakefront_Movement_GruntMLeaveSouth:
     EndMovement
 
     .balign 4, 0
+ValorLakefront_Movement_PokemonFollower3:
+    WalkFastWest
+    WalkFastNorth 11
+    EndMovement
+
+    .balign 4, 0
 ValorLakefront_Movement_GruntMLeaveNorthWestEast:
     WalkFastNorth 10
     EndMovement
@@ -172,6 +210,13 @@ ValorLakefront_Movement_GruntMNorthLeaveSouth:
     EndMovement
 
     .balign 4, 0
+ValorLakefront_Movement_PokemonFollower7:
+    WalkNormalWest
+
+    WalkSlowNorth 9
+    EndMovement
+
+    .balign 4, 0
 ValorLakefront_Movement_GruntMNorthLeaveNorthWestEast:
     WalkNormalNorth
     WalkSlowNorth 9
@@ -179,9 +224,9 @@ ValorLakefront_Movement_GruntMNorthLeaveNorthWestEast:
 
 ValorLakefront_Cynthia:
     CallIfEq VAR_0x8000, DIR_NORTH, ValorLakefront_SetCynthiaPositionNorth
-    CallIfEq VAR_0x8000, DIR_SOUTH, ValorLakefront_SetCynthiaPositionSouth
-    CallIfEq VAR_0x8000, DIR_WEST, ValorLakefront_SetCynthiaPositionWest
-    CallIfEq VAR_0x8000, DIR_EAST, ValorLakefront_SetCynthiaPositionEast
+    CallIfEq VAR_0x8000, DIR_SOUTH, ValorLakefront_PokemonFollower9
+    CallIfEq VAR_0x8000, DIR_WEST, ValorLakefront_PokemonFollower10
+    CallIfEq VAR_0x8000, DIR_EAST, ValorLakefront_PokemonFollower11
     ClearFlag FLAG_HIDE_VALOR_LAKEFRONT_CYNTHIA
     SetObjectEventDir LOCALID_CYNTHIA, DIR_SOUTH
     SetObjectEventMovementType LOCALID_CYNTHIA, MOVEMENT_TYPE_LOOK_SOUTH
@@ -190,10 +235,10 @@ ValorLakefront_Cynthia:
     WaitMovement
     Message ValorLakefront_Text_IHadToTalk
     CloseMessage
-    CallIfEq VAR_0x8000, DIR_NORTH, ValorLakefront_SetRivalPositionNorth
-    CallIfEq VAR_0x8000, DIR_SOUTH, ValorLakefront_SetRivalPositionSouth
-    CallIfEq VAR_0x8000, DIR_WEST, ValorLakefront_SetRivalPositionWest
-    CallIfEq VAR_0x8000, DIR_EAST, ValorLakefront_SetRivalPositionEast
+    CallIfEq VAR_0x8000, DIR_NORTH, ValorLakefront_PokemonFollower12
+    CallIfEq VAR_0x8000, DIR_SOUTH, ValorLakefront_PokemonFollower13
+    CallIfEq VAR_0x8000, DIR_WEST, ValorLakefront_PokemonFollower14
+    CallIfEq VAR_0x8000, DIR_EAST, ValorLakefront_PokemonFollower15
     ClearFlag FLAG_HIDE_VALOR_LAKEFRONT_RIVAL
     SetObjectEventDir LOCALID_RIVAL, DIR_NORTH
     SetObjectEventMovementType LOCALID_RIVAL, MOVEMENT_TYPE_LOOK_NORTH
@@ -237,14 +282,48 @@ ValorLakefront_SetCynthiaPositionNorth:
     SetObjectEventPos LOCALID_CYNTHIA, 723, 761
     Return
 
+ValorLakefront_PokemonFollower9:
+    CallIfEq VAR_0x8007, 767, ValorLakefront_PokemonFollower16
 ValorLakefront_SetCynthiaPositionSouth:
     SetObjectEventPos LOCALID_CYNTHIA, 723, 759
     Return
 
+ValorLakefront_PokemonFollower16:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PokemonFollower17
+    Return
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower17:
+    Delay8 2
+    FaceNorth
+    Delay8 3
+    WalkNormalWest
+    WalkNormalSouth
+    FaceNorth
+    EndMovement
+
+ValorLakefront_PokemonFollower10:
+    CallIfEq VAR_0x8007, 768, ValorLakefront_PokemonFollower18
 ValorLakefront_SetCynthiaPositionWest:
     SetObjectEventPos LOCALID_CYNTHIA, 724, 760
     Return
 
+ValorLakefront_PokemonFollower18:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PokemonFollower19
+    Return
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower19:
+    Delay8 2
+    FaceNorth
+    Delay8 3
+    WalkNormalEast
+    WalkNormalSouth
+    FaceNorth
+    EndMovement
+
+ValorLakefront_PokemonFollower11:
+    CallIfEq VAR_0x8007, 768, ValorLakefront_PokemonFollower16
 ValorLakefront_SetCynthiaPositionEast:
     SetObjectEventPos LOCALID_CYNTHIA, 722, 760
     Return
@@ -269,20 +348,128 @@ ValorLakefront_CynthiaFacePlayerEast:
     WaitMovement
     Return
 
+ValorLakefront_PokemonFollower12:
+    CallIfEq VAR_0x8007, 771, ValorLakefront_PokemonFollower20
+    CallIfEq VAR_0x8006, 724, ValorLakefront_PokemonFollower21
 ValorLakefront_SetRivalPositionNorth:
     SetObjectEventPos LOCALID_RIVAL, 724, 780
     Return
 
+ValorLakefront_PokemonFollower20:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PokemonFollower22
+    ApplyMovement LOCALID_CYNTHIA, ValorLakefront_Movement_PokemonFollower23
+    Return
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower22:
+    FaceSouth
+    Delay8
+    JumpOnSpotFastSouth
+    WalkFastEast
+    WalkFastNorth 3
+    WalkFastWest 2
+    WalkFastSouth 2
+    FaceEast
+    EndMovement
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower23:
+    Delay8 2
+    Delay4
+    FaceEast
+    Delay4 2
+    FaceNorth
+    Delay4 2
+    FaceWest
+    Delay4
+    FaceSouth
+    EndMovement
+
+ValorLakefront_PokemonFollower21:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PokemonFollower24
+    ApplyMovement LOCALID_CYNTHIA, ValorLakefront_Movement_PokemonFollower25
+    Return
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower24:
+    FaceSouth
+    Delay8
+    JumpOnSpotFastSouth
+    WalkFastNorth 2
+    WalkFastWest 2
+    WalkFastSouth 2
+    FaceEast
+    EndMovement
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower25:
+    Delay8
+    Delay4
+    FaceEast
+    Delay4 2
+    FaceNorth
+    Delay4 2
+    FaceWest
+    Delay4
+    FaceSouth
+    EndMovement
+
+ValorLakefront_PokemonFollower13:
+    CallIfEq VAR_0x8006, 724, ValorLakefront_PokemonFollower26
 ValorLakefront_SetRivalPositionSouth:
     SetObjectEventPos LOCALID_RIVAL, 724, 778
     Return
 
+ValorLakefront_PokemonFollower26:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PokemonFollower24
+    ApplyMovement LOCALID_CYNTHIA, ValorLakefront_Movement_PokemonFollower25
+    Return
+
+ValorLakefront_PokemonFollower14:
+    CallIfEq VAR_0x8007, 770, ValorLakefront_PokemonFollower27
 ValorLakefront_SetRivalPositionWest:
     SetObjectEventPos LOCALID_RIVAL, 723, 779
     Return
 
+ValorLakefront_PokemonFollower27:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PokemonFollower28
+    ApplyMovement LOCALID_CYNTHIA, ValorLakefront_Movement_PokemonFollower29
+    Return
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower28:
+    FaceSouth
+    Delay8
+    JumpOnSpotFastSouth
+    WalkFastWest
+    WalkFastNorth 3
+    WalkFastEast 2
+    WalkFastSouth 2
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+ValorLakefront_Movement_PokemonFollower29:
+    Delay8 2
+    Delay4
+    FaceWest
+    Delay4 2
+    FaceNorth
+    Delay4 2
+    FaceEast
+    Delay4
+    FaceSouth
+    EndMovement
+
+ValorLakefront_PokemonFollower15:
+    CallIfEq VAR_0x8007, 770, ValorLakefront_PokemonFollower30
 ValorLakefront_SetRivalPositionEast:
     SetObjectEventPos LOCALID_RIVAL, 723, 779
+    Return
+
+ValorLakefront_PokemonFollower30:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PokemonFollower22
+    ApplyMovement LOCALID_CYNTHIA, ValorLakefront_Movement_PokemonFollower23
     Return
 
 ValorLakefront_RivalEnterNorth:
@@ -523,6 +710,7 @@ ValorLakefront_CoordEvent_BlockSunyshore:
     CallIfEq VAR_0x8001, 791, ValorLakefront_CollectorBlockPlayerX791
     ApplyMovement LOCALID_COLLECTOR, ValorLakefront_Movement_CollectorWalkWest
     ApplyMovement LOCALID_PLAYER, ValorLakefront_Movement_PlayerGetPushedWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, ValorLakefront_Movement_PlayerGetPushedWest
     WaitMovement
     Message ValorLakefront_Text_SunyshoreHadBlackout
     CloseMessage

@@ -2,16 +2,25 @@
 #include "res/text/bank/stark_mountain_outside.h"
 #include "res/field/events/events_stark_mountain_outside.h"
 
-
     ScriptEntry StarkMountainOutside_OnTransition
     ScriptEntry StarkMountainOutside_SignboardStarkMountain
     ScriptEntry StarkMountainOutside_CoordEvent_Grunts
     ScriptEntry StarkMountainOutside_OnFrame_LookerBuck
+    ScriptEntry StarkMountainOutside_PokemonFollower2
     ScriptEntryEnd
 
 StarkMountainOutside_OnTransition:
     SetFlag FLAG_FIRST_ARRIVAL_STARK_MOUNTAIN_EXTERIOR
     End
+
+StarkMountainOutside_PokemonFollower2:
+    CallIfEq VAR_STARK_MOUNTAIN_OUTSIDE_STATE, 2, StarkMountainOutside_PokemonFollower1
+    End
+
+StarkMountainOutside_PokemonFollower1:
+    PokemonFollowerPlaceNearPlayer 3, 2
+    ShowPokemonFollower
+    Return
 
 StarkMountainOutside_SignboardStarkMountain:
     ShowLandmarkSign StarkMountainOutside_Text_SignStarkMountain

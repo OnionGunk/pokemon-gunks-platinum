@@ -3,7 +3,6 @@
 #include "res/text/bank/fullmoon_island.h"
 #include "res/field/events/events_fullmoon_island.h"
 
-
     ScriptEntry FullmoonIsland_OnTransition
     ScriptEntry FullmoonIsland_Sailor
     ScriptEntryEnd
@@ -23,16 +22,18 @@ FullmoonIsland_Sailor:
     Message FullmoonIsland_Text_SailBackToCanalave
     ShowYesNoMenu VAR_RESULT
     CloseMessage
-    GoToIfEq VAR_RESULT, MENU_YES, FullmoonIsland_TakeShipToCanalave
+    GoToIfEq VAR_RESULT, MENU_YES, FullmoonIsland_PokemonFollower1
     GoTo FullmoonIsland_AllRightThen
 
 FullmoonIsland_ThatsTheLunarWing:
     Message FullmoonIsland_Text_ThatsTheLunarWing
     CloseMessage
-    GoTo FullmoonIsland_TakeShipToCanalave
+    GoTo FullmoonIsland_PokemonFollower1
+
+FullmoonIsland_PokemonFollower1:
+    Call FullmoonIsland_PokemonFollower2
 
 FullmoonIsland_TakeShipToCanalave:
-    Call FullmoonIsland_SailorEnterShip
     CallIfEq VAR_0x8004, DIR_SOUTH, FullmoonIsland_PlayerWalkToShipSouth
     CallIfEq VAR_0x8004, DIR_EAST, FullmoonIsland_PlayerWalkToShipEast
     CallIfEq VAR_0x8004, DIR_NORTH, FullmoonIsland_PlayerWalkToShipNorth
@@ -47,6 +48,8 @@ FullmoonIsland_AllRightThen:
     ReleaseAll
     End
 
+FullmoonIsland_PokemonFollower2:
+    PokemonFollowerStartCutscene
 FullmoonIsland_SailorEnterShip:
     ApplyMovement LOCALID_SAILOR, FullmoonIsland_Movement_SailorWalkToShip
     WaitMovement

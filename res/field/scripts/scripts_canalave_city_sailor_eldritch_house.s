@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/canalave_city_sailor_eldritch_house.h"
 #include "res/field/events/events_canalave_city_sailor_eldritch_house.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry CanalaveCitySailorEldritchHouse_OnTransition
     ScriptEntry CanalaveCitySailorEldritchHouse_LittleBoy
@@ -118,9 +118,17 @@ CanalaveCitySailorEldritchHouse_SailorEldritchEnter:
     WaitMovement
     ApplyMovement LOCALID_SAILOR_ELDRITCH, CanalaveCitySailorEldritchHouse_Movement_SailorEldritchEnter
     WaitMovement
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    GoToIfEq VAR_0x8005, 5, CanalaveCitySailorEldritchHouse_PokemonFollower1
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CanalaveCitySailorEldritchHouse_Movement_PlayerMoveAside
+    GoTo CanalaveCitySailorEldritchHouse_PokemonFollower2
+
+CanalaveCitySailorEldritchHouse_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CanalaveCitySailorEldritchHouse_Movement_PokemonFollower3
+CanalaveCitySailorEldritchHouse_PokemonFollower2:
     ApplyMovement LOCALID_PLAYER, CanalaveCitySailorEldritchHouse_Movement_PlayerMoveAside
     WaitMovement
-    ApplyMovement LOCALID_SAILOR_ELDRITCH, CanalaveCitySailorEldritchHouse_Movement_SailorEldritchWalkToLittleBoy
+    ApplyMovement LOCALID_SAILOR_ELDRITCH, CanalaveCitySailorEldritchHouse_Movement_PokemonFollower4
     WaitMovement
     ApplyMovement LOCALID_PLAYER, CanalaveCitySailorEldritchHouse_Movement_PlayerFaceNorth
     WaitMovement
@@ -169,7 +177,8 @@ CanalaveCitySailorEldritchHouse_Movement_SailorEldritchFaceEast:
     .balign 4, 0
 CanalaveCitySailorEldritchHouse_Movement_SailorEldritchEnter:
     WalkNormalNorth 2
-    WalkNormalEast 2
+    WalkNormalEast
+
     EndMovement
 
     .balign 4, 0
@@ -181,8 +190,19 @@ CanalaveCitySailorEldritchHouse_Movement_PlayerMoveAside:
     EndMovement
 
     .balign 4, 0
+CanalaveCitySailorEldritchHouse_Movement_PokemonFollower3:
+    WalkNormalSouth
+    WalkNormalWest
+    WalkNormalSouth
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+CanalaveCitySailorEldritchHouse_Movement_PokemonFollower4:
+    WalkNormalEast 2
+
+    .balign 4, 0
 CanalaveCitySailorEldritchHouse_Movement_SailorEldritchWalkToLittleBoy:
-    WalkNormalEast
     EndMovement
 
     .balign 4, 0

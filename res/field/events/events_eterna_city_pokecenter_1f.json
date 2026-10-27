@@ -33,7 +33,7 @@
         },
         {
             "id": "LOCALID_ETERNA_BUNEARY",
-            "graphics_id": "OBJ_EVENT_GFX_BUNEARY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_BUNEARY",
             "movement_type": "MOVEMENT_TYPE_LOOK_SOUTH",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_ETERNA_CITY_POKECENTER_1F_BUNEARY",

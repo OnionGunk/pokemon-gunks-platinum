@@ -3,7 +3,7 @@
 #include "res/text/bank/menu_entries.h"
 #include "res/field/events/events_battle_tower.h"
 #include "generated/goods.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry BattleTower_SingleAttendant
     ScriptEntry BattleTower_MultiAttendant
@@ -369,28 +369,28 @@ BattleTower_EnterBattleRoom:
 BattleTower_EnterSingleDoubleBattleRoom:
     SetVar VAR_MAP_LOCAL_0x02, 0
     SetVar VAR_MAP_LOCAL_0x03, 15
-    Call BattleTower_EnterBattleRoomAnimation
+    Call BattleTower_PokemonFollower1
     GoTo BattleTower_WarpToElevator
     End
 
 BattleTower_EnterWiFiBattleRoom:
     SetVar VAR_MAP_LOCAL_0x02, 2
     SetVar VAR_MAP_LOCAL_0x03, 19
-    Call BattleTower_EnterBattleRoomAnimation
+    Call BattleTower_PokemonFollower1
     GoTo BattleTower_WarpToElevator
     End
 
 BattleTower_EnterMultiBattleRoom:
     SetVar VAR_MAP_LOCAL_0x02, 1
     SetVar VAR_MAP_LOCAL_0x03, 11
-    Call BattleTower_EnterBattleRoomAnimation
+    Call BattleTower_PokemonFollower1
     GoTo BattleTower_GoToWarpToElevator
     End
 
 BattleTower_EnterLinkMultiBattleRoom:
     SetVar VAR_MAP_LOCAL_0x02, 1
     SetVar VAR_MAP_LOCAL_0x03, 11
-    Call BattleTower_EnterBattleRoomAnimation
+    Call BattleTower_PokemonFollower1
     GoTo _06A0
     End
 
@@ -399,6 +399,8 @@ _06A0:
     GoTo BattleTower_WarpToElevator
     End
 
+BattleTower_PokemonFollower1:
+    PokemonFollowerStartCutscene
 BattleTower_EnterBattleRoomAnimation:
     ApplyMovement VAR_MAP_LOCAL_0x02, BattleTower_Movement_AttendantWalkToDoor
     ApplyMovement LOCALID_PLAYER, BattleTower_Movement_PlayerWalkToDoor
@@ -462,6 +464,12 @@ BattleTower_End:
     CloseMessage
     Call BattleTower_FreeBattleTower
     Call BattleTower_ResetBattleTowerVars
+    GetPlayerMapPos VAR_0x8004, VAR_0x8005
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    GoToIfNe VAR_0x8004, VAR_0x8006, BattleTower_PokemonFollower2
+    GoToIfNe VAR_0x8005, VAR_0x8007, BattleTower_PokemonFollower2
+    PokemonFollowerEndCutscene
+BattleTower_PokemonFollower2:
     ReleaseAll
     End
 

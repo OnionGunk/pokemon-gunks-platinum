@@ -4,13 +4,13 @@
 #include "res/field/events/events_battle_hall.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_hall_functions.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry BattleHall_SingleAttendant
     ScriptEntry BattleHall_OnFrame_ResumeChallenge
     ScriptEntry BattleHall_OnFrame_DidntSaveBeforeQuit
     ScriptEntry BattleHall_OnFrame_ChallengeEndedCompletedRound
-    ScriptEntry BattleHall_OnFrame_ChallengeEnded
+    ScriptEntry BattleHall_PokemonFollower4
     ScriptEntry BattleHall_MultiAttendant
     ScriptEntry BattleHall_Hiker
     ScriptEntry BattleHall_SnowpointNPC
@@ -308,7 +308,7 @@ BattleHall_HealAndSaveBeforeChallenge:
     SetVar VAR_RESULT, VAR_MAP_LOCAL_0x00
     GoToIfEq VAR_RESULT, 0, BattleHall_EndChallenge
     GoToIfEq VAR_BATTLE_HALL_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleHall_BecomeLeaderOrJoinGroup
-    GoTo BattleHall_WalkIntoCorridor
+    GoTo BattleHall_PokemonFollower1
     End
 
 BattleHall_BecomeLeaderOrJoinGroup:
@@ -375,7 +375,7 @@ BattleHall_StartMultiChallenge:
     Message BattleHall_Text_MustSaveFirst
     CallIfEq VAR_BATTLE_HALL_CHALLENGE_TYPE, FRONTIER_CHALLENGE_MULTI, BattleHall_SetChallengeInProgress
     Call BattleHall_SaveGame
-    GoTo BattleHall_WalkIntoCorridor
+    GoTo BattleHall_PokemonFollower1
     End
 
 BattleHall_SetChallengeInProgress:
@@ -392,6 +392,8 @@ BattleHall_EndCommunicationDifferentPokemon:
     EndCommunication
     Return
 
+BattleHall_PokemonFollower1:
+    PokemonFollowerStartCutscene
 BattleHall_WalkIntoCorridor:
     CallIfEq VAR_BATTLE_HALL_CHALLENGE_TYPE, FRONTIER_CHALLENGE_SINGLE, BattleHall_WalkToCorridorSingleChallenge
     CallIfEq VAR_BATTLE_HALL_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleHall_WalkToCorridorDoubleChallenge
@@ -575,7 +577,7 @@ BattleHall_OnFrame_ResumeChallenge:
     Message BattleHall_Text_MustSaveBeforeResuming
     Call BattleHall_SetChallengeInProgress
     Call BattleHall_SaveGame
-    GoTo BattleHall_WalkIntoCorridor
+    GoTo BattleHall_PokemonFollower1
     End
 
 BattleHall_SaveGame:
@@ -589,6 +591,7 @@ BattleHall_SaveGame:
 BattleHall_OnFrame_DidntSaveBeforeQuit:
     Message BattleHall_Text_DidntSaveBeforeQuit
     DeleteActiveBattleHallStreak VAR_BATTLE_HALL_CHALLENGE_TYPE
+    Call BattleHall_PokemonFollower2
     GoTo BattleHall_EndChallenge
     End
 
@@ -597,6 +600,7 @@ BattleHall_OnFrame_ChallengeEndedCompletedRound:
     CallIfEq VAR_BATTLE_HALL_CHALLENGE_TYPE, FRONTIER_CHALLENGE_DOUBLE, BattleHall_IncrementTrainerScoreRoundCompleted
     CallIfEq VAR_BATTLE_HALL_PRINT_STATE, 1, BattleHall_EarnedSilverPrint
     CallIfEq VAR_BATTLE_HALL_PRINT_STATE, 3, BattleHall_EarnedGoldPrint
+    Call BattleHall_PokemonFollower2
     GoTo BattleHall_EndChallenge
     End
 
@@ -623,6 +627,8 @@ BattleHall_EarnedGoldPrint:
     Common_CheckAllFrontierGoldPrintsObtained
     Return
 
+BattleHall_PokemonFollower4:
+    Call BattleHall_PokemonFollower2
 BattleHall_OnFrame_ChallengeEnded:
     GoTo BattleHall_EndChallenge
     End
@@ -920,3 +926,11 @@ BattleHall_MajorNPCEnd:
     End
 
     .balign 4, 0
+
+BattleHall_PokemonFollower2:
+    GetMovementType VAR_RESULT, LOCALID_POKEMON_FOLLOWER
+    GoToIfEq VAR_RESULT, 68, BattleHall_PokemonFollower3
+    PokemonFollowerEndCutscene
+
+BattleHall_PokemonFollower3:
+    Return

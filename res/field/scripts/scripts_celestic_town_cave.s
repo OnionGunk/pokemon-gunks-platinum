@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/celestic_town_cave.h"
 #include "res/field/events/events_celestic_town_cave.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry CelesticTownCave_Painting
     ScriptEntry CelesticTownCave_Cyrus
@@ -35,8 +35,10 @@ CelesticTownCave_EnterCyrus:
     SetObjectEventMovementType LOCALID_ELDER, MOVEMENT_TYPE_LOOK_NORTH
     AddObject LOCALID_ELDER
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    CallIfEq VAR_0x8004, 9, CelesticTownCave_ElderEnterX9
-    CallIfEq VAR_0x8004, 10, CelesticTownCave_ElderEnterX10
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    CompareVarToValue VAR_0x8004, 9
+    CallIf 1, CelesticTownCave_PokemonFollower1
+    CallIfEq VAR_0x8004, 10, CelesticTownCave_PokemonFollower2
     Message CelesticTownCave_Text_AncientLegendOfSinnoh
     Message CelesticTownCave_Text_IdLikeToKnowMore
     CloseMessage
@@ -53,7 +55,7 @@ CelesticTownCave_EnterCyrus:
     AddObject LOCALID_CYRUS
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     CallIfEq VAR_0x8004, 9, CelesticTownCave_CyrusEnterX9
-    CallIfEq VAR_0x8004, 10, CelesticTownCave_CyrusEnterX10
+    CallIfEq VAR_0x8004, 10, CelesticTownCave_PokemonFollower3
     Message CelesticTownCave_Text_MyNameIsCyrus
     Message CelesticTownCave_Text_NotInterested
     Message CelesticTownCave_Text_ChallengeMe
@@ -62,6 +64,9 @@ CelesticTownCave_EnterCyrus:
     GoToIfEq VAR_RESULT, MENU_NO, CelesticTownCave_DontBattleNow
     End
 
+CelesticTownCave_PokemonFollower1:
+    CallIfEq VAR_0x8006, 10, CelesticTownCave_PokemonFollower4
+    CallIfEq VAR_0x8007, 4, CelesticTownCave_PokemonFollower5
 CelesticTownCave_ElderEnterX9:
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderEnterX9
     WaitMovement
@@ -69,6 +74,17 @@ CelesticTownCave_ElderEnterX9:
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower4:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower6
+    Return
+
+CelesticTownCave_PokemonFollower5:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower7
+    Return
+
+CelesticTownCave_PokemonFollower2:
+    GoToIfNe VAR_0x8006, 9, CelesticTownCave_ElderEnterX10
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower8
 CelesticTownCave_ElderEnterX10:
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderEnterX10
     WaitMovement
@@ -88,6 +104,7 @@ CelesticTownCave_DontBattleNow:
 CelesticTownCave_CyrusPushPlayerX9:
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWatchCyrusPushPlayerX9
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerGetPushedX9
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerGetPushedX9
     ApplyMovement LOCALID_CYRUS, CelesticTownCave_Movement_CyrusPushPlayerX9
     WaitMovement
     Return
@@ -95,6 +112,7 @@ CelesticTownCave_CyrusPushPlayerX9:
 CelesticTownCave_CyrusPushPlayerX10:
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWatchCyrusPushPlayerX10
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerGetPushedX10
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerGetPushedX10
     ApplyMovement LOCALID_CYRUS, CelesticTownCave_Movement_CyrusPushPlayerX10
     WaitMovement
     Return
@@ -121,10 +139,12 @@ CelesticTownCave_DefeatedCyrus:
     FadeScreenIn
     WaitFadeScreen
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    CallIfEq VAR_0x8004, 8, CelesticTownCave_PlayerElderFaceEachOtherX8
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    CompareVarToValue VAR_0x8004, 8
+    CallIf 1, CelesticTownCave_PokemonFollower9
     CallIfEq VAR_0x8004, 9, CelesticTownCave_PlayerElderFaceEachOtherX9
     CallIfEq VAR_0x8004, 10, CelesticTownCave_PlayerElderFaceEachOtherX10
-    CallIfEq VAR_0x8004, 11, CelesticTownCave_PlayerElderFaceEachOtherX11
+    CallIfEq VAR_0x8004, 11, CelesticTownCave_PokemonFollower10
     Message CelesticTownCave_Text_YouShouldTakeThis
     SetVar VAR_0x8004, ITEM_HM03
     SetVar VAR_0x8005, 1
@@ -146,24 +166,55 @@ CelesticTownCave_CyrusEnterX9:
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower3:
+    CallIfEq VAR_0x8007, 4, CelesticTownCave_PokemonFollower11
 CelesticTownCave_CyrusEnterX10:
     ApplyMovement LOCALID_CYRUS, CelesticTownCave_Movement_CyrusEnterX10
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower11:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower12
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower12:
+    Delay8 3
+    FaceWest
+    Delay8 2
+    WalkFastEast
+    WalkFastNorth
+    FaceSouth
+    EndMovement
+
+CelesticTownCave_PokemonFollower9:
+    CallIfEq VAR_0x8006, 7, CelesticTownCave_PokemonFollower13
+    CallIfEq VAR_0x8006, 8, CelesticTownCave_PokemonFollower14
 CelesticTownCave_PlayerElderFaceEachOtherX8:
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkEast
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWalkOnSpotWest
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower13:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerWalkEast
+    Return
+
+CelesticTownCave_PokemonFollower14:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerWalkNorthOnSpotEast
+    Return
+
 CelesticTownCave_PlayerElderFaceEachOtherX9:
-    GoToIfEq VAR_0x8005, 4, CelesticTownCave_PlayerElderFaceEachOtherX9South
+    GoToIfEq VAR_0x8005, 4, CelesticTownCave_PokemonFollower15
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkOnSpotEast2
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWalkOnSpotWest
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower15:
+    CallIfEq VAR_0x8006, 8, CelesticTownCave_PokemonFollower16
+    CallIfEq VAR_0x8006, 9, CelesticTownCave_PokemonFollower17
+    CallIfEq VAR_0x8006, 10, CelesticTownCave_PokemonFollower18
 CelesticTownCave_PlayerElderFaceEachOtherX9South:
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkNorthOnSpotEast
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWalkOnSpotWest
@@ -176,13 +227,45 @@ CelesticTownCave_Unused:
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower16:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerWalkNorthOnSpotEast
+    Return
+
+CelesticTownCave_PokemonFollower17:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower19
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower19:
+    WalkNormalNorth
+    WalkNormalWest
+    WalkNormalNorth
+    FaceEast
+    EndMovement
+
+CelesticTownCave_PokemonFollower18:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower20
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower20:
+    WalkNormalWest 2
+    WalkNormalNorth
+    FaceEast
+    EndMovement
+
 CelesticTownCave_PlayerElderFaceEachOtherX10:
-    GoToIfEq VAR_0x8005, 4, CelesticTownCave_PlayerElderFaceEachOtherX10South
+    CompareVarToValue VAR_0x8005, 4
+    GoToIf 1, CelesticTownCave_PokemonFollower21
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkOnSpotWest2
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWalkOnSpotEast
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower21:
+    CallIfEq VAR_0x8006, 9, CelesticTownCave_PokemonFollower22
+    CallIfEq VAR_0x8006, 10, CelesticTownCave_PokemonFollower23
+    CallIfEq VAR_0x8006, 11, CelesticTownCave_PokemonFollower24
 CelesticTownCave_PlayerElderFaceEachOtherX10South:
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkNorthOnSpotWest
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWalkOnSpotEast
@@ -195,10 +278,48 @@ CelesticTownCave_Unused2:
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower22:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower25
+    Return
+
+CelesticTownCave_PokemonFollower23:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower26
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower26:
+    WalkNormalNorth
+    WalkNormalEast
+    WalkNormalNorth
+    FaceWest
+    EndMovement
+
+CelesticTownCave_PokemonFollower24:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerWalkNorthOnSpotWest
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower25:
+    WalkNormalEast 2
+    WalkNormalNorth
+    FaceWest
+    EndMovement
+
+CelesticTownCave_PokemonFollower10:
+    CallIfEq VAR_0x8006, 12, CelesticTownCave_PokemonFollower27
+    CallIfEq VAR_0x8006, 11, CelesticTownCave_PokemonFollower28
 CelesticTownCave_PlayerElderFaceEachOtherX11:
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkWest
     ApplyMovement LOCALID_ELDER, CelesticTownCave_Movement_ElderWalkOnSpotEast2
     WaitMovement
+    Return
+
+CelesticTownCave_PokemonFollower27:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerWalkWest
+    Return
+
+CelesticTownCave_PokemonFollower28:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PlayerWalkNorthOnSpotWest
     Return
 
 CelesticTownCave_ElderLeaveX9:
@@ -354,6 +475,39 @@ CelesticTownCave_Movement_ElderEnterX10:
     EndMovement
 
     .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower6:
+    Delay8 3
+    FaceWest
+    Delay8
+    WalkNormalSouth
+    WalkNormalWest 2
+    WalkNormalNorth
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower7:
+    Delay8 3
+    FaceWest
+    Delay8 2
+    WalkNormalWest
+    WalkNormalNorth
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower8:
+    Delay8 3
+    FaceWest
+    Delay8 2
+    WalkNormalSouth
+    WalkNormalEast 2
+    WalkNormalNorth
+    FaceSouth
+
+    EndMovement
+
+    .balign 4, 0
 CelesticTownCave_Movement_ElderWalkOnSpotSouth:
     WalkOnSpotNormalSouth
     EndMovement
@@ -446,8 +600,8 @@ CelesticTownCave_PaintingCynthia:
     SetObjectEventPos LOCALID_CYNTHIA, 4, 11
     AddObject LOCALID_CYNTHIA
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    CallIfEq VAR_0x8004, 9, CelesticTownCave_CynthiaEnterX9
-    CallIfEq VAR_0x8004, 10, CelesticTownCave_CynthiaEnterX10
+    CallIfEq VAR_0x8004, 9, CelesticTownCave_PokemonFollower29
+    CallIfEq VAR_0x8004, 10, CelesticTownCave_PokemonFollower30
     Message CelesticTownCave_Text_PaintingDescribedThisWay
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     CallIfEq VAR_0x8004, 9, CelesticTownCave_CynthiaWalkOnSpotWest
@@ -485,6 +639,11 @@ CelesticTownCave_PaintingCynthia:
     GoTo CelesticTownCave_CynthiaLeave
     End
 
+CelesticTownCave_PokemonFollower29:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    CallIfEq VAR_0x8006, 8, CelesticTownCave_PokemonFollower31
+    CallIfEq VAR_0x8006, 9, CelesticTownCave_PokemonFollower32
+    CallIfEq VAR_0x8006, 10, CelesticTownCave_PokemonFollower33
 CelesticTownCave_CynthiaEnterX9:
     ApplyMovement LOCALID_CYNTHIA, CelesticTownCave_Movement_CynthiaEnterX9
     WaitMovement
@@ -492,12 +651,97 @@ CelesticTownCave_CynthiaEnterX9:
     WaitMovement
     Return
 
+CelesticTownCave_PokemonFollower31:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower34
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower34:
+    Delay8 6
+    FaceSouth
+    Delay8 6
+    FaceEast
+    EndMovement
+
+CelesticTownCave_PokemonFollower32:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower35
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower35:
+    Delay8 6
+    FaceWest
+    Delay8
+    WalkNormalWest
+    WalkNormalNorth
+    FaceEast
+    EndMovement
+
+CelesticTownCave_PokemonFollower33:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower36
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower36:
+    Delay8 5
+    FaceSouth
+    Delay8
+    WalkNormalSouth
+    WalkNormalWest 2
+    WalkNormalNorth
+    FaceEast
+    EndMovement
+
+CelesticTownCave_PokemonFollower30:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    CallIfEq VAR_0x8006, 9, CelesticTownCave_PokemonFollower37
+    CallIfEq VAR_0x8006, 10, CelesticTownCave_PokemonFollower38
+    CallIfEq VAR_0x8006, 11, CelesticTownCave_PokemonFollower39
 CelesticTownCave_CynthiaEnterX10:
     ApplyMovement LOCALID_CYNTHIA, CelesticTownCave_Movement_CynthiaEnterX10
     WaitMovement
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkOnSpotWest3
     WaitMovement
     Return
+
+CelesticTownCave_PokemonFollower39:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower40
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower40:
+    Delay8 6
+    FaceWest
+    EndMovement
+
+CelesticTownCave_PokemonFollower38:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower41
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower41:
+    Delay8 6
+    FaceWest
+    Delay8
+    WalkNormalEast
+    WalkNormalNorth
+    FaceWest
+    EndMovement
+
+CelesticTownCave_PokemonFollower37:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CelesticTownCave_Movement_PokemonFollower42
+    Return
+
+    .balign 4, 0
+CelesticTownCave_Movement_PokemonFollower42:
+    Delay8 5
+    FaceWest
+    Delay8
+    WalkNormalSouth
+    WalkNormalEast 2
+    WalkNormalNorth
+    FaceWest
+    EndMovement
 
 CelesticTownCave_PlayerWalkOnSpotEast:
     ApplyMovement LOCALID_PLAYER, CelesticTownCave_Movement_PlayerWalkOnSpotEast3

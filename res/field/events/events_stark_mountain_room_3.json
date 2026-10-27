@@ -3,7 +3,7 @@
     "object_events": [
         {
             "id": "LOCALID_CROAGUNK",
-            "graphics_id": "OBJ_EVENT_GFX_CROAGUNK",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_CROAGUNK",
             "movement_type": "MOVEMENT_TYPE_LOOK_WEST",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_STARK_MOUNTAIN_ROOM_3_CROAGUNK",

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/celestic_town.h"
 #include "res/field/events/events_celestic_town.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry CelesticTown_OnTransition
     ScriptEntry CelesticTown_Elder
@@ -47,6 +47,7 @@ CelesticTown_GruntMBattle:
     Message CelesticTown_Text_TooMuchToHandle
     CloseMessage
     GetPlayerDir VAR_RESULT
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
     GoToIfEq VAR_RESULT, DIR_NORTH, CelesticTown_GruntMLeaveElderEnterNorth
     GoToIfEq VAR_RESULT, DIR_WEST, CelesticTown_GruntMLeaveElderEnterWest
     GoToIfEq VAR_RESULT, DIR_EAST, CelesticTown_GruntMLeaveElderEnterEast
@@ -57,8 +58,15 @@ CelesticTown_GruntMLeaveElderEnterNorth:
     ApplyMovement LOCALID_PLAYER, CelesticTown_Movement_PlayerWatchGruntMLeaveNorth
     WaitMovement
     Call CelesticTown_RemoveGruntMAddElder
+    GoToIfEq VAR_0x8004, 464, CelesticTown_PokemonFollower1
     ApplyMovement LOCALID_ELDER, CelesticTown_Movement_ElderEnterNorth
     ApplyMovement LOCALID_PLAYER, CelesticTown_Movement_PlayerWatchElderEnterNorth
+    WaitMovement
+    GoTo CelesticTown_GiveOldCharm
+
+CelesticTown_PokemonFollower1:
+    ApplyMovement LOCALID_ELDER, CelesticTown_Movement_PokemonFollower2
+    ApplyMovement LOCALID_PLAYER, CelesticTown_Movement_PokemonFollower3
     WaitMovement
     GoTo CelesticTown_GiveOldCharm
 
@@ -67,7 +75,14 @@ CelesticTown_GruntMLeaveElderEnterWest:
     ApplyMovement LOCALID_PLAYER, CelesticTown_Movement_PlayerWatchGruntMLeaveWest
     WaitMovement
     Call CelesticTown_RemoveGruntMAddElder
+    GoToIfEq VAR_0x8005, 523, CelesticTown_PokemonFollower4
     ApplyMovement LOCALID_ELDER, CelesticTown_Movement_ElderEnterWest
+    WaitMovement
+    GoTo CelesticTown_GiveOldCharm
+
+CelesticTown_PokemonFollower4:
+    ApplyMovement LOCALID_ELDER, CelesticTown_Movement_PokemonFollower5
+    ApplyMovement LOCALID_PLAYER, CelesticTown_Movement_PokemonFollower6
     WaitMovement
     GoTo CelesticTown_GiveOldCharm
 
@@ -76,7 +91,14 @@ CelesticTown_GruntMLeaveElderEnterEast:
     ApplyMovement LOCALID_PLAYER, CelesticTown_Movement_PlayerWatchGruntMLeaveEast
     WaitMovement
     Call CelesticTown_RemoveGruntMAddElder
+    GoToIfEq VAR_0x8005, 523, CelesticTown_PokemonFollower7
     ApplyMovement LOCALID_ELDER, CelesticTown_Movement_ElderEnterEast
+    WaitMovement
+    GoTo CelesticTown_GiveOldCharm
+
+CelesticTown_PokemonFollower7:
+    ApplyMovement LOCALID_ELDER, CelesticTown_Movement_PokemonFollower8
+    ApplyMovement LOCALID_PLAYER, CelesticTown_Movement_PokemonFollower9
     WaitMovement
     GoTo CelesticTown_GiveOldCharm
 
@@ -103,8 +125,17 @@ CelesticTown_GiveOldCharm:
     Message CelesticTown_Text_LookAroundRuins
     WaitButton
     CloseMessage
+    ScrCmd_Unused_06A LOCALID_ELDER, VAR_0x8004, VAR_0x8005
+    GoToIfNe VAR_0x8004, 463, CelesticTown_PokemonFollower10
+    CallIfEq VAR_0x8005, 522, CelesticTown_PokemonFollower11
+CelesticTown_PokemonFollower10:
     ReleaseAll
     End
+
+CelesticTown_PokemonFollower11:
+    ApplyMovement LOCALID_ELDER, CelesticTown_Movement_PokemonFollower12
+    WaitMovement
+    Return
 
 CelesticTown_BlackOut:
     BlackOutFromBattle
@@ -131,6 +162,13 @@ CelesticTown_Movement_ElderEnterNorth:
     EndMovement
 
     .balign 4, 0
+CelesticTown_Movement_PokemonFollower2:
+    WalkNormalNorth 7
+    WalkNormalWest 3
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
 CelesticTown_Movement_ElderEnterWest:
     WalkNormalNorth 8
     WalkNormalWest 2
@@ -138,10 +176,29 @@ CelesticTown_Movement_ElderEnterWest:
     EndMovement
 
     .balign 4, 0
+CelesticTown_Movement_PokemonFollower5:
+    WalkNormalNorth 9
+    WalkNormalWest
+    EndMovement
+
+    .balign 4, 0
 CelesticTown_Movement_ElderEnterEast:
     WalkNormalNorth 8
     WalkNormalWest 4
     WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+CelesticTown_Movement_PokemonFollower8:
+    WalkNormalNorth 9
+    WalkNormalWest 3
+    EndMovement
+
+    .balign 4, 0
+CelesticTown_Movement_PokemonFollower12:
+    WalkNormalEast
+    WalkOnSpotNormalWest
+
     EndMovement
 
     .balign 4, 0
@@ -166,6 +223,26 @@ CelesticTown_Movement_PlayerWatchGruntMLeaveEast:
 CelesticTown_Movement_PlayerWatchElderEnterNorth:
     Delay8 8
     Delay4
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+CelesticTown_Movement_PokemonFollower3:
+    Delay8 8
+    Delay4
+    WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+CelesticTown_Movement_PokemonFollower6:
+    Delay8 8
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+CelesticTown_Movement_PokemonFollower9:
+    Delay8 9
+
     WalkOnSpotNormalEast
     EndMovement
 

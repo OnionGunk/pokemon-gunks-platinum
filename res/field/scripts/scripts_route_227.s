@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_227.h"
 #include "res/field/events/events_route_227.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route227_CoordEvent_WakeRival
     ScriptEntry Route227_ArrowSignpostStarkMountain
@@ -38,9 +38,18 @@ Route227_CoordEvent_WakeRival:
     CloseMessage
     ApplyMovement LOCALID_CRASHER_WAKE, Route227_Movement_WakeLeave
     ApplyMovement LOCALID_PLAYER, Route227_Movement_PlayerWalkWestWatchWakeLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route227_Movement_PlayerWalkWestWatchWakeLeave
     ApplyMovement LOCALID_RIVAL, Route227_Movement_RivalWatchWakeLeave
     WaitMovement
     RemoveObject LOCALID_CRASHER_WAKE
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    GoToIfEq VAR_0x8005, 307, Route227_PokemonFollower1
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route227_Movement_PokemonFollower2
+    GoTo Route227_PokemonFollower3
+
+Route227_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route227_Movement_PokemonFollower4
+Route227_PokemonFollower3:
     ApplyMovement LOCALID_RIVAL, Route227_Movement_RivalWalkOnSpotSouth
     ApplyMovement LOCALID_PLAYER, Route227_Movement_PlayerWalkToRival
     WaitMovement
@@ -51,6 +60,7 @@ Route227_CoordEvent_WakeRival:
     CloseMessage
     ApplyMovement LOCALID_RIVAL, Route227_Movement_RivalLeave
     ApplyMovement LOCALID_PLAYER, Route227_Movement_PlayerWatchRivalLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route227_Movement_PlayerWatchRivalLeave
     WaitMovement
     RemoveObject LOCALID_RIVAL
     SetVar VAR_ROUTE_227_WAKE_RIVAL_STATE, 1
@@ -59,6 +69,7 @@ Route227_CoordEvent_WakeRival:
 
 Route227_PlayerWalkWestOnSpotNorth:
     ApplyMovement LOCALID_PLAYER, Route227_Movement_PlayerWalkWestOnSpotNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, Route227_Movement_PokemonFollower5
     WaitMovement
     Return
 
@@ -66,6 +77,13 @@ Route227_PlayerWalkWestOnSpotNorth:
 Route227_Movement_PlayerWalkWestOnSpotNorth:
     WalkNormalWest
     WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+Route227_Movement_PokemonFollower5:
+    WalkNormalWest 2
+    WalkNormalNorth
+
     EndMovement
 
     .balign 4, 0
@@ -78,6 +96,18 @@ Route227_Movement_PlayerWalkToRival:
     WalkNormalEast
     WalkNormalNorth
     WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+Route227_Movement_PokemonFollower2:
+    WalkNormalEast 2
+    EndMovement
+
+    .balign 4, 0
+Route227_Movement_PokemonFollower4:
+    WalkNormalNorth
+    WalkNormalEast
+
     EndMovement
 
     .balign 4, 0

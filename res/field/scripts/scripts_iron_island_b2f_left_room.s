@@ -2,10 +2,10 @@
 #include "res/text/bank/iron_island_b2f_left_room.h"
 #include "res/text/bank/special_met_location_names.h"
 #include "res/field/events/events_iron_island_b2f_left_room.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry IronIslandB2FLeftRoom_OnTransition
-    ScriptEntry IronIslandB2FLeftRoom_CoordEvent_PlatformLift
+    ScriptEntry IronIslandB2FLeftRoom_PokemonFollower5
     ScriptEntry IronIslandB2FLeftRoom_CoordEvent_RileyStartFollowing
     ScriptEntry IronIslandB2FLeftRoom_CoordEvent_PlayerLeaveRiley
     ScriptEntry IronIslandB2FLeftRoom_Dummy5
@@ -31,9 +31,37 @@ IronIslandB2FLeftRoom_SetRileyPositionAtExit:
     SetObjectEventDir LOCALID_RILEY, DIR_EAST
     End
 
+IronIslandB2FLeftRoom_PokemonFollower5:
+    GetPlayerDir VAR_RESULT
+    CallIfEq VAR_RESULT, 0, IronIslandB2FLeftRoom_PokemonFollower1
+    CallIfEq VAR_RESULT, 1, IronIslandB2FLeftRoom_PokemonFollower2
 IronIslandB2FLeftRoom_CoordEvent_PlatformLift:
     TriggerPlatformLift
     End
+
+IronIslandB2FLeftRoom_PokemonFollower1:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, IronIslandB2FLeftRoom_Movement_PokemonFollower3
+    WaitMovement
+    Return
+
+IronIslandB2FLeftRoom_PokemonFollower2:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, IronIslandB2FLeftRoom_Movement_PokemonFollower4
+    WaitMovement
+    Return
+
+    .balign 4, 0
+IronIslandB2FLeftRoom_Movement_PokemonFollower3:
+    WalkNormalEast
+    WalkNormalNorth
+    FaceSouth
+    EndMovement
+
+    .balign 4, 0
+IronIslandB2FLeftRoom_Movement_PokemonFollower4:
+    WalkNormalEast
+    WalkNormalSouth
+    FaceSouth
+    EndMovement
 
 IronIslandB2FLeftRoom_CoordEvent_RileyStartFollowing:
     LockAll
@@ -48,6 +76,7 @@ IronIslandB2FLeftRoom_CoordEvent_RileyStartFollowing:
     PlayFanfare SEQ_GONIN_sseq
     Message IronIslandB2FLeftRoom_Text_DecidedToGoWithRiley
     WaitFanfare
+    PokemonFollowerStartCutscene
     SetFlag FLAG_TALKED_TO_IRON_ISLAND_B2F_LEFT_ROOM_RILEY
     SetVar VAR_IRON_ISLAND_B2F_LEFT_ROOM_FOLLOWER_RILEY_STATE, 1
     Message IronIslandB2FLeftRoom_Text_IllHealYourPokemon
@@ -87,6 +116,7 @@ IronIslandB2FLeftRoom_CoordEvent_PlayerLeaveRiley:
     SetVar VAR_IRON_ISLAND_B2F_LEFT_ROOM_FOLLOWER_RILEY_STATE, 0
     ClearHasPartner
     SetMovementType LOCALID_RILEY, MOVEMENT_TYPE_LOOK_WEST
+    PokemonFollowerEndCutscene
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     CallIfEq VAR_0x8005, 2, IronIslandB2FLeftRoom_RileyWalkBackZ2
     CallIfEq VAR_0x8005, 3, IronIslandB2FLeftRoom_RileyWalkBackZ3
@@ -187,6 +217,7 @@ IronIslandB2FLeftRoom_CoordEvent_Grunts:
     RemoveObject LOCALID_GRUNT_M_EAST
     FadeScreenIn
     WaitFadeScreen
+    PokemonFollowerEndCutscene
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     CallIfEq VAR_0x8005, 40, IronIslandB2FLeftRoom_PlayerRileyFaceEachOtherZ40
     CallIfEq VAR_0x8005, 41, IronIslandB2FLeftRoom_PlayerRileyFaceEachOtherZ41

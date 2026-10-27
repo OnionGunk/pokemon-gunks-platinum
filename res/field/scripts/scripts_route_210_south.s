@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/route_210_south.h"
 #include "res/field/events/events_route_210_south.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry Route210South_Psyduck
     ScriptEntry Route210South_Dummy2
@@ -75,27 +75,70 @@ Route210South_UseSecretPotion:
     RemoveObject LOCALID_PSYDUCK_1
     WaitTime 45, VAR_RESULT
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
-    GoToIfEq VAR_0x8004, 560, Route210South_SetCynthiaPositionX560
-    GoToIfEq VAR_0x8004, 561, Route210South_SetCynthiaPositionX561
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8006, VAR_0x8007
+    CompareVarToValue VAR_0x8004, 560
+    GoToIf 1, Route210South_PokemonFollower1
+    GoToIfEq VAR_0x8004, 561, Route210South_PokemonFollower2
     End
 
+Route210South_PokemonFollower1:
+    GoToIfEq VAR_0x8007, 589, Route210South_SetCynthiaPositionX561
 Route210South_SetCynthiaPositionX560:
     SetObjectEventPos LOCALID_CYNTHIA, 560, 596
     SetObjectEventMovementType LOCALID_CYNTHIA, MOVEMENT_TYPE_LOOK_NORTH
-    GoTo Route210South_CynthiaEnter
+    GoTo Route210South_PokemonFollower3
 
 Route210South_SetCynthiaPositionX561:
     SetObjectEventPos LOCALID_CYNTHIA, 561, 596
     SetObjectEventMovementType LOCALID_CYNTHIA, MOVEMENT_TYPE_LOOK_NORTH
+    GoTo Route210South_PokemonFollower4
+
+Route210South_PokemonFollower2:
+    GoToIfEq VAR_0x8007, 589, Route210South_PokemonFollower5
+    SetObjectEventPos LOCALID_CYNTHIA, 561, 596
+    SetObjectEventMovementType LOCALID_CYNTHIA, 14
+    GoTo Route210South_PokemonFollower3
+
+Route210South_PokemonFollower5:
+    SetObjectEventPos LOCALID_CYNTHIA, 560, 596
+    SetObjectEventMovementType LOCALID_CYNTHIA, 14
     GoTo Route210South_CynthiaEnter
+
+Route210South_PokemonFollower3:
+    ClearFlag FLAG_HIDE_ROUTE_210_SOUTH_CYNTHIA
+    AddObject 20
+    LockObject LOCALID_CYNTHIA
+    ApplyMovement LOCALID_CYNTHIA, Route210South_Movement_CynthiaEnter
+    WaitMovement
+    ApplyMovement LOCALID_PLAYER, Route210South_Movement_PlayerWalkOnSpotSouth
+    WaitMovement
+    Message Route210South_Text_DeliverThisOldCharm
+    ShowYesNoMenu VAR_RESULT
+    GoToIfEq VAR_RESULT, 0, Route210South_AcceptOldCharm
+    GoToIfEq VAR_RESULT, 1, Route210South_RefuseOldCharm
+    End
+
+Route210South_PokemonFollower4:
+    ClearFlag FLAG_HIDE_ROUTE_210_SOUTH_CYNTHIA
+    AddObject 20
+    LockObject LOCALID_CYNTHIA
+    ApplyMovement LOCALID_CYNTHIA, Route210South_Movement_PokemonFollower6
+    WaitMovement
+    ApplyMovement LOCALID_PLAYER, Route210South_Movement_PokemonFollower7
+    WaitMovement
+    Message Route210South_Text_DeliverThisOldCharm
+    ShowYesNoMenu VAR_RESULT
+    GoToIfEq VAR_RESULT, 0, Route210South_AcceptOldCharm
+    GoToIfEq VAR_RESULT, 1, Route210South_RefuseOldCharm
+    End
 
 Route210South_CynthiaEnter:
     ClearFlag FLAG_HIDE_ROUTE_210_SOUTH_CYNTHIA
     AddObject LOCALID_CYNTHIA
     LockObject LOCALID_CYNTHIA
-    ApplyMovement LOCALID_CYNTHIA, Route210South_Movement_CynthiaEnter
+    ApplyMovement LOCALID_CYNTHIA, Route210South_Movement_PokemonFollower8
     WaitMovement
-    ApplyMovement LOCALID_PLAYER, Route210South_Movement_PlayerWalkOnSpotSouth
+    ApplyMovement LOCALID_PLAYER, Route210South_Movement_PokemonFollower9
     WaitMovement
     Message Route210South_Text_DeliverThisOldCharm
     ShowYesNoMenu VAR_RESULT
@@ -188,6 +231,18 @@ Route210South_Movement_CynthiaEnter:
     EndMovement
 
     .balign 4, 0
+Route210South_Movement_PokemonFollower6:
+    WalkNormalNorth 8
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+Route210South_Movement_PokemonFollower8:
+    WalkNormalNorth 8
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
 Route210South_Movement_CynthiaLeaveX560:
     WalkNormalSouth 9
     EndMovement
@@ -200,6 +255,17 @@ Route210South_Movement_CynthiaLeaveX561:
     .balign 4, 0
 Route210South_Movement_PlayerWalkOnSpotSouth:
     WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+Route210South_Movement_PokemonFollower7:
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+Route210South_Movement_PokemonFollower9:
+    WalkOnSpotNormalWest
+
     EndMovement
 
 Route210South_Movement_Unused:

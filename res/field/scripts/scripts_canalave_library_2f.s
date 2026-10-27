@@ -2,7 +2,6 @@
 #include "res/text/bank/canalave_library_2f.h"
 #include "res/field/events/events_canalave_library_2f.h"
 
-
     ScriptEntry CanalaveLibrary2F_SchoolKidM
     ScriptEntry CanalaveLibrary2F_Bookshelves
     ScriptEntry CanalaveLibrary2F_Shelves
@@ -116,6 +115,7 @@ CanalaveLibrary2F_ThereWerePlates:
     ApplyMovement LOCALID_HIKER, CanalaveLibrary2F_Movement_HikerLeave
     WaitMovement
     RemoveObject LOCALID_HIKER
+    PokemonFollowerResumeFollowing
     SetVar VAR_ARCEUS_EVENT_STATE, 3
     ReleaseAll
     End

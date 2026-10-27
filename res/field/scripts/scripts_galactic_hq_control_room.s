@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/galactic_hq_control_room.h"
 #include "res/field/events/events_galactic_hq_control_room.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry GalacticHQControlRoom_OnTransition
     ScriptEntry GalacticHQControlRoom_OnResume
@@ -311,6 +311,7 @@ GalacticHQControlRoom_CoordEvent_Saturn:
     Message GalacticHQControlRoom_Text_PressButtonAndFreePokemon2
     CloseMessage
     ApplyMovement LOCALID_PLAYER, GalacticHQControlRoom_Movement_PlayerWalkNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, GalacticHQControlRoom_Movement_PlayerWalkNorth
     WaitMovement
     ReleaseAll
     End

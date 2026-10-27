@@ -162,7 +162,7 @@
         },
         {
             "id": "LOCALID_PACHIRISU",
-            "graphics_id": "OBJ_EVENT_GFX_PACHIRISU",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_PACHIRISU",
             "movement_type": "MOVEMENT_TYPE_NONE",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "0",
@@ -483,7 +483,7 @@
         },
         {
             "id": "LOCALID_BUNEARY",
-            "graphics_id": "OBJ_EVENT_GFX_BUNEARY",
+            "graphics_id": "OBJ_EVENT_GFX_FOLLOWER_BUNEARY",
             "movement_type": "MOVEMENT_TYPE_LOOK_WEST",
             "trainer_type": "TRAINER_TYPE_NONE",
             "hidden_flag": "FLAG_HIDE_HEARTHOME_CITY_BUNEARY",

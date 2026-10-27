@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/pokemon_mansion.h"
 #include "res/field/events/events_pokemon_mansion.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry PokemonMansion_OnTransition
     ScriptEntry PokemonMansion_MaidOffice
@@ -65,6 +65,7 @@ PokemonMansion_MaidWest:
 PokemonMansion_GetInPositionNorth:
     ApplyMovement LOCALID_MAID_FAR_WEST, PokemonMansion_Movement_MaidFarWestWalkOnSpotEast
     ApplyMovement LOCALID_PLAYER, PokemonMansion_Movement_PlayerGetInPositionNorth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonMansion_Movement_PokemonFollower1
     WaitMovement
     GoTo PokemonMansion_FiveMaidKnockoutChallenge
     End
@@ -72,6 +73,7 @@ PokemonMansion_GetInPositionNorth:
 PokemonMansion_GetInPositionSouth:
     ApplyMovement LOCALID_MAID_FAR_WEST, PokemonMansion_Movement_MaidFarWestWalkOnSpotEast2
     ApplyMovement LOCALID_PLAYER, PokemonMansion_Movement_PlayerGetInPositionSouth
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, PokemonMansion_Movement_PokemonFollower2
     WaitMovement
     GoTo PokemonMansion_FiveMaidKnockoutChallenge
     End
@@ -283,8 +285,25 @@ PokemonMansion_Movement_PlayerGetInPositionNorth:
     EndMovement
 
     .balign 4, 0
+PokemonMansion_Movement_PokemonFollower1:
+    WalkNormalWest
+    WalkNormalEast 2
+    WalkNormalNorth
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
 PokemonMansion_Movement_PlayerGetInPositionSouth:
     WalkNormalEast
+    WalkNormalSouth
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+PokemonMansion_Movement_PokemonFollower2:
+    WalkNormalWest
+    WalkNormalEast 2
+
     WalkNormalSouth
     WalkOnSpotNormalWest
     EndMovement

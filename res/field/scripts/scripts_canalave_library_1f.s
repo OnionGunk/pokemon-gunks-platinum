@@ -2,7 +2,6 @@
 #include "res/text/bank/canalave_library_1f.h"
 #include "res/field/events/events_canalave_library_1f.h"
 
-
     ScriptEntry CanalaveLibrary1F_Receptionist
     ScriptEntry CanalaveLibrary1F_Lass
     ScriptEntry CanalaveLibrary1F_Bookshelves
@@ -102,7 +101,7 @@ CanalaveLibrary1F_SeeAtPokemonLeague:
     GetPlayerDir VAR_0x8000
     CallIfEq VAR_0x8000, DIR_NORTH, CanalaveLibrary1F_LucianLeaveNorth
     CallIfEq VAR_0x8000, DIR_WEST, CanalaveLibrary1F_LucianLeaveWest
-    CallIfEq VAR_0x8000, DIR_EAST, CanalaveLibrary1F_LucianLeaveEast
+    CallIfEq VAR_0x8000, DIR_EAST, CanalaveLibrary1F_PokemonFollower1
     PlaySE SEQ_SE_DP_KAIDAN2_sseq
     RemoveObject LOCALID_LUCIAN
     WaitSE SEQ_SE_DP_KAIDAN2_sseq
@@ -120,8 +119,9 @@ CanalaveLibrary1F_LucianLeaveWest:
     WaitMovement
     Return
 
+CanalaveLibrary1F_PokemonFollower1:
+    ApplyMovement LOCALID_LUCIAN, CanalaveLibrary1F_Movement_PokemonFollower2
 CanalaveLibrary1F_LucianLeaveEast:
-    ApplyMovement LOCALID_LUCIAN, CanalaveLibrary1F_Movement_LucianLeaveEast
     ApplyMovement LOCALID_PLAYER, CanalaveLibrary1F_Movement_PlayerWatchLucianEast
     WaitMovement
     Return
@@ -134,10 +134,14 @@ CanalaveLibrary1F_Movement_LucianNorthWest:
     EndMovement
 
     .balign 4, 0
+CanalaveLibrary1F_Movement_PokemonFollower2:
+    WalkNormalSouth 2
+
+    .balign 4, 0
 CanalaveLibrary1F_Movement_LucianLeaveEast:
-    WalkNormalSouth
     WalkNormalWest 5
-    WalkNormalSouth 5
+    WalkNormalSouth 4
+
     Delay4
     EndMovement
 

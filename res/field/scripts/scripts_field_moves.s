@@ -1,6 +1,6 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/field_moves.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry FieldMoves_CutTree
     ScriptEntry FieldMoves_Rock
@@ -50,7 +50,8 @@ FieldMoves_UseCutFromField:
     BufferPartyMonNickname 0, VAR_RESULT
     Message FieldMoves_Text_PokemonUsedCut
     CloseMessage
-    PlayHMCutIn VAR_0x8004
+    SetVarFromVar VAR_0x8001, VAR_0x8004
+    Call FieldMoves_PokemonFollower1
     StartDestroyObstacleAnimation 0, VAR_0x8005
     WaitTime 7, VAR_RESULT
     RemoveObject VAR_LAST_TALKED
@@ -67,7 +68,8 @@ FieldMoves_UseCutFromMenu:
     BufferPartyMonNickname 0, VAR_0x8000
     Message FieldMoves_Text_PokemonUsedCut
     CloseMessage
-    PlayHMCutIn VAR_0x8000
+    SetVarFromVar VAR_0x8001, VAR_0x8000
+    Call FieldMoves_PokemonFollower1
     StartDestroyObstacleAnimation 0, VAR_0x8005
     WaitTime 7, VAR_RESULT
     RemoveObject VAR_LAST_TALKED
@@ -151,7 +153,8 @@ FieldMoves_UseRockSmashFromField:
     BufferPartyMonNickname 0, VAR_0x8004
     Message FieldMoves_Text_PokemonUsedRockSmash
     CloseMessage
-    PlayHMCutIn VAR_0x8004
+    SetVarFromVar VAR_0x8001, VAR_0x8004
+    Call FieldMoves_PokemonFollower1
     StartDestroyObstacleAnimation 1, VAR_0x8005
     WaitTime 10, VAR_RESULT
     RemoveObject VAR_LAST_TALKED
@@ -168,7 +171,8 @@ FieldMoves_UseRockSmashFromMenu:
     BufferPartyMonNickname 0, VAR_0x8000
     Message FieldMoves_Text_PokemonUsedRockSmash
     CloseMessage
-    PlayHMCutIn VAR_0x8000
+    SetVarFromVar VAR_0x8001, VAR_0x8000
+    Call FieldMoves_PokemonFollower1
     StartDestroyObstacleAnimation 1, VAR_0x8005
     WaitTime 10, VAR_RESULT
     RemoveObject VAR_LAST_TALKED
@@ -210,8 +214,9 @@ FieldMoves_UseStrengthFromField:
     SetVar VAR_0x8004, VAR_RESULT
     BufferPartyMonNickname 0, VAR_RESULT
     Message FieldMoves_Text_PokemonUsedStrength
-    PlayHMCutIn VAR_0x8004
     CloseMessage
+    SetVarFromVar VAR_0x8001, VAR_0x8004
+    Call FieldMoves_PokemonFollower2
     Message FieldMoves_Text_PokemonStrengthMadePossibleToMove
     WaitButton
     CloseMessage
@@ -235,7 +240,8 @@ FieldMoves_UseStrengthFromMenu:
     BufferPartyMonNickname 0, VAR_0x8000
     Message FieldMoves_Text_PokemonUsedStrength
     CloseMessage
-    PlayHMCutIn VAR_0x8000
+    SetVarFromVar VAR_0x8001, VAR_0x8000
+    Call FieldMoves_PokemonFollower2
     Message FieldMoves_Text_PokemonStrengthMadePossibleToMove
     WaitButton
     CloseMessage
@@ -364,7 +370,8 @@ FieldMoves_UseDefogFromField_Unused:
     BufferPartyMonNickname 0, VAR_RESULT
     Message FieldMoves_Text_PokemonUsedDefog
     CloseMessage
-    PlayHMCutIn VAR_0x8004
+    SetVarFromVar VAR_0x8001, VAR_0x8004
+    Call FieldMoves_PokemonFollower2
     GetCurrentMapID VAR_0x8004
     CreateJournalEvent LOCATION_EVENT_USED_DEFOG, VAR_0x8004
     GetCurrentMapID VAR_0x8004
@@ -381,7 +388,8 @@ FieldMoves_UseDefogFromMenu:
     BufferPartyMonNickname 0, VAR_0x8000
     Message FieldMoves_Text_PokemonUsedDefog
     CloseMessage
-    PlayHMCutIn VAR_0x8000
+    SetVarFromVar VAR_0x8001, VAR_0x8000
+    Call FieldMoves_PokemonFollower2
     DoDefogFunc FIELD_MOVE_FUNC_SET_ACTIVE
     PlaySE SEQ_SE_DP_FBRADE_sseq
     ScrCmd_0C4
@@ -464,3 +472,173 @@ FieldMoves_Dummy8:
     End
 
     .balign 4, 0
+
+FieldMoves_PokemonFollower1:
+    CheckPokemonFollowerActive VAR_RESULT
+    GoToIfEq VAR_RESULT, 0, FieldMoves_PokemonFollower3
+    GetPokemonFollowerPartySlot VAR_RESULT
+    GetPartyMonSpecies VAR_RESULT, VAR_0x8006
+    GoToIfNe VAR_RESULT, VAR_0x8001, FieldMoves_PokemonFollower3
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    GetPokemonFollowerDirFromPlayer VAR_RESULT
+    GoToIfEq VAR_RESULT, 4, FieldMoves_PokemonFollower3
+    ShowPokemonFollower
+    GetPlayerDir VAR_0x8001
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    CallIfEq VAR_RESULT, 0, FieldMoves_PokemonFollower4
+    CallIfEq VAR_RESULT, 1, FieldMoves_PokemonFollower5
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    CallIfEq VAR_RESULT, 2, FieldMoves_PokemonFollower6
+    CallIfEq VAR_RESULT, 3, FieldMoves_PokemonFollower7
+    PlayCry VAR_0x8006, 0
+    WaitCry
+    Return
+
+FieldMoves_PokemonFollower2:
+    CheckPokemonFollowerActive VAR_RESULT
+    GoToIfEq VAR_RESULT, 0, FieldMoves_PokemonFollower3
+    GetPokemonFollowerPartySlot VAR_RESULT
+    GetPartyMonSpecies VAR_RESULT, VAR_0x8006
+    GoToIfNe VAR_RESULT, VAR_0x8001, FieldMoves_PokemonFollower3
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    GetPokemonFollowerDirFromPlayer VAR_RESULT
+    GoToIfEq VAR_RESULT, 4, FieldMoves_PokemonFollower3
+    ShowPokemonFollower
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower8
+    WaitMovement
+    PlayCry VAR_0x8006, 0
+    WaitCry
+    Return
+
+FieldMoves_PokemonFollower3:
+    PlayHMCutIn VAR_0x8001
+    Return
+
+FieldMoves_PokemonFollower4:
+    ApplyMovement LOCALID_PLAYER, FieldMoves_Movement_PokemonFollower9
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower10
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    Call FieldMoves_PokemonFollower11
+    WaitMovement
+    Return
+
+FieldMoves_PokemonFollower5:
+    ApplyMovement LOCALID_PLAYER, FieldMoves_Movement_PokemonFollower12
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower13
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    Call FieldMoves_PokemonFollower11
+    WaitMovement
+    Return
+
+FieldMoves_PokemonFollower6:
+    ApplyMovement LOCALID_PLAYER, FieldMoves_Movement_PokemonFollower14
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower15
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    Call FieldMoves_PokemonFollower11
+    WaitMovement
+    Return
+
+FieldMoves_PokemonFollower7:
+    ApplyMovement LOCALID_PLAYER, FieldMoves_Movement_PokemonFollower16
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower17
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    Call FieldMoves_PokemonFollower11
+    WaitMovement
+    Return
+
+FieldMoves_PokemonFollower11:
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    GoToIfEq VAR_0x8001, 0, FieldMoves_PokemonFollower18
+    GoToIfEq VAR_0x8001, 1, FieldMoves_PokemonFollower19
+    WaitTime 1, VAR_MAP_LOCAL_0x00
+    GoToIfEq VAR_0x8001, 2, FieldMoves_PokemonFollower20
+    GoToIfEq VAR_0x8001, 3, FieldMoves_PokemonFollower21
+    Return
+
+FieldMoves_PokemonFollower18:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower22
+    Return
+
+FieldMoves_PokemonFollower19:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower23
+    Return
+
+FieldMoves_PokemonFollower20:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower24
+    Return
+
+FieldMoves_PokemonFollower21:
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, FieldMoves_Movement_PokemonFollower25
+    Return
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower9:
+    WalkNormalNorth
+    WalkOnSpotNormalSouth
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower12:
+    WalkNormalSouth
+    WalkOnSpotNormalNorth
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower14:
+    WalkNormalWest
+    WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower16:
+    WalkNormalEast
+    WalkOnSpotNormalWest
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower13:
+    WalkNormalNorth
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower10:
+    WalkNormalSouth
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower17:
+    WalkNormalWest
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower15:
+    WalkNormalEast
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower22:
+    JumpOnSpotFastNorth
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower23:
+    JumpOnSpotFastSouth
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower24:
+    JumpOnSpotFastWest
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower25:
+    JumpOnSpotFastEast
+    EndMovement
+
+    .balign 4, 0
+FieldMoves_Movement_PokemonFollower8:
+    LockDir
+    JumpOnSpotFastSouth
+    UnlockDir
+    EndMovement

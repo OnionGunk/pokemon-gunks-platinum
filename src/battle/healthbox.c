@@ -1376,7 +1376,15 @@ static s32 HealthBox_DrawGauge(HealthBox *healthbox, enum HealthBoxGaugeType gau
     s32 fillOffset;
 
     if (gaugeType == HEALTHBOX_GAUGE_HP) {
-        result = UpdateGauge(healthbox->maxHP, healthbox->curHP, healthbox->damage, &healthbox->hpTemp, HEALTHBOX_HP_CELL_COUNT, 1);
+        // move the bar one pixel per frame whatever the max HP (vanilla moved 1 HP per frame, so
+        // big HP pools drained for seconds); a full bar now drains in 48 frames
+        fillOffset = healthbox->maxHP / (HEALTHBOX_HP_CELL_COUNT * HEALTHBOX_NAME_BLOCK_COUNT_X);
+
+        if (fillOffset < 1) {
+            fillOffset = 1;
+        }
+
+        result = UpdateGauge(healthbox->maxHP, healthbox->curHP, healthbox->damage, &healthbox->hpTemp, HEALTHBOX_HP_CELL_COUNT, fillOffset);
     } else {
         fillOffset = CalcGaugeFill(healthbox->curExp, healthbox->expReward, healthbox->maxExp, HEALTHBOX_EXP_CELL_COUNT);
 

@@ -1,7 +1,7 @@
 #include "macros/scrcmd.inc"
 #include "res/text/bank/vista_lighthouse.h"
 #include "res/field/events/events_vista_lighthouse.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry VistaLighthouse_Sailor
     ScriptEntry VistaLighthouse_Youngster
@@ -38,7 +38,7 @@ VistaLighthouse_Volkner:
     WaitTime 15, VAR_RESULT
     GetPlayerDir VAR_RESULT
     GoToIfEq VAR_RESULT, DIR_NORTH, VistaLighthouse_VolknerWalkToDoorNorth
-    GoToIfEq VAR_RESULT, DIR_WEST, VistaLighthouse_VolknerWalkToDoorWest
+    GoToIfEq VAR_RESULT, DIR_WEST, VistaLighthouse_PokemonFollower1
     GoToIfEq VAR_RESULT, DIR_EAST, VistaLighthouse_VolknerWalkToDoorEast
     End
 
@@ -48,6 +48,10 @@ VistaLighthouse_VolknerWalkToDoorNorth:
     WaitMovement
     GoTo VistaLighthouse_VolknerLeave
 
+VistaLighthouse_PokemonFollower1:
+    ScrCmd_Unused_06A LOCALID_POKEMON_FOLLOWER, VAR_0x8004, VAR_0x8005
+    GoToIfNe VAR_0x8005, 5, VistaLighthouse_VolknerWalkToDoorWest
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, VistaLighthouse_Movement_PokemonFollower2
 VistaLighthouse_VolknerWalkToDoorWest:
     ApplyMovement LOCALID_VOLKNER, VistaLighthouse_Movement_VolknerWalkToDoorWestEast
     ApplyMovement LOCALID_PLAYER, VistaLighthouse_Movement_PlayerWatchVolknerWalkToDoorWest
@@ -108,4 +112,11 @@ VistaLighthouse_Movement_PlayerWatchVolknerWalkToDoorWest:
     WalkOnSpotNormalSouth
     Delay8
     WalkOnSpotNormalEast
+    EndMovement
+
+    .balign 4, 0
+VistaLighthouse_Movement_PokemonFollower2:
+    WalkNormalEast
+    WalkNormalNorth
+    FaceSouth
     EndMovement

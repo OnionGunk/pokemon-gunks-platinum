@@ -2,7 +2,7 @@
 #include "res/text/bank/canalave_library_3f.h"
 #include "res/text/bank/menu_entries.h"
 #include "res/field/events/events_canalave_library_3f.h"
-
+#define LOCALID_POKEMON_FOLLOWER 253
 
     ScriptEntry CanalaveLibrary3F_OnTransition
     ScriptEntry CanalaveLibrary3F_OnFrame_Explosion
@@ -38,9 +38,11 @@ CanalaveLibrary3F_OnFrame_Explosion:
     BufferPlayerName 1
     Message CanalaveLibrary3F_Text_OverHere
     CloseMessage
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CanalaveLibrary3F_Movement_PokemonFollower1
     ApplyMovement LOCALID_RIVAL, CanalaveLibrary3F_Movement_RivalTakePlayerToTable
     ApplyMovement LOCALID_PLAYER, CanalaveLibrary3F_Movement_PlayerFollowRivalToTable
     WaitMovement
+    ShowPokemonFollower
     GetPlayerMapPos VAR_0x8004, VAR_0x8005
     AddFreeCamera VAR_0x8004, VAR_0x8005
     ApplyFreeCameraMovement CanalaveLibrary3F_Movement_CameraMoveEast
@@ -60,6 +62,7 @@ CanalaveLibrary3F_OnFrame_Explosion:
     ApplyMovement LOCALID_RIVAL, CanalaveLibrary3F_Movement_RivalWalkSouth
     WaitMovement
     WaitTime 10, VAR_RESULT
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CanalaveLibrary3F_Movement_PokemonFollower2
     BufferPlayerName 0
     Message CanalaveLibrary3F_Text_EveryonesHereFinally
     CloseMessage
@@ -69,6 +72,7 @@ CanalaveLibrary3F_OnFrame_Explosion:
     CloseMessage
     ApplyMovement LOCALID_PROF_ROWAN, CanalaveLibrary3F_Movement_ProfRowanWalkWestOnSpotNorth
     WaitMovement
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CanalaveLibrary3F_Movement_PokemonFollower3
     Message CanalaveLibrary3F_Text_HelpMeFindLakePokemon
     BufferRivalName 0
     Message CanalaveLibrary3F_Text_IDidntGetPokedex
@@ -120,6 +124,7 @@ CanalaveLibrary3F_Explosion:
     ApplyMovement LOCALID_PROF_ROWAN, CanalaveLibrary3F_Movement_ProfRowanWalkOnSpotNorth
     ApplyMovement LOCALID_COUNTERPART, CanalaveLibrary3F_Movement_CounterpartWalkOnSpotNorth
     WaitMovement
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CanalaveLibrary3F_Movement_PokemonFollower4
     BufferRivalName 0
     Message CanalaveLibrary3F_Text_RivalToLakeAcuity
     CloseMessage
@@ -131,6 +136,7 @@ CanalaveLibrary3F_Explosion:
     WaitMovement
     BufferPlayerName 0
     Message CanalaveLibrary3F_Text_ThatLeavesLakeValor
+    PokemonFollowerHappyHop
     WaitSE SE_CONFIRM_sseq_3
     MessageInstant CanalaveLibrary3F_Text_BigExplosion
     ScrCmd_29F 1
@@ -163,7 +169,8 @@ CanalaveLibrary3F_Explosion:
     WaitMovement
     Message CanalaveLibrary3F_Text_LetsGetOutside
     CloseMessage
-    ApplyMovement LOCALID_COUNTERPART, CanalaveLibrary3F_Movement_CounterpartLeave
+    ApplyMovement LOCALID_POKEMON_FOLLOWER, CanalaveLibrary3F_Movement_PokemonFollower5
+    ApplyMovement LOCALID_COUNTERPART, CanalaveLibrary3F_Movement_PokemonFollower6
     ApplyMovement LOCALID_RIVAL, CanalaveLibrary3F_Movement_RivalLeave
     ApplyMovement LOCALID_PROF_ROWAN, CanalaveLibrary3F_Movement_ProfRowanWalkToStairs
     ApplyFreeCameraMovement CanalaveLibrary3F_Movement_CameraMoveWest
@@ -244,6 +251,19 @@ CanalaveLibrary3F_Movement_PlayerFollowRivalToTable:
     EndMovement
 
     .balign 4, 0
+CanalaveLibrary3F_Movement_PokemonFollower1:
+    Delay8 4
+    SetVisible
+    Delay8
+    Delay2 2
+    WalkNormalSouth 2
+    WalkNormalEast
+    WalkNormalSouth
+    WalkNormalEast
+    WalkNormalSouth
+    EndMovement
+
+    .balign 4, 0
 CanalaveLibrary3F_Movement_PlayerFaceTV:
     WalkOnSpotNormalNorth
     EndMovement
@@ -315,10 +335,13 @@ CanalaveLibrary3F_Movement_RivalWalkOnSpotSouth2:
     EndMovement
 
     .balign 4, 0
+CanalaveLibrary3F_Movement_PokemonFollower6:
+    WalkNormalWest 2
+    WalkNormalNorth 5
+
+    .balign 4, 0
 CanalaveLibrary3F_Movement_CounterpartLeave:
     WalkNormalWest
-    WalkNormalNorth 5
-    WalkNormalWest 2
     WalkNormalNorth 2
     WalkNormalEast
     SetInvisible
@@ -577,3 +600,40 @@ CanalaveLibrary3F_BgSign:
     End
 
     .balign 4, 0
+
+    .balign 4, 0
+CanalaveLibrary3F_Movement_PokemonFollower2:
+    Delay8 4
+    FaceNorth
+    Delay8 3
+    FaceWest
+    EndMovement
+
+    .balign 4, 0
+CanalaveLibrary3F_Movement_PokemonFollower3:
+    Delay8 9
+    WalkSlowNorth
+    WalkSlowEast 3
+    WalkSlowNorth 2
+    Delay8 6
+    WalkSlowEast
+    FaceNorth
+    Delay8 3
+    WalkSlowEast 2
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+CanalaveLibrary3F_Movement_PokemonFollower4:
+    Delay8 3
+    WalkSlowWest
+    FaceNorth
+    EndMovement
+
+    .balign 4, 0
+CanalaveLibrary3F_Movement_PokemonFollower5:
+    Delay8
+    FaceWest
+    Delay8 5
+    FaceNorth
+    EndMovement

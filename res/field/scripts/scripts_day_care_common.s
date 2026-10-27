@@ -4,7 +4,6 @@
 #include "res/field/events/events_pokemon_day_care.h"
 #include "constants/daycare.h"
 
-
     ScriptEntry DayCareCommon_Man
     ScriptEntry DayCareCommon_Lady
     ScriptEntryEnd
@@ -138,20 +137,17 @@ DayCareCommon_ChoosePokemon:
     GoTo DayCareCommon_ChoosePokemon
 
 DayCareCommon_TryRaiseSelectedSlot:
-    ReturnToField
-    ShowMoney 20, 2
-    FadeScreenIn
-    WaitFadeScreen
-    GoToIfEq VAR_0x8000, PARTY_SLOT_NONE, DayCareCommon_VeryGoodComeAgain
+    GoToIfEq VAR_0x8000, PARTY_SLOT_NONE, DayCareCommon_PokemonFollower1
     TryRevertPokemonForm VAR_0x8000, VAR_RESULT
-    GoToIfEq VAR_RESULT, 0xFF, DayCareCommon_GriseousOrbCouldNotBeRemoved
+    GoToIfEq VAR_RESULT, 0xFF, DayCareCommon_PokemonFollower2
     GetPartyMonSpecies VAR_0x8000, VAR_RESULT
-    GoToIfEq VAR_RESULT, SPECIES_NONE, DayCareCommon_CantRaiseEgg
+    GoToIfEq VAR_RESULT, SPECIES_NONE, DayCareCommon_PokemonFollower3
     CountAliveMonsExcept VAR_RESULT, VAR_0x8000
-    GoToIfEq VAR_RESULT, 0, DayCareCommon_SelectedOnlyAlivePokemon
+    GoToIfEq VAR_RESULT, 0, DayCareCommon_PokemonFollower4
     BufferPartyMonNicknameReturnSpecies VAR_0x8000, VAR_0x8001
     StorePartyMonIntoDaycare VAR_0x8000
     SetFlag FLAG_STORED_POKEMON_AT_DAY_CARE
+    Call DayCareCommon_PokemonFollower5
     GetDaycareState VAR_RESULT
     GoToIfEq VAR_RESULT, DAYCARE_ONE_MON, DayCareCommon_RaiseFirstPokemon
     GoTo DayCareCommon_RaiseSecondPokemon
@@ -172,6 +168,15 @@ DayCareCommon_RaiseSecondPokemon:
     ReleaseAll
     End
 
+DayCareCommon_PokemonFollower5:
+    ReturnToField
+    ShowMoney 20, 2
+    FadeScreen 6, 1, 1, 0
+    WaitFadeScreen
+    Return
+
+DayCareCommon_PokemonFollower3:
+    Call DayCareCommon_PokemonFollower5
 DayCareCommon_CantRaiseEgg:
     Message DayCareCommon_Text_ThatIsMerelyAnEgg
     WaitButton
@@ -180,6 +185,16 @@ DayCareCommon_CantRaiseEgg:
     ReleaseAll
     End
 
+DayCareCommon_PokemonFollower6:
+    Message DayCareCommon_Text_VeryGoodComeAgain
+    WaitButton
+    CloseMessage
+    HideMoney
+    ReleaseAll
+    End
+
+DayCareCommon_PokemonFollower1:
+    Call DayCareCommon_PokemonFollower5
 DayCareCommon_VeryGoodComeAgain:
     Message DayCareCommon_Text_VeryGoodComeAgain
     WaitButton
@@ -192,7 +207,7 @@ DayCareCommon_AskRaiseAnotherPokemon:
     Message DayCareCommon_Text_RaiseAnotherPokemon
     ShowYesNoMenu VAR_RESULT
     GoToIfEq VAR_RESULT, MENU_YES, DayCareCommon_TryRaisePokemon
-    GoTo DayCareCommon_VeryGoodComeAgain
+    GoTo DayCareCommon_PokemonFollower6
     End
 
 DayCareCommon_OnlyOnePokemonWithYou:
@@ -203,6 +218,8 @@ DayCareCommon_OnlyOnePokemonWithYou:
     ReleaseAll
     End
 
+DayCareCommon_PokemonFollower4:
+    Call DayCareCommon_PokemonFollower5
 DayCareCommon_SelectedOnlyAlivePokemon:
     Message DayCareCommon_Text_WhatWillYouBattleWith
     WaitButton
@@ -246,7 +263,7 @@ DayCareCommon_LadyOneMon:
     Message DayCareCommon_Text_DoYouWantPokemonBack
     ShowYesNoMenu VAR_RESULT
     GoToIfEq VAR_RESULT, MENU_YES, DayCareCommon_TryTakePokemonBack
-    GoTo DayCareCommon_VeryGoodComeAgain
+    GoTo DayCareCommon_PokemonFollower6
 
 DayCareCommon_TryTakePokemonBack:
     GetPartyCount VAR_RESULT
@@ -264,14 +281,14 @@ DayCareCommon_TryTakePokemonBack:
     SetVar VAR_0x8008, VAR_0x8001
     GoToIfEq VAR_0x8008, 0, DayCareCommon_PokemonBackCostsX
     GoToIfEq VAR_0x8008, 1, DayCareCommon_PokemonBackCostsX
-    GoTo DayCareCommon_VeryGoodComeAgain
+    GoTo DayCareCommon_PokemonFollower6
 
 DayCareCommon_PokemonBackCostsX:
     BufferDaycarePriceBySlot VAR_0x8004, VAR_0x8001
     Message DayCareCommon_Text_PokemonBackCostsX
     ShowYesNoMenu VAR_RESULT
     GoToIfEq VAR_RESULT, MENU_YES, DayCareCommon_GetPokemonBackCheckMoney
-    GoTo DayCareCommon_VeryGoodComeAgain
+    GoTo DayCareCommon_PokemonFollower6
 
 DayCareCommon_GetPokemonBackCheckMoney:
     CheckMoney2 VAR_RESULT, VAR_0x8004
@@ -298,13 +315,13 @@ DayCareCommon_GetPokemonBack:
     WaitCry
     GetDaycareState VAR_RESULT
     GoToIfEq VAR_RESULT, DAYCARE_ONE_MON, DayCareCommon_AskTakeOtherBackToo
-    GoTo DayCareCommon_VeryGoodComeAgain
+    GoTo DayCareCommon_PokemonFollower6
 
 DayCareCommon_AskTakeOtherBackToo:
     Message DayCareCommon_Text_DoYouWantOtherBackToo
     ShowYesNoMenu VAR_RESULT
     GoToIfEq VAR_RESULT, MENU_YES, DayCareCommon_TryTakePokemonBack
-    GoTo DayCareCommon_VeryGoodComeAgain
+    GoTo DayCareCommon_PokemonFollower6
 
 DayCareCommon_TeamIsFull:
     Message DayCareCommon_Text_TeamIsFull
@@ -356,6 +373,8 @@ DayCareCommon_Unused:
     ReleaseAll
     End
 
+DayCareCommon_PokemonFollower2:
+    Call DayCareCommon_PokemonFollower5
 DayCareCommon_GriseousOrbCouldNotBeRemoved:
     HideMoney
     Common_GriseousOrbCouldNotBeRemoved

@@ -32,6 +32,7 @@
 #include "save_player.h"
 #include "savedata.h"
 #include "savedata_misc.h"
+#include "string_gf.h"
 #include "system_data.h"
 #include "system_flags.h"
 #include "trainer_info.h"
@@ -114,6 +115,7 @@ static int GameStartNewSave_Init(ApplicationManager *appMan, int *state)
 #ifdef TEST_SKIP_INTRO
 // lives in the resident binary (dexnav_search.c): this file is an overlay whose .bss is cleared on load
 extern u16 gTestLeadSpecies;
+extern u16 gTestSaveMode;
 #endif
 
 static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
@@ -123,18 +125,28 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     PlayTime_Start(SaveData_GetPlayTime(saveData));
 
 #ifdef TEST_SKIP_INTRO
-    // test save: Poketch, Pokedex, all badges, every town visited, Master Balls and a flyer
     VarsFlags *varsFlags = SaveData_GetVarsFlags(saveData);
     TrainerInfo *trainerInfo = SaveData_GetTrainerInfo(saveData);
+    static const charcode_t testName[] = { CHAR_T, CHAR_E, CHAR_S, CHAR_T, CHAR_EOS };
+    static const charcode_t rivalName[] = { CHAR_B, CHAR_A, CHAR_R, CHAR_R, CHAR_Y, CHAR_EOS };
+    String *rivalNameString = String_Init(8, HEAP_ID_GAME_START);
 
+    TrainerInfo_SetName(trainerInfo, testName);
+    String_CopyChars(rivalNameString, rivalName);
+    MiscSaveBlock_SetRivalName(SaveData_MiscSaveBlock(saveData), rivalNameString);
+    String_Free(rivalNameString);
+
+    // story start: a plain new game, so story cutscenes can be tested from the beginning
+    if (gTestSaveMode == 1) {
+        goto testSaveDone;
+    }
+
+    // test save: Poketch, Pokedex, all badges, every town visited, Master Balls and a flyer
     Poketch_Enable(SaveData_GetPoketch(saveData));
     Pokedex_ObtainPokedex(SaveData_GetPokedex(saveData));
     Pokedex_ObtainNationalDex(SaveData_GetPokedex(saveData));
     SystemFlag_SetBagAcquired(varsFlags);
     SystemVars_SetPlayerStarter(varsFlags, SPECIES_PIPLUP);
-
-    static const charcode_t testName[] = { CHAR_T, CHAR_E, CHAR_S, CHAR_T, CHAR_EOS };
-    TrainerInfo_SetName(trainerInfo, testName);
 
     for (int badge = 0; badge < 8; badge++) {
         TrainerInfo_SetBadge(trainerInfo, badge);
@@ -186,6 +198,7 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     Pokemon_InitWith(dexMon, SPECIES_STARAPTOR, 50, INIT_IVS_RANDOM, FALSE, 0, OTID_NOT_SET, 0);
     Pokedex_Capture(SaveData_GetPokedex(saveData), dexMon);
     Heap_Free(dexMon);
+testSaveDone:
 #endif
     return TRUE;
 }

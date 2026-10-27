@@ -850,6 +850,22 @@ ScriptCommand(SCRCMD_DEXNAVSTARTSEARCH,                                    ScrCm
 ScriptCommand(SCRCMD_DEXNAVSTARTBATTLE,                                    ScrCmd_DexNavStartBattle)
 ScriptCommand(SCRCMD_DEXNAVPRINTMESSAGE,                                   ScrCmd_DexNavPrintMessage)
 ScriptCommand(SCRCMD_GETPOKEMONFOLLOWERPARTYSLOT,                          ScrCmd_GetPokemonFollowerPartySlot)
+ScriptCommand(SCRCMD_SETALLOWTWOPOKEMONCRIES,                              ScrCmd_SetAllowTwoPokemonCries)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERSTARTCUTSCENE,                         ScrCmd_PokemonFollowerStartCutscene)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERSETPAUSED,                             ScrCmd_PokemonFollowerSetPaused)
+ScriptCommand(SCRCMD_WAITFORPOKEMONFOLLOWER,                               ScrCmd_WaitForPokemonFollower)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERSETMOVEMENTTYPE,                       ScrCmd_PokemonFollowerSetMovementType)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERPLACENEARPLAYER,                       ScrCmd_PokemonFollowerPlaceNearPlayer)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERENDCUTSCENE,                           ScrCmd_PokemonFollowerEndCutscene)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERRESUMEFOLLOWING,                       ScrCmd_PokemonFollowerResumeFollowing)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERRESPAWN,                               ScrCmd_PokemonFollowerRespawn)
+ScriptCommand(SCRCMD_HIDEPOKEMONFOLLOWER,                                  ScrCmd_HidePokemonFollower)
+ScriptCommand(SCRCMD_SHOWPOKEMONFOLLOWER,                                  ScrCmd_ShowPokemonFollower)
+ScriptCommand(SCRCMD_PLAYPOKEBALLANIMATION,                                ScrCmd_PlayPokeBallAnimation)
+ScriptCommand(SCRCMD_POKEMONFOLLOWERHAPPYHOP,                              ScrCmd_PokemonFollowerHappyHop)
+ScriptCommand(SCRCMD_GETPARTYMONFOLLOWERGFX,                               ScrCmd_GetPartyMonFollowerGfx)
+ScriptCommand(SCRCMD_CHECKPOKEMONFOLLOWERACTIVE,                           ScrCmd_CheckPokemonFollowerActive)
+ScriptCommand(SCRCMD_GETPOKEMONFOLLOWERDIRFROMPLAYER,                      ScrCmd_GetPokemonFollowerDirFromPlayer)
 
 // clang-format on
 
