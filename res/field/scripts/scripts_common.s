@@ -84,6 +84,9 @@
     ScriptEntry CommonScript_SetLookerBGM @ 0x807
     ScriptEntry CommonScript_FadeToDefaultMusic @ 0x808
     ScriptEntry CommonScript_GriseousOrbCouldNotBeRemoved @ 0x809
+    ScriptEntry CommonScript_DexNav @ 0x80A
+    ScriptEntry CommonScript_DexNavBattle @ 0x80B
+    ScriptEntry CommonScript_DexNavMenu @ 0x80C
     ScriptEntryEnd
 
 CommonScript_Dummy2010:
@@ -1692,6 +1695,47 @@ CommonScript_GriseousOrbCouldNotBeRemoved:
     CloseMessage
     ReleaseAll
     ReturnCommonScript
+    End
+
+    .balign 4, 0
+
+CommonScript_DexNav:
+    LockAll
+    DexNavStartSearch VAR_RESULT
+    GoToIfNe VAR_RESULT, 0, CommonScript_DexNavMessage
+    ReleaseAll
+    End
+
+CommonScript_DexNavMessage:
+    OpenMessage
+    DexNavPrintMessage VAR_RESULT
+    WaitButton
+    CloseMessage
+    ReleaseAll
+    End
+
+CommonScript_DexNavMenu:
+    LockAll
+    FadeScreenOut
+    WaitFadeScreen
+    OpenDexNav
+    ReturnToField
+    FadeScreenIn
+    WaitFadeScreen
+    ReleaseAll
+    End
+
+CommonScript_DexNavBattle:
+    LockAll
+    DexNavStartBattle
+    CheckWonBattle VAR_RESULT
+    GoToIfEq VAR_RESULT, FALSE, CommonScript_DexNavBlackOut
+    ReleaseAll
+    End
+
+CommonScript_DexNavBlackOut:
+    BlackOutFromBattle
+    ReleaseAll
     End
 
     .balign 4, 0

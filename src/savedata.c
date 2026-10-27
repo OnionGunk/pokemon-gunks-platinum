@@ -128,7 +128,7 @@ BOOL SaveData_Erase(SaveData *saveData)
 
     MI_CpuFillFast(saveBuffer, 0xffffffff, SAVE_SECTOR_SIZE);
 
-    for (int i = 0; i < SAVE_PAGE_MAX * SECTOR_ID_MAX; i++) {
+    for (int i = 0; i < BACKUP_SECTOR_START - PRIMARY_SECTOR_START; i++) {
         SaveData_CardSave(SAVE_SECTOR_SIZE * (i + PRIMARY_SECTOR_START), saveBuffer, SAVE_SECTOR_SIZE);
         SaveData_CardSave(SAVE_SECTOR_SIZE * (i + BACKUP_SECTOR_START), saveBuffer, SAVE_SECTOR_SIZE);
     }

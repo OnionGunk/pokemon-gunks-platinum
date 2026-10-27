@@ -727,6 +727,8 @@ field_sprites_frame_seqs = frameseqproc_gen.process(files(
     'frame_sequences/unused_2.json',
 ))
 
+subdir('followers')
+
 field_sprites_narc = custom_target(field_sprites_target_name,
     output: [
         'field_sprites.narc',
@@ -736,6 +738,7 @@ field_sprites_narc = custom_target(field_sprites_target_name,
         field_sprites_nsbtxs,
         field_sprites_nsbmds,
         field_sprites_frame_seqs,
+        field_sprites_followers,
     ],
     command: [
         nitroarc_exe,

@@ -410,6 +410,23 @@ static const UnkStruct_ov5_021FB0F0 Unk_ov5_021FB028 = {
 };
 
 // clang-format off
+// Following Platinum follower sprites (Mikelan98 et al.), imported by tools/followers.
+static const UnkStruct_ov5_021FB0F0 sFollowerRenderer = {
+    ov5_021ECA70,
+    PokemonFollowerRenderer_Update,
+    ov5_021ECABC,
+    ov5_021ECAC4,
+    PokemonFollowerRenderer_Refresh
+};
+
+static const BillboardAnim sFollowerBillboardAnims[] = {
+    BILLBOARD_ANIM_LOOP( 0, 19),
+    BILLBOARD_ANIM_LOOP(20, 39),
+    BILLBOARD_ANIM_LOOP(40, 59),
+    BILLBOARD_ANIM_LOOP(60, 79),
+    BILLBOARD_ANIMS_END
+};
+
 const ObjectEventGfxRendererEntry gObjectEventGfxRenderersTable[] = {
     OBJ_EVENT_RENDERER(PLAYER_M,                              &Unk_ov5_021FB0F0),
     OBJ_EVENT_RENDERER(NINJA_BOY,                             &Unk_ov5_021FAFD8),
@@ -669,6 +686,7 @@ const ObjectEventGfxRendererEntry gObjectEventGfxRenderersTable[] = {
     OBJ_EVENT_RENDERER(PLAYER_F_SAVE_HEARTHOME_GYM,           &Unk_ov5_021FAFB0),
     OBJ_EVENT_RENDERER(PLAYER_M_POKETCH_HEARTHOME_GYM,        &Unk_ov5_021FB0DC),
     OBJ_EVENT_RENDERER(PLAYER_F_POKETCH_HEARTHOME_GYM,        &Unk_ov5_021FB0DC),
+#include "overlay005/followers/renderers.h"
     OBJ_EVENT_RENDERER(SENTINEL_ID,                           NULL)
 };
 
@@ -1113,6 +1131,7 @@ const ObjectEventGfxFileEntry gObjectEventGfxTexturesTable[] = {
     OBJ_EVENT_TEXTURE(PLAYER_F_SAVE_HEARTHOME_GYM,          player_f_save_nsbtx),
     OBJ_EVENT_TEXTURE(PLAYER_M_POKETCH_HEARTHOME_GYM,       player_m_poketch_nsbtx),
     OBJ_EVENT_TEXTURE(PLAYER_F_POKETCH_HEARTHOME_GYM,       player_f_poketch_nsbtx),
+#include "overlay005/followers/textures.h"
     OBJ_EVENT_TEXTURE(SENTINEL_ID,                          0)
 };
 
@@ -1162,6 +1181,7 @@ const ObjectEventGfxFileEntry gObjectEventGfxFrameSeqsTable[] = {
     BILLBOARD_FRAME_SEQ_FILE(HEATRAN,            heatran_bin),
     BILLBOARD_FRAME_SEQ_FILE(GIRATINA_ORIGIN,    giratina_origin_bin),
     BILLBOARD_FRAME_SEQ_FILE(VS_SEEKER,          vs_seeker_bin),
+    BILLBOARD_FRAME_SEQ_FILE(FOLLOWER,           follower_walk_bin),
     BILLBOARD_FRAME_SEQ_FILE(SENTINEL_ID,        0)
 };
 
@@ -1774,6 +1794,7 @@ const ObjectEventGfxModelAnimEntry gObjectEventGfxModelAnimsTable[] = {
     OBJ_EVENT_MODEL_ANIM(PLAYER_F_SAVE_HEARTHOME_GYM,          HEARTHOME_GYM_PLAYER,       SAVE,               sSaveBillboardAnims),
     OBJ_EVENT_MODEL_ANIM(PLAYER_M_POKETCH_HEARTHOME_GYM,       HEARTHOME_GYM_PLAYER,       POKETCH,            sPoketchBillboardAnims),
     OBJ_EVENT_MODEL_ANIM(PLAYER_F_POKETCH_HEARTHOME_GYM,       HEARTHOME_GYM_PLAYER,       POKETCH,            sPoketchBillboardAnims),
+#include "overlay005/followers/model_anims.h"
     OBJ_EVENT_MODEL_ANIM(SENTINEL_ID,                          SENTINEL_ID,                SENTINEL_ID,        NULL)
 };
 
@@ -2042,6 +2063,7 @@ const ObjectEventGfxRenderDetailsEntry gObjectEventGfxRenderDetailsTable[] = {
     OBJ_EVENT_DETAILS(PLAYER_F_SAVE_HEARTHOME_GYM,          BILLBOARD,  .hasShadow = FALSE, .trackType = TRACK_TYPE_FOOTSTEPS, .hasReflection = TRUE  ),
     OBJ_EVENT_DETAILS(PLAYER_M_POKETCH_HEARTHOME_GYM,       BILLBOARD,  .hasShadow = FALSE, .trackType = TRACK_TYPE_FOOTSTEPS, .hasReflection = TRUE  ),
     OBJ_EVENT_DETAILS(PLAYER_F_POKETCH_HEARTHOME_GYM,       BILLBOARD,  .hasShadow = FALSE, .trackType = TRACK_TYPE_FOOTSTEPS, .hasReflection = TRUE  ),
+#include "overlay005/followers/details.h"
     OBJ_EVENT_DETAILS(SENTINEL_ID,                          NONE,       .hasShadow = FALSE, .trackType = TRACK_TYPE_NONE,      .hasReflection = FALSE )
 };
 

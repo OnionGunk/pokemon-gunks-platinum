@@ -845,6 +845,10 @@ ScriptCommand(SCRCMD_BUFFERTRAINERCLASSNAMEWITHARTICLE,                    ScrCm
 ScriptCommand(SCRCMD_BUFFERBALLSEALNAMEPLURAL,                             ScrCmd_BufferBallSealNamePlural)
 ScriptCommand(SCRCMD_CAPITALIZEFIRSTLETTER,                                ScrCmd_CapitalizeFirstLetter)
 ScriptCommand(SCRCMD_BUFFERFLOORNUMBER,                                    ScrCmd_BufferFloorNumber)
+ScriptCommand(SCRCMD_OPENDEXNAV,                                           ScrCmd_OpenDexNav)
+ScriptCommand(SCRCMD_DEXNAVSTARTSEARCH,                                    ScrCmd_DexNavStartSearch)
+ScriptCommand(SCRCMD_DEXNAVSTARTBATTLE,                                    ScrCmd_DexNavStartBattle)
+ScriptCommand(SCRCMD_DEXNAVPRINTMESSAGE,                                   ScrCmd_DexNavPrintMessage)
 
 // clang-format on
 

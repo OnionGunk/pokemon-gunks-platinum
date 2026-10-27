@@ -4995,6 +4995,24 @@
     .byte \floor
     .endm
 
+    .macro OpenDexNav
+    .short SCRCMD_OPENDEXNAV
+    .endm
+
+    .macro DexNavStartSearch destVarID
+    .short SCRCMD_DEXNAVSTARTSEARCH
+    .short \destVarID
+    .endm
+
+    .macro DexNavStartBattle
+    .short SCRCMD_DEXNAVSTARTBATTLE
+    .endm
+
+    .macro DexNavPrintMessage messageID
+    .short SCRCMD_DEXNAVPRINTMESSAGE
+    .short \messageID
+    .endm
+
 
 
     .macro GoToIfLt varID, valueOrVarID, offset

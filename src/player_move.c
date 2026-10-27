@@ -1911,6 +1911,15 @@ u32 PlayerAvatar_CheckCollision(PlayerAvatar *playerAvatar, MapObject *mapObj, i
  *
  * @return Collision mask as specified by MAP_OBJ_COLLISION_ flags
  */
+// The Pokemon follower (local ID 0xFD, see field_map_change.c) never blocks the player; it simply
+// trails behind. Mirrors Following Platinum's collision hook.
+static BOOL PlayerAvatar_IsPokemonFollowerAt(FieldSystem *fieldSystem, int x, int z)
+{
+    MapObject *follower = MapObjMan_LocalMapObjByIndex(fieldSystem->mapObjMan, 0xFD);
+
+    return follower != NULL && MapObject_GetX(follower) == x && MapObject_GetZ(follower) == z;
+}
+
 static u32 PlayerAvatar_CheckMapObjCollision(PlayerAvatar *playerAvatar, MapObject *mapObj, int dir)
 {
     int x = MapObject_GetX(mapObj) + MapObject_GetDxFromDir(dir);
@@ -1941,7 +1950,7 @@ static u32 PlayerAvatar_CheckMapObjCollision(PlayerAvatar *playerAvatar, MapObje
         collisionFlag |= MAP_OBJ_COLLISION_WILL_COLLIDE;
     }
 
-    if (sub_02063F00(mapObj, x, y, z) == TRUE) {
+    if (sub_02063F00(mapObj, x, y, z) == TRUE && !PlayerAvatar_IsPokemonFollowerAt(fieldSystem, x, z)) {
         collisionFlag |= MAP_OBJ_COLLISION_2;
     }
 

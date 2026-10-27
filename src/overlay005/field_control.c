@@ -55,6 +55,7 @@
 #include "save_player.h"
 #include "script_manager.h"
 #include "sound_playback.h"
+#include "dexnav_search.h"
 #include "start_menu.h"
 #include "system.h"
 #include "system_flags.h"
@@ -105,7 +106,7 @@ static void FieldInput_Clear(FieldInput *input)
     input->mapTransition = FALSE;
     input->movement = FALSE;
     input->dummy1 = FALSE;
-    input->dummy2 = FALSE;
+    input->dexNav = FALSE;
     input->dummy3 = FALSE;
     input->dummy4 = FALSE;
     input->dummy5 = FALSE;
@@ -135,6 +136,10 @@ void FieldInput_Update(FieldInput *input, FieldSystem *fieldSystem, u16 pressedK
 
         if (pressedKeys & PAD_BUTTON_A) {
             input->interact = TRUE;
+        }
+
+        if (pressedKeys & PAD_BUTTON_R) {
+            input->dexNav = TRUE;
         }
 
         if (pressedKeys & PAD_BUTTON_B) {
@@ -225,6 +230,13 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
     }
 
     if (input->endMovement) {
+        DexNavSearch_Update(fieldSystem);
+
+        if (DexNavSearch_IsPlayerInPatch(fieldSystem, PlayerAvatar_GetXPos(fieldSystem->playerAvatar), PlayerAvatar_GetZPos(fieldSystem->playerAvatar))) {
+            ScriptManager_Set(fieldSystem, SCRIPT_ID(COMMON_SCRIPTS, 0x80B - SCRIPT_ID_OFFSET_COMMON_SCRIPTS), NULL);
+            return TRUE;
+        }
+
         if (Field_CheckWildEncounter(fieldSystem)) {
             return TRUE;
         }
@@ -331,6 +343,12 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
     if (input->menu && FieldSystem_IsInValidLocation(fieldSystem) == TRUE) {
         Sound_PlayEffect(SEQ_SE_DP_WIN_OPEN_sseq);
         StartMenu_Open(fieldSystem);
+        return TRUE;
+    }
+
+    if (input->dexNav && FieldSystem_IsInValidLocation(fieldSystem) == TRUE) {
+        Sound_PlayEffect(SEQ_SE_DP_WIN_OPEN_sseq);
+        ScriptManager_Set(fieldSystem, SCRIPT_ID(COMMON_SCRIPTS, 0x80A - SCRIPT_ID_OFFSET_COMMON_SCRIPTS), NULL);
         return TRUE;
     }
 

@@ -9,6 +9,7 @@
 #include "struct_decls/map_object_manager.h"
 
 #include "field/field_system.h"
+#include "field_map_change.h"
 #include "overlay005/field_effect_manager.h"
 #include "overlay005/ov5_021F3D00.h"
 
@@ -238,6 +239,123 @@ static int sub_02069D8C(MapObject *mapObj)
     }
 
     return 0;
+}
+
+// Pokemon follower movement (movement type 68), ported from Following Platinum by Mikelan98 et al.
+// It is vanilla follow-player movement plus a catch-up: if the follower ends up more than one tile
+// from where the player just was (warps, ledges, scripted moves), it snaps there and fixes its height.
+static int PokemonFollower_StepState(MapObject *mapObj, UnkStruct_02069CA8 *param1);
+
+static int (*const sPokemonFollowerStates[])(MapObject *, UnkStruct_02069CA8 *) = {
+    PokemonFollower_StepState,
+    sub_02069C8C
+};
+
+void PokemonFollower_MovementInit(MapObject *mapObj)
+{
+    UnkStruct_02069CA8 *data = sub_02062A54(mapObj, sizeof(UnkStruct_02069CA8));
+
+    sub_02069CA8(mapObj, data);
+    sub_02062A0C(mapObj, 0);
+    sub_02062D10(mapObj);
+    sub_02062D80(mapObj, 0);
+}
+
+void PokemonFollower_MovementUpdate(MapObject *mapObj)
+{
+    UnkStruct_02069CA8 *data = sub_02062A78(mapObj);
+
+    if (sub_02069CA8(mapObj, data) == 0) {
+        return;
+    }
+
+    sub_02062D80(mapObj, 0);
+
+    while (sPokemonFollowerStates[data->unk_00](mapObj, data) == 1) {
+        (void)0;
+    }
+}
+
+static void PokemonFollower_CatchUp(MapObject *mapObj)
+{
+    PlayerAvatar *playerAvatar = FieldSystem_GetPlayerAvatar(MapObject_FieldSystem(mapObj));
+    int xPrev = PlayerAvatar_XPosPrev(playerAvatar);
+    int zPrev = PlayerAvatar_ZPosPrev(playerAvatar);
+    int dx = MapObject_GetX(mapObj) - xPrev;
+    int dz = MapObject_GetZ(mapObj) - zPrev;
+
+    if (dx < 0) {
+        dx = -dx;
+    }
+
+    if (dz < 0) {
+        dz = -dz;
+    }
+
+    if (dx + dz > 1) {
+        MapObject_SetPosDirFromCoords(mapObj, xPrev, MapObject_GetYPrev(PlayerAvatar_GetMapObject(playerAvatar)), zPrev, MapObject_GetFacingDir(mapObj));
+        MapObject_RecalculateObjectHeight(mapObj);
+    }
+}
+
+// Following Platinum's timing: the follower waits until the player is a quarter tile into its step,
+// so it trails a little further while walking and closes the gap once the player stops.
+static BOOL PokemonFollower_PlayerStepStarted(MapObject *mapObj)
+{
+    MapObject *player = PlayerAvatar_GetMapObject(FieldSystem_GetPlayerAvatar(MapObject_FieldSystem(mapObj)));
+    const VecFx32 *pos = MapObject_GetPos(player);
+    fx32 dx = pos->x - FX32_CONST(MapObject_GetXPrev(player) * 16 + 8);
+    fx32 dz = pos->z - FX32_CONST(MapObject_GetZPrev(player) * 16 + 8);
+
+    if (dx < 0) {
+        dx = -dx;
+    }
+
+    if (dz < 0) {
+        dz = -dz;
+    }
+
+    return dx + dz >= FX32_CONST(4);
+}
+
+// The follower spawns on the player's arrival tile, which is often a door, and appears once it has
+// stepped onto the free tile behind the player.
+static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
+{
+    int flags = MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_FLAGS);
+
+    if ((flags & POKEMON_FOLLOWER_FLAG_ARRIVING) == 0
+        || (MapObject_GetX(mapObj) == MapObject_GetXInitial(mapObj) && MapObject_GetZ(mapObj) == MapObject_GetZInitial(mapObj))) {
+        return;
+    }
+
+    MapObject_SetDataAt(mapObj, flags & ~POKEMON_FOLLOWER_FLAG_ARRIVING, POKEMON_FOLLOWER_DATA_FLAGS);
+
+    int species = MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_SPECIES);
+
+    if (PokemonFollower_CanSpawn(species, MapObject_FieldSystem(mapObj)->location->mapHeaderID)) {
+        MapObject_SetHidden(mapObj, FALSE);
+    }
+}
+
+static int PokemonFollower_StepState(MapObject *mapObj, UnkStruct_02069CA8 *param1)
+{
+    sub_02062D10(mapObj);
+    MapObject_SetEndMovementOff(mapObj);
+    PokemonFollower_RevealAfterArrival(mapObj);
+
+    if (sub_02069CFC(mapObj, param1) == 1 && PokemonFollower_PlayerStepStarted(mapObj)) {
+        sub_02069D30(mapObj, param1);
+        PokemonFollower_CatchUp(mapObj);
+
+        if (sub_02069D8C(mapObj) == 1) {
+            sub_02062D04(mapObj);
+            param1->unk_00++;
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
 
 void sub_02069DF4(MapObject *mapObj)

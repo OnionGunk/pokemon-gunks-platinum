@@ -18,4 +18,7 @@ void ov5_021ECB78(MapObject *param0);
 Billboard *ov5_021ECB80(MapObject *param0);
 Billboard *ov5_021ECB8C(UnkStruct_ov5_021ECB8C *param0);
 
+void PokemonFollowerRenderer_Update(MapObject *mapObj);
+void PokemonFollowerRenderer_Refresh(MapObject *mapObj);
+
 #endif // POKEPLATINUM_OV5_021ECA70_H

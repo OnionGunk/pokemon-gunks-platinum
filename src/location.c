@@ -5,6 +5,16 @@
 #include "field_overworld_state.h"
 #include "savedata.h"
 
+#ifdef TEST_SKIP_INTRO
+// test builds start on a route with wild encounters
+static const Location sPlayerStartLocation = {
+    .mapHeaderID = MAP_HEADER_ROUTE_201,
+    .warpId = WARP_ID_NONE,
+    .x = 125,
+    .z = 850,
+    .faceDirection = FACE_UP,
+};
+#else
 static const Location sPlayerStartLocation = {
     .mapHeaderID = MAP_HEADER_TWINLEAF_TOWN_PLAYER_HOUSE_2F,
     .warpId = WARP_ID_NONE,
@@ -12,6 +22,7 @@ static const Location sPlayerStartLocation = {
     .z = 6,
     .faceDirection = FACE_UP,
 };
+#endif
 
 static const Location sPlayerFirstRespawnLocation = {
     .mapHeaderID = MAP_HEADER_TWINLEAF_TOWN,

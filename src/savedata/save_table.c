@@ -10,6 +10,8 @@
 #include "battle_regulation.h"
 #include "chatot_cry.h"
 #include "daycare_save.h"
+#include "constants/savedata/savedata.h"
+#include "dexnav_search.h"
 #include "easy_chat_words.h"
 #include "field_overworld_state.h"
 #include "game_records.h"
@@ -83,7 +85,9 @@ const SaveTableEntry gSaveTable[] = {
     { SAVE_TABLE_ENTRY_UNLOCKED_EASY_CHAT_WORDS, SAVE_BLOCK_ID_NORMAL, (SaveEntrySizeFunc)UnlockedEasyChatWords_SaveSize, (SaveEntryInitFunc)UnlockedEasyChatWords_Init },
     { SAVE_TABLE_ENTRY_EMAIL, SAVE_BLOCK_ID_NORMAL, (SaveEntrySizeFunc)Email_SaveSize, (SaveEntryInitFunc)Email_Init },
     { SAVE_TABLE_ENTRY_WIFI_PLAZA_QUESTIONS, SAVE_BLOCK_ID_NORMAL, (SaveEntrySizeFunc)WiFiPlazaQuestion_SaveSize, (SaveEntryInitFunc)WiFiPlazaQuestion_Init },
+    { SAVE_TABLE_ENTRY_DEXNAV, SAVE_BLOCK_ID_NORMAL, (SaveEntrySizeFunc)DexNavSave_SaveSize, (SaveEntryInitFunc)DexNavSave_Init },
     { SAVE_TABLE_ENTRY_PC_BOXES, SAVE_BLOCK_ID_BOXES, (SaveEntrySizeFunc)PCBoxes_SaveSize, (SaveEntryInitFunc)PCBoxes_Init },
+    { SAVE_TABLE_ENTRY_DEXNAV_LEVELS, SAVE_BLOCK_ID_BOXES, (SaveEntrySizeFunc)DexNavLevels_SaveSize, (SaveEntryInitFunc)DexNavLevels_Init },
 };
 
 const int gSaveTableSize = NELEMS(gSaveTable);
@@ -109,6 +113,9 @@ MigratedPokemon *SaveData_GetPalParkTransfer(SaveData *saveData)
 {
     return SaveData_SaveTable(saveData, SAVE_TABLE_ENTRY_PAL_PARK_TRANSFER);
 }
+
+// the main save plus the extra saves must fit in one half of the flash chip
+typedef char ExtraSavesFitInFlashHalf[(SAVE_PAGE_MAX + EXTRA_SAVE_PAGES <= BACKUP_SECTOR_START) ? 1 : -1];
 
 const SaveTableEntry gExtraSaveTable[] = {
     { EXTRA_SAVE_TABLE_ENTRY_HALL_OF_FAME, SAVE_PAGE_MAX, (SaveEntrySizeFunc)HallOfFame_SaveSize, (SaveEntryInitFunc)HallOfFame_Init },

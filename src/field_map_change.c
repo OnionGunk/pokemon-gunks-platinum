@@ -42,6 +42,12 @@
 #include "map_header_data.h"
 #include "map_matrix.h"
 #include "map_object.h"
+#include "party.h"
+#include "pokemon.h"
+#include "unk_02054884.h"
+#include "constants/species.h"
+#include "generated/movement_types.h"
+#include "generated/object_events_gfx.h"
 #include "menu.h"
 #include "message.h"
 #include "persisted_map_features.h"
@@ -338,6 +344,143 @@ void FieldMapChange_UpdateGameDataDistortionWorld(FieldSystem *fieldSystem, BOOL
     fieldSystem->wildBattleMetadata.wildMonDefeated = 0;
 }
 
+#include "data/follower_species_gfx.h"
+
+// Following Platinum's sprite choice: base sprite for the species, then +1 for females of species
+// with visible gender differences, or + form number for species with alternate forms.
+int PokemonFollower_GraphicsID(Pokemon *mon)
+{
+    u16 species = Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL);
+
+    if (species == SPECIES_NONE || species >= NELEMS(sFollowerSpeciesGfx) || sFollowerSpeciesGfx[species].baseGfx == 0) {
+        return -1;
+    }
+
+    int gfx = sFollowerSpeciesGfx[species].baseGfx;
+
+    if (sFollowerSpeciesGfx[species].genderDiff) {
+        if (Pokemon_GetValue(mon, MON_DATA_GENDER, NULL) == GENDER_FEMALE) {
+            gfx++;
+        }
+    } else {
+        int form = Pokemon_GetValue(mon, MON_DATA_FORM, NULL);
+
+        if (form <= sFollowerSpeciesGfx[species].numForms) {
+            gfx += form;
+        }
+    }
+
+    return gfx;
+}
+
+// The first Pokemon able to battle, or the first hatched one if every Pokemon has fainted.
+Pokemon *PokemonFollower_GetLead(SaveData *saveData)
+{
+    Party *party = SaveData_GetParty(saveData);
+
+    if (Party_GetCurrentCount(party) == 0) {
+        return NULL;
+    }
+
+    return Party_AliveMonsCount(party) > 0 ? Party_FindFirstEligibleBattler(party) : Party_FindFirstHatchedMon(party);
+}
+
+#define POKEMON_FOLLOWER_LOCAL_ID 0xFD
+
+// Ported from Following Platinum's spawn routine: the first Pokemon able to battle (or the first
+// hatched one if all have fainted) follows the player, starting on the player's own tile.
+// Following Platinum's spawn rules (fp_023c84ac): no follower on link/gimmick maps or in the
+// Distortion World, none in elevators, and no oversized Pokemon inside buildings.
+static const u16 sFollowerExcludedMaps[] = {
+    MAP_HEADER_UNDERGROUND,
+    MAP_HEADER_GLOBAL_TERMINAL_1F,
+    MAP_HEADER_GLOBAL_TERMINAL_2F,
+    MAP_HEADER_GLOBAL_TERMINAL_3F,
+    MAP_HEADER_CANALAVE_CITY_GYM,
+    MAP_HEADER_PASTORIA_CITY_GYM,
+    MAP_HEADER_SUNYSHORE_CITY_GYM_ROOM_1,
+    MAP_HEADER_SUNYSHORE_CITY_GYM_ROOM_2,
+    MAP_HEADER_SUNYSHORE_CITY_GYM_ROOM_3,
+    MAP_HEADER_SNOWPOINT_CITY_GYM,
+    MAP_HEADER_FUEGO_IRONWORKS_BUILDING,
+    MAP_HEADER_COMMUNICATION_CLUB_COLOSSEUM_2P,
+    MAP_HEADER_COMMUNICATION_CLUB_COLOSSEUM_4P,
+    MAP_HEADER_RECORD_MIXING_ROOM,
+    MAP_HEADER_UNION_ROOM,
+};
+
+static const u16 sFollowerTooBigIndoors[] = {
+    SPECIES_STEELIX,
+    SPECIES_LUGIA,
+    SPECIES_HO_OH,
+    SPECIES_WAILORD,
+    SPECIES_KYOGRE,
+    SPECIES_GROUDON,
+    SPECIES_RAYQUAZA,
+    SPECIES_DIALGA,
+    SPECIES_PALKIA,
+    SPECIES_REGIGIGAS,
+    SPECIES_GIRATINA,
+    SPECIES_ARCEUS,
+};
+
+#define FOLLOWER_ELEVATOR_MAP_MATRIX 207
+
+BOOL PokemonFollower_CanSpawn(int species, enum MapHeaderID mapHeaderID)
+{
+    int i;
+
+    for (i = 0; i < NELEMS(sFollowerExcludedMaps); i++) {
+        if (mapHeaderID == sFollowerExcludedMaps[i]) {
+            return FALSE;
+        }
+    }
+
+    if (mapHeaderID >= MAP_HEADER_DISTORTION_WORLD_1F && mapHeaderID <= MAP_HEADER_DISTORTION_WORLD_TURNBACK_CAVE_ROOM) {
+        return FALSE;
+    }
+
+    if (MapHeader_GetMapMatrixID(mapHeaderID) == FOLLOWER_ELEVATOR_MAP_MATRIX) {
+        return FALSE;
+    }
+
+    if (MapHeader_IsBuilding(mapHeaderID)) {
+        for (i = 0; i < NELEMS(sFollowerTooBigIndoors); i++) {
+            if (species == sFollowerTooBigIndoors[i]) {
+                return FALSE;
+            }
+        }
+    }
+
+    return TRUE;
+}
+
+static void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
+{
+    Pokemon *lead = PokemonFollower_GetLead(fieldSystem->saveData);
+
+    if (lead == NULL) {
+        return;
+    }
+    u16 species = Pokemon_GetValue(lead, MON_DATA_SPECIES, NULL);
+    int graphicsID = PokemonFollower_GraphicsID(lead);
+
+    if (graphicsID < 0 || !PokemonFollower_CanSpawn(species, fieldSystem->location->mapHeaderID)) {
+        return;
+    }
+
+    MapObject *follower = MapObjectMan_AddMapObject(fieldSystem->mapObjMan, fieldSystem->location->x, fieldSystem->location->z, fieldSystem->location->faceDirection, graphicsID, MOVEMENT_TYPE_POKEMON_FOLLOWER, fieldSystem->location->mapHeaderID);
+
+    MapObject_SetLocalID(follower, POKEMON_FOLLOWER_LOCAL_ID);
+    MapObject_SetTrainerType(follower, 0);
+    MapObject_SetDataAt(follower, species, POKEMON_FOLLOWER_DATA_SPECIES);
+    MapObject_SetDataAt(follower, POKEMON_FOLLOWER_FLAG_ARRIVING | (Pokemon_IsShiny(lead) ? POKEMON_FOLLOWER_FLAG_SHINY : 0), POKEMON_FOLLOWER_DATA_FLAGS);
+    MapObject_SetHidden(follower, TRUE);
+    MapObject_SetMovementRangeX(follower, -1);
+    MapObject_SetMovementRangeZ(follower, -1);
+    MapObject_SetDynamicHeightCalculationEnabled(follower, TRUE);
+}
+
 static void FieldMapChange_CreateObjects(FieldSystem *fieldSystem)
 {
     fieldSystem->mapObjMan = MapObjectMan_New(fieldSystem, 64, 5);
@@ -348,6 +491,7 @@ static void FieldMapChange_CreateObjects(FieldSystem *fieldSystem)
 
     fieldSystem->playerAvatar = PlayerAvatar_New(fieldSystem->mapObjMan, fieldSystem->location->x, fieldSystem->location->z, fieldSystem->location->faceDirection, playerData->playerState, gender, 0, playerData);
 
+    FieldMapChange_CreatePokemonFollower(fieldSystem);
     sub_0203A418(fieldSystem);
     MapObjectMan_StopAllMovement(fieldSystem->mapObjMan);
 }

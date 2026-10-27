@@ -260,6 +260,7 @@ Static main
 	Object src/dynamic_map_features.c
 	Object src/item_use_functions.c
 	Object src/pokeradar.c
+	Object src/dexnav_search.c
 	Object src/unk_02069BE0.c
 	Object src/scroll_prompts.c
 	Object src/system_flags.c
@@ -1522,6 +1523,12 @@ Overlay diploma
 {
 	After main
 	Object src/applications/diploma.c
+}
+
+Overlay dexnav
+{
+	After main
+	Object src/applications/dexnav.c
 }
 
 Overlay dummy7

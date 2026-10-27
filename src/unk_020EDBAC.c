@@ -556,6 +556,14 @@ static const UnkStruct_020EDF0C Unk_020EE0D8 = {
     sub_020633EC
 };
 
+static const UnkStruct_020EDF0C sPokemonFollowerMovementType = {
+    0x3,
+    PokemonFollower_MovementInit,
+    PokemonFollower_MovementUpdate,
+    sub_02069C44,
+    sub_020633EC
+};
+
 const UnkStruct_020EDF0C *const Unk_020EE3A8[] = {
     &Unk_020EDF0C,
     &Unk_020EDE58,
@@ -624,7 +632,8 @@ const UnkStruct_020EDF0C *const Unk_020EE3A8[] = {
     &Unk_020EE088,
     &Unk_020EE09C,
     &Unk_020EE0D8,
-    &Unk_020EE2B8
+    &Unk_020EE2B8,
+    &sPokemonFollowerMovementType
 };
 
 BOOL (*const *const gMovementActionFuncs[MAX_MOVEMENT_ACTION])(MapObject *) = {

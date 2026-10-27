@@ -668,7 +668,8 @@ static void MapObjectMan_AddMoveTask(const MapObjectManager *mapObjMan, MapObjec
     SysTask *task;
 
     if (movementType == MOVEMENT_TYPE_FOLLOW_PLAYER
-        || movementType == MOVEMENT_TYPE_FOLLOW_PARTNER_TRAINER) {
+        || movementType == MOVEMENT_TYPE_FOLLOW_PARTNER_TRAINER
+        || movementType == MOVEMENT_TYPE_POKEMON_FOLLOWER) {
         v0 += 2;
     }
 
@@ -2338,7 +2339,7 @@ static int ObjectEvent_GetHiddenFlagNoScript(const ObjectEvent *objectEvent)
 
 static const UnkStruct_020EDF0C *sub_0206320C(u32 param0)
 {
-    GF_ASSERT(param0 < 0x44);
+    GF_ASSERT(param0 < MAX_MOVEMENT_TYPE);
     return Unk_020EE3A8[param0];
 }
 

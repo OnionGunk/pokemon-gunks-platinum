@@ -46,7 +46,9 @@ enum SaveTableEntryID {
     SAVE_TABLE_ENTRY_UNLOCKED_EASY_CHAT_WORDS,
     SAVE_TABLE_ENTRY_EMAIL,
     SAVE_TABLE_ENTRY_WIFI_PLAZA_QUESTIONS,
+    SAVE_TABLE_ENTRY_DEXNAV,
     SAVE_TABLE_ENTRY_PC_BOXES,
+    SAVE_TABLE_ENTRY_DEXNAV_LEVELS,
 
     SAVE_TABLE_ENTRY_MAX
 };
@@ -62,7 +64,9 @@ enum ExtraSaveTableEntryID {
     EXTRA_SAVE_TABLE_ENTRY_MAX
 };
 
-#define SAVE_PAGE_MAX    32
+// Vanilla uses 32; 52 is the most that fits with the 12 extra-save sectors in each 64-sector flash half.
+#define SAVE_PAGE_MAX    52
+#define EXTRA_SAVE_PAGES 12
 #define SAVE_SECTOR_SIZE (0x1000)
 
 #define EXTRA_SAVE_TABLE_ENTRY_NONE 0xFFFFFFFF

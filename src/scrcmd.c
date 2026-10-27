@@ -127,6 +127,10 @@
 #include "location.h"
 #include "mail.h"
 #include "map_header_data.h"
+#include "applications/dexnav.h"
+#include "constants/charcode.h"
+#include "dexnav_search.h"
+#include "overlay006/wild_encounters.h"
 #include "map_object.h"
 #include "map_object_move.h"
 #include "math_util.h"
@@ -420,6 +424,10 @@ static BOOL ScrCmd_ChangePlayerState(ScriptContext *ctx);
 static BOOL ScrCmd_GetPlayerStarterSpecies(ScriptContext *ctx);
 static BOOL ScrCmd_GetSwarmMapAndSpecies(ScriptContext *ctx);
 static BOOL ScrCmd_PrintTrainerDialogue(ScriptContext *ctx);
+static BOOL ScrCmd_OpenDexNav(ScriptContext *ctx);
+static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx);
+static BOOL ScrCmd_DexNavStartBattle(ScriptContext *ctx);
+static BOOL ScrCmd_DexNavPrintMessage(ScriptContext *ctx);
 static BOOL ScrCmd_StartBattleClient(ScriptContext *ctx);
 static BOOL sub_02042F74(ScriptContext *ctx);
 static BOOL ScrCmd_StartBattleServer(ScriptContext *ctx);
@@ -3796,6 +3804,205 @@ static BOOL ScrCmd_PrintTrainerDialogue(ScriptContext *ctx)
     Window_FillTilemap(FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_MANAGER_WINDOW), SCRIPT_MANAGER_STR_TEMPLATE);
 
     *printerID = FieldMessage_Print(FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_MANAGER_WINDOW), *string, SaveData_GetOptions(ctx->fieldSystem->saveData), SCRIPT_MANAGER_WINDOW);
+    ScriptContext_Pause(ctx, ScriptContext_WaitForFinishedPrinting);
+
+    return TRUE;
+}
+
+static void DexNav_AppendAscii(String *dst, const char *src)
+{
+    for (; *src != '\0'; src++) {
+        char c = *src;
+
+        if (c >= 'A' && c <= 'Z') {
+            String_AppendChar(dst, CHAR_A + (c - 'A'));
+        } else if (c >= 'a' && c <= 'z') {
+            String_AppendChar(dst, CHAR_a + (c - 'a'));
+        } else if (c == '.') {
+            String_AppendChar(dst, CHAR_PERIOD);
+        } else if (c == '#') {
+            String_AppendChar(dst, CHAR_e_ACUTE);
+        } else if (c == '\'') {
+            String_AppendChar(dst, CHAR_SINGLE_QUOTE_CLOSE);
+        } else if (c == '|') {
+            String_AppendChar(dst, CHAR_CR);
+        } else {
+            String_AppendChar(dst, CHAR_SPACE);
+        }
+    }
+}
+
+static void DexNav_AddSlot(DexNavEntry *slots, int *count, int species, int method, int minLevel, int maxLevel)
+{
+    if (species == SPECIES_NONE) {
+        return;
+    }
+
+    for (int i = 0; i < *count; i++) {
+        if (slots[i].species == species) {
+            slots[i].minLevel = minLevel < slots[i].minLevel ? minLevel : slots[i].minLevel;
+            slots[i].maxLevel = maxLevel > slots[i].maxLevel ? maxLevel : slots[i].maxLevel;
+            return;
+        }
+    }
+
+    if (*count >= DEXNAV_SECTION_SLOTS) {
+        return;
+    }
+
+    slots[*count].species = species;
+    slots[*count].method = method;
+    slots[*count].minLevel = minLevel;
+    slots[*count].maxLevel = maxLevel;
+    (*count)++;
+}
+
+// Fills the land and water halves of the DexNav grid from the current map's encounter table.
+static void DexNav_BuildAreaData(FieldSystem *fieldSystem, DexNavData *data)
+{
+    const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
+    DexNavEntry *land = &data->slots[0];
+    DexNavEntry *water = &data->slots[DEXNAV_SECTION_SLOTS];
+    int numLand = 0, numWater = 0, i;
+    int grassMin = 100, grassMax = 0;
+
+    for (i = 0; i < MAX_GRASS_ENCOUNTERS; i++) {
+        const GrassEncounter *slot = &encounters->grassEncounters.encounters[i];
+
+        if (slot->species != SPECIES_NONE) {
+            grassMin = slot->level < grassMin ? slot->level : grassMin;
+            grassMax = slot->level > grassMax ? slot->level : grassMax;
+        }
+
+        DexNav_AddSlot(land, &numLand, slot->species, DEXNAV_METHOD_GRASS, slot->level, slot->level);
+    }
+
+    for (i = 0; i < MAX_TIMED_ENCOUNTERS; i++) {
+        DexNav_AddSlot(land, &numLand, encounters->dayEncounters[i], DEXNAV_METHOD_MORNING, grassMin, grassMax);
+        DexNav_AddSlot(land, &numLand, encounters->nightEncounters[i], DEXNAV_METHOD_NIGHT, grassMin, grassMax);
+    }
+
+    for (i = 0; i < MAX_SWARM_ENCOUNTERS; i++) {
+        DexNav_AddSlot(land, &numLand, encounters->swarmEncounters[i], DEXNAV_METHOD_SWARM, grassMin, grassMax);
+    }
+
+    const WaterEncounters *waterTables[] = {
+        &encounters->surfEncounters,
+        &encounters->oldRodEncounters,
+        &encounters->goodRodEncounters,
+        &encounters->superRodEncounters,
+    };
+    const u8 waterMethods[] = { DEXNAV_METHOD_SURF, DEXNAV_METHOD_OLD_ROD, DEXNAV_METHOD_GOOD_ROD, DEXNAV_METHOD_SUPER_ROD };
+
+    for (int table = 0; table < NELEMS(waterTables); table++) {
+        for (i = 0; i < MAX_WATER_ENCOUNTERS; i++) {
+            const WaterEncounter *slot = &waterTables[table]->encounters[i];
+            DexNav_AddSlot(water, &numWater, slot->species, waterMethods[table], slot->minLevel, slot->maxLevel);
+        }
+    }
+}
+
+static BOOL ScrCmd_OpenDexNav(ScriptContext *ctx)
+{
+    FS_EXTERN_OVERLAY(dexnav);
+
+    static const ApplicationManagerTemplate template = {
+        DexNav_Init,
+        DexNav_Main,
+        DexNav_Exit,
+        FS_OVERLAY_ID(dexnav),
+    };
+
+    FieldSystem *fieldSystem = ctx->fieldSystem;
+    void **data = FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_MANAGER_PARTY_MANAGEMENT_DATA);
+    DexNavData *dexNavData = Heap_Alloc(HEAP_ID_FIELD3, sizeof(DexNavData));
+
+    memset(dexNavData, 0, sizeof(DexNavData));
+    dexNavData->saveData = fieldSystem->saveData;
+    DexNav_BuildAreaData(fieldSystem, dexNavData);
+
+    *data = dexNavData;
+    FieldSystem_StartChildProcess(fieldSystem, &template, dexNavData);
+    ScriptContext_Pause(ctx, sub_02041CC8);
+
+    return TRUE;
+}
+
+enum DexNavSearchResult {
+    DEXNAV_SEARCH_STARTED = 0,
+    DEXNAV_SEARCH_NONE_SELECTED,
+    DEXNAV_SEARCH_NO_GRASS,
+    DEXNAV_SEARCH_NOT_HERE,
+};
+
+static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx)
+{
+    u16 *destVar = ScriptContext_GetVarPointer(ctx);
+    FieldSystem *fieldSystem = ctx->fieldSystem;
+    u16 species = DexNavSave_GetSelectedSpecies(fieldSystem->saveData);
+
+    if (species == SPECIES_NONE) {
+        *destVar = DEXNAV_SEARCH_NONE_SELECTED;
+        return FALSE;
+    }
+
+    // only land slots can be searched for now
+    DexNavData *area = Heap_Alloc(HEAP_ID_FIELD3, sizeof(DexNavData));
+    const DexNavEntry *entry = NULL;
+
+    memset(area, 0, sizeof(DexNavData));
+    DexNav_BuildAreaData(fieldSystem, area);
+
+    for (int i = 0; i < DEXNAV_SECTION_SLOTS; i++) {
+        if (area->slots[i].species == species) {
+            entry = &area->slots[i];
+            break;
+        }
+    }
+
+    if (entry == NULL) {
+        *destVar = DEXNAV_SEARCH_NOT_HERE;
+    } else {
+        // restarting replaces any search already running
+        DexNavSearch_End(TRUE);
+        DexNavSearch_Request(species, entry->minLevel + LCRNG_RandMod(entry->maxLevel - entry->minLevel + 1));
+        *destVar = DexNavSearch_TryStart(fieldSystem) ? DEXNAV_SEARCH_STARTED : DEXNAV_SEARCH_NO_GRASS;
+    }
+
+    Heap_Free(area);
+    return FALSE;
+}
+
+static BOOL ScrCmd_DexNavStartBattle(ScriptContext *ctx)
+{
+    int *battleResultMaskPtr = FieldSystem_GetScriptMemberPtr(ctx->fieldSystem, SCRIPT_MANAGER_BATTLE_RESULT);
+    Pokemon *mon = DexNavSearch_CreateEncounterMon(ctx->fieldSystem, HEAP_ID_FIELD2);
+
+    Encounter_NewVsWildMon(ctx->task, mon, battleResultMaskPtr);
+    Heap_Free(mon);
+
+    return TRUE;
+}
+
+// '#' stands for e-acute, '|' for a line break
+static const char *const sDexNavMessages[] = {
+    [DEXNAV_SEARCH_NONE_SELECTED] = "Select a Pok#mon in the DexNav|first.",
+    [DEXNAV_SEARCH_NO_GRASS] = "There is no tall grass close enough|to search.",
+    [DEXNAV_SEARCH_NOT_HERE] = "This Pok#mon can't be found here.",
+};
+
+static BOOL ScrCmd_DexNavPrintMessage(ScriptContext *ctx)
+{
+    FieldSystem *fieldSystem = ctx->fieldSystem;
+    u16 messageID = ScriptContext_GetVar(ctx);
+    String **string = FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_MANAGER_MESSAGE_BUF);
+    u8 *printerID = FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_MANAGER_MESSAGE_ID);
+
+    String_Clear(*string);
+    DexNav_AppendAscii(*string, sDexNavMessages[messageID]);
+    Window_FillTilemap(FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_MANAGER_WINDOW), SCRIPT_MANAGER_STR_TEMPLATE);
+
+    *printerID = FieldMessage_Print(FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_MANAGER_WINDOW), *string, SaveData_GetOptions(fieldSystem->saveData), SCRIPT_MANAGER_WINDOW);
     ScriptContext_Pause(ctx, ScriptContext_WaitForFinishedPrinting);
 
     return TRUE;
