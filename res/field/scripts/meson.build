@@ -1128,6 +1128,7 @@ scr_seq_files = files(
     'scripts_route_226.s',
     'scripts_route_226_house.s',
     'scripts_route_230.s',
+    'scripts_pokemon_follower.s',
 )
 
 scr_seq_narc = custom_target('scr_seq.narc',

@@ -6,12 +6,12 @@
 #include "savedata.h"
 
 #ifdef TEST_SKIP_INTRO
-// test builds start on a route with wild encounters
+// test builds start on Twinleaf's north road: Route 201's grass and the map border are a few steps north
 static const Location sPlayerStartLocation = {
-    .mapHeaderID = MAP_HEADER_ROUTE_201,
+    .mapHeaderID = MAP_HEADER_TWINLEAF_TOWN,
     .warpId = WARP_ID_NONE,
-    .x = 125,
-    .z = 850,
+    .x = 111,
+    .z = 873,
     .faceDirection = FACE_UP,
 };
 #else

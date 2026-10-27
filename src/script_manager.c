@@ -30,7 +30,8 @@
 
 // clang-format off
 #define SCRIPT_RANGE_TABLE(Entry) \
-    Entry(SCRIPT_ID_OFFSET_SCRATCH_OFF_CARDS,              scripts_scratch_off_cards,              TEXT_BANK_SCRATCH_OFF_CARDS) \
+    Entry(SCRIPT_ID_OFFSET_POKEMON_FOLLOWER,               scripts_pokemon_follower,               TEXT_BANK_POKEMON_FOLLOWER) \
+    Entry(SCRIPT_ID_OFFSET_SCRATCH_OFF_CARDS,             scripts_scratch_off_cards,              TEXT_BANK_SCRATCH_OFF_CARDS) \
     Entry(SCRIPT_ID_OFFSET_BATTLE_FRONTIER_RECORDS,        scripts_battle_frontier_records,        TEXT_BANK_BATTLE_FRONTIER_RECORDS) \
     Entry(SCRIPT_ID_OFFSET_POKEMON_CENTER_DAILY_TRAINERS,  scripts_pokemon_center_daily_trainers,  TEXT_BANK_POKEMON_CENTER_DAILY_TRAINERS) \
     Entry(SCRIPT_ID_OFFSET_COUNTERPART_TALK,               scripts_counterpart_talk,               TEXT_BANK_COUNTERPART_TALK) \

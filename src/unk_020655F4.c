@@ -11,6 +11,7 @@
 #include "overlay005/map_object_anim_cmd.h"
 #include "overlay005/ov5_021F3E74.h"
 #include "overlay005/ov5_021F5A10.h"
+#include "overlay005/pokemon_follower_emote.h"
 
 #include "heap.h"
 #include "map_header_data.h"
@@ -1236,6 +1237,140 @@ static BOOL MovementAction_EmoteDoubleExclamationMark_Step0(MapObject *mapObj)
 static BOOL MovementAction_153_Step0(MapObject *mapObj)
 {
     sub_020664A0(mapObj, 0, 1);
+    return FALSE;
+}
+
+// Following Platinum: a quick hop that covers two tiles in four frames
+
+static BOOL MovementAction_JumpFarFasterNorth_Step0(MapObject *mapObj)
+{
+    MovementAction_InitJump(mapObj, DIR_NORTH, FX32_CONST(8), 4, MAP_OBJ_UNK_A0_05, JUMP_HEIGHT_HIGH, 0x100);
+    return TRUE;
+}
+
+static BOOL MovementAction_JumpFarFasterSouth_Step0(MapObject *mapObj)
+{
+    MovementAction_InitJump(mapObj, DIR_SOUTH, FX32_CONST(8), 4, MAP_OBJ_UNK_A0_05, JUMP_HEIGHT_HIGH, 0x100);
+    return TRUE;
+}
+
+static BOOL MovementAction_JumpFarFasterWest_Step0(MapObject *mapObj)
+{
+    MovementAction_InitJump(mapObj, DIR_WEST, FX32_CONST(8), 4, MAP_OBJ_UNK_A0_05, JUMP_HEIGHT_HIGH, 0x100);
+    return TRUE;
+}
+
+static BOOL MovementAction_JumpFarFasterEast_Step0(MapObject *mapObj)
+{
+    MovementAction_InitJump(mapObj, DIR_EAST, FX32_CONST(8), 4, MAP_OBJ_UNK_A0_05, JUMP_HEIGHT_HIGH, 0x100);
+    return TRUE;
+}
+
+// Following Platinum: emote bubbles over the Pokemon follower
+static void MovementAction_InitFollowerEmote(MapObject *mapObj, enum PokemonFollowerEmote emote)
+{
+    EmoteMovementData *data = MapObject_InitMovementData(mapObj, sizeof(EmoteMovementData));
+
+    data->unk_00 = emote;
+    data->unk_04 = PokemonFollowerEmote_Show(mapObj, emote);
+
+    MapObject_AdvanceMovementStep(mapObj);
+}
+
+static BOOL MovementAction_FollowerEmote_Step1(MapObject *mapObj)
+{
+    EmoteMovementData *data = MapObject_GetMovementData(mapObj);
+
+    if (PokemonFollowerEmote_IsDone(data->unk_04)) {
+        OverworldAnimManager_Finish(data->unk_04);
+        MapObject_AdvanceMovementStep(mapObj);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteHeart_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_HEART);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteFace1_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_FACE_1);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteFace2_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_FACE_2);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteFace3_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_FACE_3);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteFace4_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_FACE_4);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteFace5_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_FACE_5);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteMusic_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_MUSIC);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteQuestion_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_QUESTION);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteExclamation_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_EXCLAMATION);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteSweat_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_SWEAT);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteCry_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_CRY);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmotePoison_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_POISON);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteSilence_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_SILENCE);
+    return FALSE;
+}
+
+static BOOL MovementAction_FollowerEmoteSleep_Step0(MapObject *mapObj)
+{
+    MovementAction_InitFollowerEmote(mapObj, POKEMON_FOLLOWER_EMOTE_SLEEP);
     return FALSE;
 }
 
@@ -2920,6 +3055,114 @@ BOOL (*const gMovementActionFuncs_144[])(MapObject *) = {
 BOOL (*const gMovementActionFuncs_153[])(MapObject *) = {
     MovementAction_153_Step0,
     MovementAction_Emote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_JumpFarFasterNorth[])(MapObject *) = {
+    MovementAction_JumpFarFasterNorth_Step0,
+    MovementAction_Jump_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_JumpFarFasterSouth[])(MapObject *) = {
+    MovementAction_JumpFarFasterSouth_Step0,
+    MovementAction_Jump_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_JumpFarFasterWest[])(MapObject *) = {
+    MovementAction_JumpFarFasterWest_Step0,
+    MovementAction_Jump_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_JumpFarFasterEast[])(MapObject *) = {
+    MovementAction_JumpFarFasterEast_Step0,
+    MovementAction_Jump_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteHeart[])(MapObject *) = {
+    MovementAction_FollowerEmoteHeart_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteFace1[])(MapObject *) = {
+    MovementAction_FollowerEmoteFace1_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteFace2[])(MapObject *) = {
+    MovementAction_FollowerEmoteFace2_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteFace3[])(MapObject *) = {
+    MovementAction_FollowerEmoteFace3_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteFace4[])(MapObject *) = {
+    MovementAction_FollowerEmoteFace4_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteFace5[])(MapObject *) = {
+    MovementAction_FollowerEmoteFace5_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteMusic[])(MapObject *) = {
+    MovementAction_FollowerEmoteMusic_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteQuestion[])(MapObject *) = {
+    MovementAction_FollowerEmoteQuestion_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteExclamation[])(MapObject *) = {
+    MovementAction_FollowerEmoteExclamation_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteSweat[])(MapObject *) = {
+    MovementAction_FollowerEmoteSweat_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteCry[])(MapObject *) = {
+    MovementAction_FollowerEmoteCry_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmotePoison[])(MapObject *) = {
+    MovementAction_FollowerEmotePoison_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteSilence[])(MapObject *) = {
+    MovementAction_FollowerEmoteSilence_Step0,
+    MovementAction_FollowerEmote_Step1,
+    MovementAction_End,
+};
+
+BOOL (*const gMovementActionFuncs_FollowerEmoteSleep[])(MapObject *) = {
+    MovementAction_FollowerEmoteSleep_Step0,
+    MovementAction_FollowerEmote_Step1,
     MovementAction_End,
 };
 

@@ -188,7 +188,6 @@ static void ov5_021ECC0C(MapObject *param0)
 #include "overlay005/followers/offsets.h"
 
 #define FOLLOWER_FIRST_GFX    276
-#define FOLLOWER_LOCAL_ID     0xFD
 #define FOLLOWER_SHINY_DATA   POKEMON_FOLLOWER_DATA_FLAGS
 #define FOLLOWER_SHINY_FLAG   POKEMON_FOLLOWER_FLAG_SHINY
 
@@ -262,7 +261,7 @@ void PokemonFollowerRenderer_Update(MapObject *mapObj)
 // vanilla billboard refresh.
 void PokemonFollowerRenderer_Refresh(MapObject *mapObj)
 {
-    if (MapObject_GetLocalID(mapObj) == FOLLOWER_LOCAL_ID) {
+    if (MapObject_GetLocalID(mapObj) == POKEMON_FOLLOWER_LOCAL_ID) {
         FieldSystem *fieldSystem = MapObject_FieldSystem(mapObj);
         Pokemon *lead = PokemonFollower_GetLead(fieldSystem->saveData);
 

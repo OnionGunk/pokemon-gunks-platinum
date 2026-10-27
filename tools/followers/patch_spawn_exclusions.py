@@ -1,7 +1,7 @@
 """Port Following Platinum's follower spawn exclusions (fp_023c84ac) into field_map_change.c and the renderer."""
 import os
 
-os.chdir('C:/src/pkplat-dexnav')
+os.chdir('C:/projects/pokemon-platinum-dexnav/pkplat-dexnav')
 
 
 def edit(p, old, new):

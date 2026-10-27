@@ -4,11 +4,6 @@
 #include "easy3d.h"
 #include "heap.h"
 
-enum BillboardAnimStatus {
-    BILLBOARD_ANIM_STATUS_RUNNING = 0,
-    BILLBOARD_ANIM_STATUS_FINISHED,
-};
-
 enum BillboardRedraw {
     BILLBOARD_REDRAW_NONE = 0,
     BILLBOARD_REDRAW_NEEDED,

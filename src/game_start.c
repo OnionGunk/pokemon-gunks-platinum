@@ -4,8 +4,6 @@
 #include "constants/heap.h"
 
 #ifdef TEST_SKIP_INTRO
-#include "generated/vars_flags.h"
-
 #include "constants/charcode.h"
 #include "constants/items.h"
 #include "constants/species.h"
@@ -116,8 +114,6 @@ static int GameStartNewSave_Init(ApplicationManager *appMan, int *state)
 #ifdef TEST_SKIP_INTRO
 // lives in the resident binary (dexnav_search.c): this file is an overlay whose .bss is cleared on load
 extern u16 gTestLeadSpecies;
-
-#include "data/test_save_postgame_vars.h"
 #endif
 
 static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
@@ -146,13 +142,6 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
 
     for (int zone = 0; zone < FIRST_ARRIVAL_MAX; zone++) {
         SystemFlag_HandleFirstArrivalToZone(varsFlags, HANDLE_FLAG_SET, zone);
-    }
-
-    // post-game: game cleared, and every story variable at its final value so no cutscene auto-starts
-    SystemFlag_SetGameCompleted(varsFlags);
-
-    for (int i = 0; i < NELEMS(sTestPostgameVars); i++) {
-        *VarsFlags_GetVarAddress(varsFlags, sTestPostgameVars[i][0]) = sTestPostgameVars[i][1];
     }
 
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_MASTER_BALL, 99, HEAP_ID_GAME_START);

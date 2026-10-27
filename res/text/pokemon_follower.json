@@ -1,0 +1,1006 @@
+{
+  "key": 15060,
+  "messages": [
+    {
+      "id": "PokemonFollower_Text_000",
+      "en_US": "{STRVAR_1 3, 0, 0} suddenly became angry!"
+    },
+    {
+      "id": "PokemonFollower_Text_001",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems angry for some\n",
+        "reason!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_002",
+      "en_US": [
+        "......\n",
+        "Your Pokémon won’t look you in the eye."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_003",
+      "en_US": [
+        "......\n",
+        "Your Pokémon won’t come even though\f",
+        "you’re calling."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_004",
+      "en_US": "{STRVAR_1 3, 0, 0} is suddenly angry!"
+    },
+    {
+      "id": "PokemonFollower_Text_005",
+      "en_US": "...Your Pokémon is so very angry!"
+    },
+    {
+      "id": "PokemonFollower_Text_006",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is somehow fighting off\n",
+        "sleep..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_007",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0}’s head is nodding as it\n",
+        "starts to fall asleep..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_008",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} has a sleepy look on\n",
+        "its face..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_009",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_010",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_011",
+      "en_US": "{STRVAR_1 3, 0, 0} seems very hot..."
+    },
+    {
+      "id": "PokemonFollower_Text_012",
+      "en_US": "{STRVAR_1 3, 0, 0}’s burn looks painful!"
+    },
+    {
+      "id": "PokemonFollower_Text_013",
+      "en_US": "{STRVAR_1 3, 0, 0}’s burn looks painful!"
+    },
+    {
+      "id": "PokemonFollower_Text_014",
+      "en_US": "{STRVAR_1 3, 0, 0} is a little scared."
+    },
+    {
+      "id": "PokemonFollower_Text_015",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is walking along\n",
+        "cautiously!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_016",
+      "en_US": "{STRVAR_1 3, 0, 0} is standing guard!"
+    },
+    {
+      "id": "PokemonFollower_Text_017",
+      "en_US": "{STRVAR_1 3, 0, 0} yawned loudly."
+    },
+    {
+      "id": "PokemonFollower_Text_018",
+      "en_US": "{STRVAR_1 3, 0, 0} spun around in a circle!"
+    },
+    {
+      "id": "PokemonFollower_Text_019",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is so happy, it started\n",
+        "dancing!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_020",
+      "en_US": "Your Pokémon is dancing with you!"
+    },
+    {
+      "id": "PokemonFollower_Text_021",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} started spinning around in\n",
+        "circles."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_022",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is facing you with a\n",
+        "blank expression."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_023",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring straight into\n",
+        "{STRVAR_1 3, 1, 0}’s eyes."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_024",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is twitching its ears,\n",
+        "listening to the sound of the wind."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_025",
+      "en_US": "{STRVAR_1 3, 0, 0} is sensing something..."
+    },
+    {
+      "id": "PokemonFollower_Text_026",
+      "en_US": "{STRVAR_1 3, 0, 0} seems a little shy."
+    },
+    {
+      "id": "PokemonFollower_Text_027",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is cautiously listening\n",
+        "to the surrounding sounds!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_028",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is wandering around and\n",
+        "listening to the different sounds."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_029",
+      "en_US": "{STRVAR_1 3, 0, 0} is sniffing at the air."
+    },
+    {
+      "id": "PokemonFollower_Text_030",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} was not paying attention\n",
+        "and ran headfirst into you!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_031",
+      "en_US": "{STRVAR_1 3, 0, 0} suddenly roared!"
+    },
+    {
+      "id": "PokemonFollower_Text_032",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} was surprised by a sudden\n",
+        "sound!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_033",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} sensed something strange\n",
+        "and was surprised!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_034",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is vigorously producing\n",
+        "fire!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_035",
+      "en_US": "{STRVAR_1 3, 0, 0} emitted fire and shouted!"
+    },
+    {
+      "id": "PokemonFollower_Text_036",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is vigorously breathing\n",
+        "fire!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_037",
+      "en_US": [
+        "Your Pokémon is smelling the scent of\n",
+        "the flowers."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_038",
+      "en_US": [
+        "Your Pokémon has a flower petal on\n",
+        "its face!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_039",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is wandering around and\n",
+        "enjoying the forest scenery."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_040",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring at the sunlight\n",
+        "coming through the trees."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_041",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is looking around\n",
+        "restlessly at the forest."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_042",
+      "en_US": "{STRVAR_1 3, 0, 0} is standing guard!"
+    },
+    {
+      "id": "PokemonFollower_Text_043",
+      "en_US": [
+        "...Your Pokémon appears to be somewhat\n",
+        "hardened and unable to move."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_044",
+      "en_US": [
+        "......\n",
+        "Your Pokémon seems a little cold."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_045",
+      "en_US": "{STRVAR_1 3, 0, 0} is shivering with cold..."
+    },
+    {
+      "id": "PokemonFollower_Text_046",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems very happy to be\n",
+        "so close!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_047",
+      "en_US": "{STRVAR_1 3, 0, 0} is very happy!"
+    },
+    {
+      "id": "PokemonFollower_Text_048",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is happily cuddling up to\n",
+        "you!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_049",
+      "en_US": "{STRVAR_1 3, 0, 0} looks very happy!"
+    },
+    {
+      "id": "PokemonFollower_Text_050",
+      "en_US": "{STRVAR_1 3, 0, 0} seems to be very happy!"
+    },
+    {
+      "id": "PokemonFollower_Text_051",
+      "en_US": "{STRVAR_1 3, 0, 0} beamed happily at you!"
+    },
+    {
+      "id": "PokemonFollower_Text_052",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be very happy\n",
+        "for some reason!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_053",
+      "en_US": "{STRVAR_1 3, 0, 0} is really happy!"
+    },
+    {
+      "id": "PokemonFollower_Text_054",
+      "en_US": "{STRVAR_1 3, 0, 0} just looks so very happy!"
+    },
+    {
+      "id": "PokemonFollower_Text_055",
+      "en_US": "{STRVAR_1 3, 0, 0} jumped a little!"
+    },
+    {
+      "id": "PokemonFollower_Text_056",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to want to play with\n",
+        "{STRVAR_1 3, 1, 0}!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_057",
+      "en_US": "{STRVAR_1 3, 0, 0} is jumping for joy!"
+    },
+    {
+      "id": "PokemonFollower_Text_058",
+      "en_US": "{STRVAR_1 3, 0, 0} seems incredibly happy!"
+    },
+    {
+      "id": "PokemonFollower_Text_059",
+      "en_US": "Whoa! {STRVAR_1 3, 0, 0} is suddenly playful!"
+    },
+    {
+      "id": "PokemonFollower_Text_060",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is regarding you with\n",
+        "adoration!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_061",
+      "en_US": [
+        "Whoa! {STRVAR_1 3, 0, 0} suddenly hugged\n",
+        "you!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_062",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be really\n",
+        "enjoying the heat!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_063",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be unhappy that\n",
+        "it’s so hot..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_064",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0}’s head is bowed\n",
+        "because of the heat."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_065",
+      "en_US": "{STRVAR_1 3, 0, 0} seems very hot..."
+    },
+    {
+      "id": "PokemonFollower_Text_066",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is wobbling and seems\n",
+        "about to fall over."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_067",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} slipped and seems about\n",
+        "to fall over!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_068",
+      "en_US": [
+        "Your Pokémon seems surprised to\n",
+        "touch ice!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_069",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to really enjoy\n",
+        "sliding around!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_070",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} looks like it wants to\n",
+        "lead!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_071",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} suddenly started walking\n",
+        "closer!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_072",
+      "en_US": "{STRVAR_1 3, 0, 0} is jumping around!"
+    },
+    {
+      "id": "PokemonFollower_Text_073",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is looking around\n",
+        "restlessly at the lake!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_074",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is tangled in the long\n",
+        "grass!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_075",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is having fun getting\n",
+        "tangled in the long grass!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_076",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is paying close attention\n",
+        "to its surroundings!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_077",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is carefully scanning the\n",
+        "area!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_078",
+      "en_US": "{STRVAR_1 3, 0, 0} is surveying the area!"
+    },
+    {
+      "id": "PokemonFollower_Text_079",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is looking around\n",
+        "restlessly."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_080",
+      "en_US": [
+        "......\n",
+        "Your Pokémon seems to be\f",
+        "smelling something good."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_081",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} looks like it’s about to\n",
+        "fall over!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_082",
+      "en_US": [
+        "Careful!\n",
+        "Your Pokémon seems about to fall..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_083",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring intently at the\n",
+        "machine."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_084",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is listening to the sound\n",
+        "of the machine."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_085",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to want to touch\n",
+        "the machine!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_086",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is looking at the machine\n",
+        "in a strange manner."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_087",
+      "en_US": "{STRVAR_1 3, 0, 0} greeted your mom!"
+    },
+    {
+      "id": "PokemonFollower_Text_088",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is looking up at the tall\n",
+        "mountain..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_089",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring intently at the\n",
+        "mountain."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_090",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is looking at the mountain\n",
+        "as if anticipating climbing it."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_091",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} cried out, looking at the\n",
+        "tall mountain!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_092",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to have found\n",
+        "something on the mountain!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_093",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring straight at the\n",
+        "Pokémon League."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_094",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be having\n",
+        "difficulty moving its body!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_095",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is trying very hard to\n",
+        "keep up with you..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_096",
+      "en_US": "{STRVAR_1 3, 0, 0} is shaking!"
+    },
+    {
+      "id": "PokemonFollower_Text_097",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is shivering with the\n",
+        "effects of being poisoned..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_098",
+      "en_US": "{STRVAR_1 3, 0, 0} is playing in the puddle!"
+    },
+    {
+      "id": "PokemonFollower_Text_099",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} was surprised by its own\n",
+        "reflection!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_100",
+      "en_US": "{STRVAR_1 3, 0, 0} is playing in the puddle!"
+    },
+    {
+      "id": "PokemonFollower_Text_101",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is splashing around in the\n",
+        "puddle!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_102",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring at the\n",
+        "reflection of its face."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_103",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring at the\n",
+        "reflections in the water."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_104",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be very\n",
+        "surprised that it’s raining!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_105",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be happy about\n",
+        "the rain!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_106",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is very happy about the\n",
+        "rain!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_107",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is splashing around in the\n",
+        "wet grass."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_108",
+      "en_US": "{STRVAR_1 3, 0, 0} seems happy to be all wet!"
+    },
+    {
+      "id": "PokemonFollower_Text_109",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is taking shelter in the\n",
+        "grass from the rain."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_110",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} doesn’t seem to like being\n",
+        "all wet..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_111",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is steadily observing the\n",
+        "flow of the river."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_112",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is wandering around,\n",
+        "listening to the sound of running water."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_113",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is making an unhappy\n",
+        "face..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_114",
+      "en_US": "{STRVAR_1 3, 0, 0} is a little scared."
+    },
+    {
+      "id": "PokemonFollower_Text_115",
+      "en_US": "{STRVAR_1 3, 0, 0} seems unhappy somehow..."
+    },
+    {
+      "id": "PokemonFollower_Text_116",
+      "en_US": "Your Pokémon seems somehow unhappy."
+    },
+    {
+      "id": "PokemonFollower_Text_117",
+      "en_US": "{STRVAR_1 3, 0, 0} is a little nervous..."
+    },
+    {
+      "id": "PokemonFollower_Text_118",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to want to ride the\n",
+        "train!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_119",
+      "en_US": "{STRVAR_1 3, 0, 0} is playing on the sand!"
+    },
+    {
+      "id": "PokemonFollower_Text_120",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is looking at\n",
+        "{STRVAR_1 3, 1, 0}’s footprints."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_121",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is staring intently at the\n",
+        "surging sea."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_122",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is listening intently to\n",
+        "the sound of the waves."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_123",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is listening intently to\n",
+        "the sound of the waves."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_124",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be feeling better\n",
+        "because of the sea breeze!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_125",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is happily watching the\n",
+        "waves!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_126",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is wandering around,\n",
+        "surveying the area."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_127",
+      "en_US": "{STRVAR_1 3, 0, 0} is singing happily!"
+    },
+    {
+      "id": "PokemonFollower_Text_128",
+      "en_US": [
+        "Your Pokémon seems to be\n",
+        "singing something?"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_129",
+      "en_US": "{STRVAR_1 3, 0, 0} seems a little relieved!"
+    },
+    {
+      "id": "PokemonFollower_Text_130",
+      "en_US": "{STRVAR_1 3, 0, 0} seems very satisfied!"
+    },
+    {
+      "id": "PokemonFollower_Text_131",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is steadily keeping up\n",
+        "with you!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_132",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is doing its best to keep\n",
+        "up with you!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_133",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be feeling great\n",
+        "about walking with you!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_134",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is focusing its attention\n",
+        "on you."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_135",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} turned to face you\n",
+        "and smiled!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_136",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems to be feeling great\n",
+        "about traveling around Sinnoh!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_137",
+      "en_US": "{STRVAR_1 3, 0, 0} is saying hello!"
+    },
+    {
+      "id": "PokemonFollower_Text_138",
+      "en_US": "{STRVAR_1 3, 0, 0} is relaxing comfortably."
+    },
+    {
+      "id": "PokemonFollower_Text_139",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} got closer to\n",
+        "{STRVAR_1 3, 1, 0}!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_140",
+      "en_US": "{STRVAR_1 3, 0, 0} is keeping close to you."
+    },
+    {
+      "id": "PokemonFollower_Text_141",
+      "en_US": "{STRVAR_1 3, 0, 0} is very excited!"
+    },
+    {
+      "id": "PokemonFollower_Text_142",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is cheerful because of\n",
+        "the cold!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_143",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is cheering happily\n",
+        "because of the cold!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_144",
+      "en_US": "{STRVAR_1 3, 0, 0} is touching the snow."
+    },
+    {
+      "id": "PokemonFollower_Text_145",
+      "en_US": "{STRVAR_1 3, 0, 0} is gnawing at the snow."
+    },
+    {
+      "id": "PokemonFollower_Text_146",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems unhappy about the\n",
+        "cold..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_147",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} made its body slightly\n",
+        "smaller because of the cold..."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_148",
+      "en_US": "{STRVAR_1 3, 0, 0} seems very cold!"
+    },
+    {
+      "id": "PokemonFollower_Text_149",
+      "en_US": "{STRVAR_1 3, 0, 0} seems a little cold..."
+    },
+    {
+      "id": "PokemonFollower_Text_150",
+      "en_US": [
+        "......\n",
+        "Your Pokémon seems a little cold."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_151",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is dancing and splashing\n",
+        "around!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_152",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is wandering around and\n",
+        "listening to the different sounds."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_153",
+      "en_US": "{STRVAR_1 3, 0, 0} is smelling the grass."
+    },
+    {
+      "id": "PokemonFollower_Text_154",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is noticing the scent of\n",
+        "the grass."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_155",
+      "en_US": "{STRVAR_1 3, 0, 0} is staring at the grass."
+    },
+    {
+      "id": "PokemonFollower_Text_156",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is tripping over the tall\n",
+        "grass!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_157",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is playing around, plucking\n",
+        "bits of grass."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_158",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is biting at the tall\n",
+        "grass!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_159",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} is listening to the sound\n",
+        "of the waterfall."
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_160",
+      "en_US": [
+        "{STRVAR_1 3, 0, 0} seems concerned about\n",
+        "the waterfall!"
+      ]
+    },
+    {
+      "id": "PokemonFollower_Text_161",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_162",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_163",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_164",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_165",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_166",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_167",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_168",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_169",
+      "en_US": ""
+    },
+    {
+      "id": "PokemonFollower_Text_170",
+      "en_US": ""
+    }
+  ]
+}

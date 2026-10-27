@@ -770,6 +770,97 @@
     .short \length
     .endm
 
+    // Following Platinum: quick two-tile hops and Pokemon follower emote bubbles
+    .macro JumpFarFasterNorth length=1
+    .short MOVEMENT_ACTION_JUMP_FAR_FASTER_NORTH
+    .short \length
+    .endm
+
+    .macro JumpFarFasterSouth length=1
+    .short MOVEMENT_ACTION_JUMP_FAR_FASTER_SOUTH
+    .short \length
+    .endm
+
+    .macro JumpFarFasterWest length=1
+    .short MOVEMENT_ACTION_JUMP_FAR_FASTER_WEST
+    .short \length
+    .endm
+
+    .macro JumpFarFasterEast length=1
+    .short MOVEMENT_ACTION_JUMP_FAR_FASTER_EAST
+    .short \length
+    .endm
+
+    .macro FollowerEmoteHeart length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_HEART
+    .short \length
+    .endm
+
+    .macro FollowerEmoteFace1 length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_FACE_1
+    .short \length
+    .endm
+
+    .macro FollowerEmoteFace2 length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_FACE_2
+    .short \length
+    .endm
+
+    .macro FollowerEmoteFace3 length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_FACE_3
+    .short \length
+    .endm
+
+    .macro FollowerEmoteFace4 length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_FACE_4
+    .short \length
+    .endm
+
+    .macro FollowerEmoteFace5 length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_FACE_5
+    .short \length
+    .endm
+
+    .macro FollowerEmoteMusic length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_MUSIC
+    .short \length
+    .endm
+
+    .macro FollowerEmoteQuestion length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_QUESTION
+    .short \length
+    .endm
+
+    .macro FollowerEmoteExclamation length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_EXCLAMATION
+    .short \length
+    .endm
+
+    .macro FollowerEmoteSweat length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_SWEAT
+    .short \length
+    .endm
+
+    .macro FollowerEmoteCry length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_CRY
+    .short \length
+    .endm
+
+    .macro FollowerEmotePoison length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_POISON
+    .short \length
+    .endm
+
+    .macro FollowerEmoteSilence length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_SILENCE
+    .short \length
+    .endm
+
+    .macro FollowerEmoteSleep length=1
+    .short MOVEMENT_ACTION_FOLLOWER_EMOTE_SLEEP
+    .short \length
+    .endm
+
     .macro EndMovement
     .short MOVEMENT_ACTION_END
     .short 0

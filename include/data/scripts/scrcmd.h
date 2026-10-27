@@ -849,6 +849,7 @@ ScriptCommand(SCRCMD_OPENDEXNAV,                                           ScrCm
 ScriptCommand(SCRCMD_DEXNAVSTARTSEARCH,                                    ScrCmd_DexNavStartSearch)
 ScriptCommand(SCRCMD_DEXNAVSTARTBATTLE,                                    ScrCmd_DexNavStartBattle)
 ScriptCommand(SCRCMD_DEXNAVPRINTMESSAGE,                                   ScrCmd_DexNavPrintMessage)
+ScriptCommand(SCRCMD_GETPOKEMONFOLLOWERPARTYSLOT,                          ScrCmd_GetPokemonFollowerPartySlot)
 
 // clang-format on
 

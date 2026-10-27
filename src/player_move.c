@@ -6,6 +6,7 @@
 #include "constants/field/dynamic_map_features.h"
 #include "constants/field/map.h"
 #include "constants/map_object.h"
+#include "constants/pokemon_follower.h"
 #include "generated/game_records.h"
 #include "generated/movement_actions.h"
 
@@ -1911,11 +1912,11 @@ u32 PlayerAvatar_CheckCollision(PlayerAvatar *playerAvatar, MapObject *mapObj, i
  *
  * @return Collision mask as specified by MAP_OBJ_COLLISION_ flags
  */
-// The Pokemon follower (local ID 0xFD, see field_map_change.c) never blocks the player; it simply
+// The Pokemon follower (see field_map_change.c) never blocks the player; it simply
 // trails behind. Mirrors Following Platinum's collision hook.
 static BOOL PlayerAvatar_IsPokemonFollowerAt(FieldSystem *fieldSystem, int x, int z)
 {
-    MapObject *follower = MapObjMan_LocalMapObjByIndex(fieldSystem->mapObjMan, 0xFD);
+    MapObject *follower = MapObjMan_LocalMapObjByIndex(fieldSystem->mapObjMan, POKEMON_FOLLOWER_LOCAL_ID);
 
     return follower != NULL && MapObject_GetX(follower) == x && MapObject_GetZ(follower) == z;
 }

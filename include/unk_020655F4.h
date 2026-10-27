@@ -177,5 +177,23 @@ extern BOOL (*const gMovementActionFuncs_142[])(MapObject *);
 extern BOOL (*const gMovementActionFuncs_143[])(MapObject *);
 extern BOOL (*const gMovementActionFuncs_144[])(MapObject *);
 extern BOOL (*const gMovementActionFuncs_153[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_JumpFarFasterNorth[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_JumpFarFasterSouth[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_JumpFarFasterWest[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_JumpFarFasterEast[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteHeart[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteFace1[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteFace2[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteFace3[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteFace4[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteFace5[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteMusic[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteQuestion[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteExclamation[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteSweat[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteCry[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmotePoison[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteSilence[])(MapObject *);
+extern BOOL (*const gMovementActionFuncs_FollowerEmoteSleep[])(MapObject *);
 
 #endif // POKEPLATINUM_UNK_020655F4_H

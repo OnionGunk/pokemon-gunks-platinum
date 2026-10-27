@@ -9,7 +9,7 @@ import json
 import re
 from collections import defaultdict
 
-ROOT = 'C:/src/pkplat-dexnav'
+ROOT = 'C:/projects/pokemon-platinum-dexnav/pkplat-dexnav'
 trigger_vals = defaultdict(set)
 
 for path in glob.glob(f'{ROOT}/res/field/scripts/scripts_init_*.s'):

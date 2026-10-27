@@ -1,7 +1,7 @@
 """Keep the follower hidden after a map load until it has stepped off the arrival tile (doors, warps)."""
 import os
 
-os.chdir('C:/src/pkplat-dexnav')
+os.chdir('C:/projects/pokemon-platinum-dexnav/pkplat-dexnav')
 
 
 def edit(p, old, new):

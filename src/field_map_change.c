@@ -374,21 +374,35 @@ int PokemonFollower_GraphicsID(Pokemon *mon)
 }
 
 // The first Pokemon able to battle, or the first hatched one if every Pokemon has fainted.
-Pokemon *PokemonFollower_GetLead(SaveData *saveData)
+// The first Pokemon able to battle follows the player, or the first hatched one if all have fainted.
+int PokemonFollower_GetLeadSlot(SaveData *saveData)
 {
     Party *party = SaveData_GetParty(saveData);
+    int partyCount = Party_GetCurrentCount(party);
+    int firstHatched = PARTY_SLOT_NONE;
 
-    if (Party_GetCurrentCount(party) == 0) {
-        return NULL;
+    for (int i = 0; i < partyCount; i++) {
+        Pokemon *mon = Party_GetPokemonBySlotIndex(party, i);
+
+        if (Pokemon_CanBattle(mon)) {
+            return i;
+        }
+
+        if (firstHatched == PARTY_SLOT_NONE && Pokemon_GetValue(mon, MON_DATA_IS_EGG, NULL) == FALSE) {
+            firstHatched = i;
+        }
     }
 
-    return Party_AliveMonsCount(party) > 0 ? Party_FindFirstEligibleBattler(party) : Party_FindFirstHatchedMon(party);
+    return firstHatched;
 }
 
-#define POKEMON_FOLLOWER_LOCAL_ID 0xFD
+Pokemon *PokemonFollower_GetLead(SaveData *saveData)
+{
+    int slot = PokemonFollower_GetLeadSlot(saveData);
 
-// Ported from Following Platinum's spawn routine: the first Pokemon able to battle (or the first
-// hatched one if all have fainted) follows the player, starting on the player's own tile.
+    return slot == PARTY_SLOT_NONE ? NULL : Party_GetPokemonBySlotIndex(SaveData_GetParty(saveData), slot);
+}
+
 // Following Platinum's spawn rules (fp_023c84ac): no follower on link/gimmick maps or in the
 // Distortion World, none in elevators, and no oversized Pokemon inside buildings.
 static const u16 sFollowerExcludedMaps[] = {
@@ -455,6 +469,8 @@ BOOL PokemonFollower_CanSpawn(int species, enum MapHeaderID mapHeaderID)
     return TRUE;
 }
 
+// Ported from Following Platinum's spawn routine: the lead Pokemon follows the player, starting
+// hidden on the player's own tile.
 static void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
 {
     Pokemon *lead = PokemonFollower_GetLead(fieldSystem->saveData);
@@ -473,9 +489,13 @@ static void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
 
     MapObject_SetLocalID(follower, POKEMON_FOLLOWER_LOCAL_ID);
     MapObject_SetTrainerType(follower, 0);
+    // talking to the follower runs its script (Following Platinum uses the same script ID)
+    MapObject_SetScript(follower, SCRIPT_ID(POKEMON_FOLLOWER, 0));
     MapObject_SetDataAt(follower, species, POKEMON_FOLLOWER_DATA_SPECIES);
     MapObject_SetDataAt(follower, POKEMON_FOLLOWER_FLAG_ARRIVING | (Pokemon_IsShiny(lead) ? POKEMON_FOLLOWER_FLAG_SHINY : 0), POKEMON_FOLLOWER_DATA_FLAGS);
     MapObject_SetHidden(follower, TRUE);
+    // like the player, survive walking across a map border (other objects of the old map are deleted)
+    MapObject_SetFlagIsPersistent(follower, TRUE);
     MapObject_SetMovementRangeX(follower, -1);
     MapObject_SetMovementRangeZ(follower, -1);
     MapObject_SetDynamicHeightCalculationEnabled(follower, TRUE);
@@ -620,10 +640,29 @@ static BOOL FieldTask_LoadNewGameSpawn(FieldTask *task)
     return FALSE;
 }
 
+#ifdef TEST_SKIP_INTRO
+#include "generated/vars_flags.h"
+#include "data/test_save_postgame_vars.h"
+
+// Test saves start post-game: game cleared, and every story variable at its final value so no
+// cutscene auto-starts. Runs after the new-game script, which resets some of these variables.
+static void TestSave_ApplyPostgame(VarsFlags *varsFlags)
+{
+    SystemFlag_SetGameCompleted(varsFlags);
+
+    for (int i = 0; i < NELEMS(sTestPostgameVars); i++) {
+        *VarsFlags_GetVarAddress(varsFlags, sTestPostgameVars[i][0]) = sTestPostgameVars[i][1];
+    }
+}
+#endif
+
 void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem)
 {
     fieldSystem->mapLoadType = MAP_LOAD_TYPE_OVERWORLD;
     FieldSystem_InitNewGameState(fieldSystem);
+#ifdef TEST_SKIP_INTRO
+    TestSave_ApplyPostgame(SaveData_GetVarsFlags(fieldSystem->saveData));
+#endif
     FieldSystem_CreateTask(fieldSystem, FieldTask_LoadNewGameSpawn, NULL);
 }
 

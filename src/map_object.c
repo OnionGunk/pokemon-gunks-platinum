@@ -6,6 +6,8 @@
 #include "generated/movement_types.h"
 #include "generated/object_events_gfx.h"
 
+#include "constants/pokemon_follower.h"
+
 #include "struct_decls/struct_02061830_sub1_decl.h"
 #include "struct_defs/struct_020EDF0C.h"
 
@@ -1650,7 +1652,8 @@ void MapObjectMan_PauseAllMovement(MapObjectManager *mapObjMan)
     MapObject *mapObj = MapObjectMan_GetMapObject(mapObjMan);
 
     do {
-        if (sub_02062CF8(mapObj)) {
+        // the Pokemon follower keeps animating and following during scripts and menus (Following Platinum)
+        if (sub_02062CF8(mapObj) && MapObject_GetLocalID(mapObj) != POKEMON_FOLLOWER_LOCAL_ID) {
             MapObject_SetPauseMovementOn(mapObj);
         }
 

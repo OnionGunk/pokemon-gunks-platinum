@@ -5013,6 +5013,11 @@
     .short \messageID
     .endm
 
+    .macro GetPokemonFollowerPartySlot destVarID
+    .short SCRCMD_GETPOKEMONFOLLOWERPARTYSLOT
+    .short \destVarID
+    .endm
+
 
 
     .macro GoToIfLt varID, valueOrVarID, offset

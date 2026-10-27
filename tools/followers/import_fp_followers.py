@@ -4,7 +4,7 @@
 Credit: Following Platinum by Mikelan98 and collaborators. Everything here is taken directly from
 their ROM: textures, the walk frame sequence, edited billboard models, and their table rows.
 
-Usage: python import_fp_followers.py <repo root> <unpacked FP dir (C:/src/fp)>
+Usage: python import_fp_followers.py <repo root> <unpacked FP dir (C:/projects/pokemon-platinum-dexnav/fp)>
 Requires the FP extraction outputs: fp_mmodel/*.bin, fp_gfx_tables.json, fp_follower_table.json.
 """
 import json

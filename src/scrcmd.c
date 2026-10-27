@@ -425,6 +425,7 @@ static BOOL ScrCmd_GetPlayerStarterSpecies(ScriptContext *ctx);
 static BOOL ScrCmd_GetSwarmMapAndSpecies(ScriptContext *ctx);
 static BOOL ScrCmd_PrintTrainerDialogue(ScriptContext *ctx);
 static BOOL ScrCmd_OpenDexNav(ScriptContext *ctx);
+static BOOL ScrCmd_GetPokemonFollowerPartySlot(ScriptContext *ctx);
 static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx);
 static BOOL ScrCmd_DexNavStartBattle(ScriptContext *ctx);
 static BOOL ScrCmd_DexNavPrintMessage(ScriptContext *ctx);
@@ -7337,5 +7338,14 @@ static BOOL ScrCmd_CheckPartyHasFatefulEncounterRegigigas(ScriptContext *ctx)
         }
     }
 
+    return FALSE;
+}
+
+// Following Platinum (command 856): party slot of the Pokemon following the player
+static BOOL ScrCmd_GetPokemonFollowerPartySlot(ScriptContext *ctx)
+{
+    u16 *destVar = ScriptContext_GetVarPointer(ctx);
+
+    *destVar = PokemonFollower_GetLeadSlot(ctx->fieldSystem->saveData);
     return FALSE;
 }

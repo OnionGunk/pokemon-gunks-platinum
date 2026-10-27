@@ -318,22 +318,39 @@ static BOOL PokemonFollower_PlayerStepStarted(MapObject *mapObj)
     return dx + dz >= FX32_CONST(4);
 }
 
-// The follower spawns on the player's arrival tile, which is often a door, and appears once it has
-// stepped onto the free tile behind the player.
+// The follower spawns hidden on the player's arrival tile and appears there once the player steps off
+// it. If that tile is a door it waits until it has walked out onto the free tile behind the player,
+// so it never draws through the doorway.
 static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
 {
     int flags = MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_FLAGS);
 
-    if ((flags & POKEMON_FOLLOWER_FLAG_ARRIVING) == 0
-        || (MapObject_GetX(mapObj) == MapObject_GetXInitial(mapObj) && MapObject_GetZ(mapObj) == MapObject_GetZInitial(mapObj))) {
+    if ((flags & POKEMON_FOLLOWER_FLAG_ARRIVING) == 0) {
         return;
+    }
+
+    FieldSystem *fieldSystem = MapObject_FieldSystem(mapObj);
+    int spawnX = MapObject_GetXInitial(mapObj);
+    int spawnZ = MapObject_GetZInitial(mapObj);
+    BOOL onSpawnTile = MapObject_GetX(mapObj) == spawnX && MapObject_GetZ(mapObj) == spawnZ;
+
+    if (TileBehavior_IsDoor(TerrainCollisionManager_GetTileBehavior(fieldSystem, spawnX, spawnZ))) {
+        if (onSpawnTile) {
+            return;
+        }
+    } else {
+        PlayerAvatar *playerAvatar = FieldSystem_GetPlayerAvatar(fieldSystem);
+
+        if (PlayerAvatar_GetXPos(playerAvatar) == spawnX && PlayerAvatar_GetZPos(playerAvatar) == spawnZ) {
+            return;
+        }
     }
 
     MapObject_SetDataAt(mapObj, flags & ~POKEMON_FOLLOWER_FLAG_ARRIVING, POKEMON_FOLLOWER_DATA_FLAGS);
 
     int species = MapObject_GetDataAt(mapObj, POKEMON_FOLLOWER_DATA_SPECIES);
 
-    if (PokemonFollower_CanSpawn(species, MapObject_FieldSystem(mapObj)->location->mapHeaderID)) {
+    if (PokemonFollower_CanSpawn(species, fieldSystem->location->mapHeaderID)) {
         MapObject_SetHidden(mapObj, FALSE);
     }
 }
