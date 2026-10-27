@@ -763,9 +763,6 @@ def main():
         if name.startswith('scripts_init_'):
             results.append((i, name, 'skipped', 'init script table'))
             continue
-        if name == 'scripts_amity_square':
-            results.append((i, name, 'skipped', 'Amity Square rework deferred'))
-            continue
         try:
             text, extras = port(i, name, van[i], fp[i])
             problem = validate(name, text, fp[i], extras)

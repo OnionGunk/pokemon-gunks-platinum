@@ -36,6 +36,8 @@
 #include "map_tile_behavior.h"
 #include "message.h"
 #include "pal_pad.h"
+#include "field_map_change.h"
+#include "map_object.h"
 #include "party.h"
 #include "player_avatar.h"
 #include "pokedex.h"
@@ -231,6 +233,32 @@ void FieldBattleDTO_CopyChatotCryToBattler(FieldBattleDTO *dto, const ChatotCry 
     ChatotCry_Copy(dto->chatotCries[battler], src);
 }
 
+// Following Platinum: the Pokemon walking with the player (when it is out, not in its Poke Ball or
+// held by a cutscene) runs into battle without a Poke Ball
+static u8 FieldBattleDTO_GetPokemonFollowerSlot(FieldSystem *fieldSystem)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+    Party *party = SaveData_GetParty(fieldSystem->saveData);
+
+    if (follower == NULL || MapObject_IsHidden(follower) || Party_AliveMonsCount(party) <= 0) {
+        return 0;
+    }
+
+    if (MapObject_GetDataAt(follower, POKEMON_FOLLOWER_DATA_FLAGS) & (POKEMON_FOLLOWER_FLAG_ARRIVING | POKEMON_FOLLOWER_FLAG_SCRIPT_HIDDEN)) {
+        return 0;
+    }
+
+    for (int i = 0; i < Party_GetCurrentCount(party); i++) {
+        Pokemon *mon = Party_GetPokemonBySlotIndex(party, i);
+
+        if (Pokemon_GetValue(mon, MON_DATA_IS_EGG, NULL) == FALSE && Pokemon_GetValue(mon, MON_DATA_HP, NULL) != 0) {
+            return i + 1;
+        }
+    }
+
+    return 0;
+}
+
 void FieldBattleDTO_InitFromGameState(FieldBattleDTO *dto, const FieldSystem *fieldSystem, SaveData *saveData, enum MapHeaderID mapHeaderID, JournalEntry *journalEntry, BagCursor *bagCursor, u8 *subscreenCursorOn)
 {
     TrainerInfo *trainerInfo = SaveData_GetTrainerInfo(saveData);
@@ -243,6 +271,7 @@ void FieldBattleDTO_InitFromGameState(FieldBattleDTO *dto, const FieldSystem *fi
 
     if (fieldSystem != NULL) {
         SetBackgroundAndTerrain(dto, fieldSystem);
+        dto->pokemonFollowerSlot = FieldBattleDTO_GetPokemonFollowerSlot(fieldSystem);
         dto->timeOfDay = FieldSystem_GetTimeOfDay(fieldSystem);
     } else {
         dto->background = MapHeader_GetBattleBG(mapHeaderID);

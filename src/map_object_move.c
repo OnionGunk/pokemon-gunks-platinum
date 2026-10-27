@@ -107,7 +107,7 @@ static BOOL sub_02063478(const MapObject *mapObj)
 
     if (MapObject_CheckStatus(mapObj, MAP_OBJ_STATUS_12 | MAP_OBJ_STATUS_11) == FALSE) {
         return TRUE;
-    } else if (MapObject_GetMovementType(mapObj) == 0x32) {
+    } else if (MapObject_GetMovementType(mapObj) == 0x32 || MapObject_GetMovementType(mapObj) == MOVEMENT_TYPE_POKEMON_FOLLOWER) {
         return TRUE;
     }
 
@@ -311,16 +311,22 @@ static void MapObject_SinkIntoTerrain(MapObject *mapObj, u8 currTileBehavior, u8
     MapObject_SetSpriteTerrainOffset(mapObj, &spriteOffset);
 }
 
+// Following Platinum: the follower makes no grass rustle while it is hidden in its Poke Ball
+static BOOL MapObject_IsHiddenPokemonFollower(MapObject *mapObj)
+{
+    return MapObject_GetLocalID(mapObj) == POKEMON_FOLLOWER_LOCAL_ID && MapObject_IsHidden(mapObj);
+}
+
 static void sub_02063964(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBehavior, const ObjectEventGfxRenderDetailsEntry *renderDetails)
 {
-    if (TileBehavior_IsTallGrass(currTileBehavior) == TRUE) {
+    if (!MapObject_IsHiddenPokemonFollower(mapObj) && TileBehavior_IsTallGrass(currTileBehavior) == TRUE) {
         ov5_021F2EA4(mapObj, 0);
     }
 }
 
 static void sub_0206397C(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBehavior, const ObjectEventGfxRenderDetailsEntry *renderDetails)
 {
-    if (TileBehavior_IsTallGrass(currTileBehavior) == TRUE) {
+    if (!MapObject_IsHiddenPokemonFollower(mapObj) && TileBehavior_IsTallGrass(currTileBehavior) == TRUE) {
         ov5_021F2EA4(mapObj, 1);
     }
 }
@@ -456,7 +462,7 @@ static void sub_02063BB4(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBeha
 
 static void sub_02063C00(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBehavior, const ObjectEventGfxRenderDetailsEntry *renderDetails)
 {
-    if (TileBehavior_IsVeryTallGrass(currTileBehavior) == TRUE) {
+    if (!MapObject_IsHiddenPokemonFollower(mapObj) && TileBehavior_IsVeryTallGrass(currTileBehavior) == TRUE) {
         ov5_021F3844(mapObj, 0);
     }
 }
@@ -470,7 +476,7 @@ static void sub_02063C18(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBeha
 
 static void sub_02063C30(MapObject *mapObj, u8 currTileBehavior, u8 prevTileBehavior, const ObjectEventGfxRenderDetailsEntry *renderDetails)
 {
-    if (TileBehavior_IsMudWithGrass(currTileBehavior) == TRUE) {
+    if (!MapObject_IsHiddenPokemonFollower(mapObj) && TileBehavior_IsMudWithGrass(currTileBehavior) == TRUE) {
         ov5_021F3AEC(mapObj, 0);
     }
 }

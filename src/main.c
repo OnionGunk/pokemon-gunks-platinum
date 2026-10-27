@@ -12,6 +12,7 @@
 #include "comm_manager.h"
 #include "communication_system.h"
 #include "font.h"
+#include "game_options.h"
 #include "game_overlay.h"
 #include "game_start.h"
 #include "main.h"
@@ -134,7 +135,8 @@ void NitroMain(void)
             SysTaskManager_ExecuteTasks(gSystem.printTaskMgr);
 
             if (!gSystem.frameCounter) {
-                OS_WaitIrq(TRUE, OS_IE_V_BLANK);
+                // unlocked (Following Platinum's option) this doesn't wait for another V-blank
+                OS_WaitIrq(!Options_IsFrameRateUnlocked(), OS_IE_V_BLANK);
                 gSystem.vblankCounter++;
             }
         }

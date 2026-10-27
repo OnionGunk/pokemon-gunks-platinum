@@ -854,6 +854,13 @@ static void ov5_021D1878(FieldSystem *fieldSystem)
     }
 
     sub_02061C48(fieldSystem->mapObjMan);
+
+    // Following Platinum: when the field comes back after a menu or battle without a follower
+    // (e.g. the party had none that could follow before), the new lead starts following
+    if (fieldSystem->mapLoadType == MAP_LOAD_TYPE_OVERWORLD && PokemonFollower_GetMapObject(fieldSystem) == NULL) {
+        FieldMapChange_CreatePokemonFollower(fieldSystem);
+    }
+
     CommPlayerMan_ForcePos();
     sub_02062C3C(fieldSystem->mapObjMan);
     LandDataManager_TrackTarget(PlayerAvatar_GetPos(fieldSystem->playerAvatar), fieldSystem->landDataMan);

@@ -141,6 +141,7 @@ struct BattleSystem {
     u32 padding_2474_1 : 31;
     SysTask *playbackStopButton;
     u8 recordedChatter[MAX_BATTLERS];
+    u8 pokemonFollowerSlot; // Following Platinum: party slot of the follower, MAX_PARTY_SIZE = none
 };
 
 #endif // POKEPLATINUM_STRUCT_BATTLE_SYSTEM_H

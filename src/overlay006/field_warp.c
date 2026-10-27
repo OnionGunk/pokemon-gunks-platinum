@@ -44,6 +44,35 @@ static enum FieldWarpStateResult FinishWarpInAnimation(FieldTask *task, FieldSys
 static enum FieldWarpStateResult StartFieldMoveCutIn(FieldTask *task, FieldSystem *fieldSystem, FieldWarp *fieldWarp);
 static enum FieldWarpStateResult FinishFieldMoveCutIn(FieldTask *task, FieldSystem *fieldSystem, FieldWarp *fieldWarp);
 
+// Following Platinum: a visible follower spins along with the player during Escape Rope, Dig,
+// Teleport and their arrivals
+static void FieldWarp_SetPokemonFollower(FieldWarp *fieldWarp, FieldSystem *fieldSystem)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+
+    fieldWarp->follower = follower != NULL && !MapObject_IsHidden(follower) ? follower : NULL;
+    fieldWarp->followerAnimationTask = NULL;
+}
+
+static void FieldWarp_StartAnimation(FieldWarp *fieldWarp, const MapObjectAnimCmd *animation)
+{
+    fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, animation);
+
+    if (fieldWarp->follower != NULL) {
+        fieldWarp->followerAnimationTask = MapObject_StartAnimation(fieldWarp->follower, animation);
+    }
+}
+
+static void FieldWarp_FinishAnimation(FieldWarp *fieldWarp)
+{
+    MapObject_FinishAnimation(fieldWarp->animationTask);
+
+    if (fieldWarp->followerAnimationTask != NULL) {
+        MapObject_FinishAnimation(fieldWarp->followerAnimationTask);
+        fieldWarp->followerAnimationTask = NULL;
+    }
+}
+
 static const FieldWarpStateFunc sEscapeRopeStates[] = {
     StartWarpOutSpinning,
     StartFadeOut,
@@ -139,6 +168,7 @@ FieldWarp *FieldWarp_InitEscapeRope(FieldSystem *fieldSystem, enum HeapID heapID
     fieldWarp->warpType = FIELD_WARP_TYPE_ESCAPE_ROPE;
     fieldWarp->fieldSystem = fieldSystem;
     fieldWarp->player = PlayerAvatar_GetMapObject(fieldSystem->playerAvatar);
+    FieldWarp_SetPokemonFollower(fieldWarp, fieldSystem);
 
     return fieldWarp;
 }
@@ -164,7 +194,7 @@ static enum FieldWarpStateResult StartWarpOutSpinning(FieldTask *task, FieldSyst
 {
     fieldWarp->unk_14 = ov5_021F0EB0(fieldSystem, HEAP_ID_FIELD1);
     ov5_021F0F10(fieldWarp->unk_14, 1, FX32_CONST(-150), 15);
-    fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, sFadeOutWarpAnimation);
+    FieldWarp_StartAnimation(fieldWarp, sFadeOutWarpAnimation);
     fieldWarp->state++;
 
     switch (fieldWarp->warpType) {
@@ -188,9 +218,9 @@ static enum FieldWarpStateResult StartFadeOut(FieldTask *task, FieldSystem *fiel
         return STATE_RESULT_NEXT_STATE;
     }
 
-    MapObject_FinishAnimation(fieldWarp->animationTask);
+    FieldWarp_FinishAnimation(fieldWarp);
 
-    fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, sWarpFastSpinningAnimation);
+    FieldWarp_StartAnimation(fieldWarp, sWarpFastSpinningAnimation);
     fieldWarp->animationDelay++;
 
     if (fieldWarp->animationDelay < 8) {
@@ -210,15 +240,15 @@ static enum FieldWarpStateResult StartFadeOut(FieldTask *task, FieldSystem *fiel
 static enum FieldWarpStateResult FinishFadeOut(FieldTask *task, FieldSystem *fieldSystem, FieldWarp *fieldWarp)
 {
     if (MapObject_HasAnimationEnded(fieldWarp->animationTask) == TRUE) {
-        MapObject_FinishAnimation(fieldWarp->animationTask);
-        fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, sWarpFastSpinningAnimation);
+        FieldWarp_FinishAnimation(fieldWarp);
+        FieldWarp_StartAnimation(fieldWarp, sWarpFastSpinningAnimation);
     }
 
     if (!IsScreenFadeDone()) {
         return STATE_RESULT_NEXT_STATE;
     }
 
-    MapObject_FinishAnimation(fieldWarp->animationTask);
+    FieldWarp_FinishAnimation(fieldWarp);
     ov5_021F0EFC(fieldWarp->unk_14);
 
     fieldWarp->state++;
@@ -251,6 +281,7 @@ FieldWarp *FieldWarp_InitFadeIn(FieldSystem *fieldSystem, enum HeapID heapID, en
     fieldWarp->warpType = warpType;
     fieldWarp->fieldSystem = fieldSystem;
     fieldWarp->player = PlayerAvatar_GetMapObject(fieldSystem->playerAvatar);
+    FieldWarp_SetPokemonFollower(fieldWarp, fieldSystem);
 
     return fieldWarp;
 }
@@ -294,7 +325,7 @@ static enum FieldWarpStateResult StartFadeIn(FieldTask *task, FieldSystem *field
 
     fieldWarp->unk_14 = ov5_021F0EB0(fieldSystem, HEAP_ID_FIELD1);
     ov5_021F0F10(fieldWarp->unk_14, 1, FX32_CONST(-150), 1);
-    fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, sWarpFastSpinningAnimation);
+    FieldWarp_StartAnimation(fieldWarp, sWarpFastSpinningAnimation);
     fieldWarp->state++;
 
     return STATE_RESULT_NEXT_STATE;
@@ -303,8 +334,8 @@ static enum FieldWarpStateResult StartFadeIn(FieldTask *task, FieldSystem *field
 static enum FieldWarpStateResult FinishFadeIn(FieldTask *task, FieldSystem *fieldSystem, FieldWarp *fieldWarp)
 {
     if (MapObject_HasAnimationEnded(fieldWarp->animationTask) == TRUE) {
-        MapObject_FinishAnimation(fieldWarp->animationTask);
-        fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, sWarpFastSpinningAnimation);
+        FieldWarp_FinishAnimation(fieldWarp);
+        FieldWarp_StartAnimation(fieldWarp, sWarpFastSpinningAnimation);
     }
 
     if (!IsScreenFadeDone()) {
@@ -323,15 +354,15 @@ static enum FieldWarpStateResult SlowDownWarpInSpinning(FieldTask *task, FieldSy
         return STATE_RESULT_NEXT_STATE;
     }
 
-    MapObject_FinishAnimation(fieldWarp->animationTask);
+    FieldWarp_FinishAnimation(fieldWarp);
     fieldWarp->animationDelay++;
 
     if (fieldWarp->animationDelay < 4) {
-        fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, sWarpFastSpinningAnimation);
+        FieldWarp_StartAnimation(fieldWarp, sWarpFastSpinningAnimation);
         return STATE_RESULT_NEXT_STATE;
     }
 
-    fieldWarp->animationTask = MapObject_StartAnimation(fieldWarp->player, sFadeInWarpAnimation);
+    FieldWarp_StartAnimation(fieldWarp, sFadeInWarpAnimation);
     fieldWarp->state++;
 
     return STATE_RESULT_NEXT_STATE;
@@ -348,7 +379,7 @@ static enum FieldWarpStateResult FinishWarpInAnimation(FieldTask *task, FieldSys
     }
 
     ov5_021F0EFC(fieldWarp->unk_14);
-    MapObject_FinishAnimation(fieldWarp->animationTask);
+    FieldWarp_FinishAnimation(fieldWarp);
 
     return STATE_RESULT_END_TASK;
 }
@@ -360,6 +391,7 @@ FieldWarp *FieldWarp_InitDig(FieldSystem *fieldSystem, Pokemon *mon, enum HeapID
     fieldWarp->warpType = FIELD_WARP_TYPE_DIG;
     fieldWarp->fieldSystem = fieldSystem;
     fieldWarp->player = PlayerAvatar_GetMapObject(fieldSystem->playerAvatar);
+    FieldWarp_SetPokemonFollower(fieldWarp, fieldSystem);
     fieldWarp->mon = mon;
 
     return fieldWarp;
@@ -410,6 +442,7 @@ FieldWarp *FieldWarp_InitTeleport(FieldSystem *fieldSystem, Pokemon *mon, enum H
     fieldWarp->warpType = FIELD_WARP_TYPE_TELEPORT;
     fieldWarp->fieldSystem = fieldSystem;
     fieldWarp->player = PlayerAvatar_GetMapObject(fieldSystem->playerAvatar);
+    FieldWarp_SetPokemonFollower(fieldWarp, fieldSystem);
     fieldWarp->mon = mon;
 
     return fieldWarp;

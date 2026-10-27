@@ -78,6 +78,8 @@ typedef struct RockClimbTaskEnv {
     OverworldAnimManager *unk_18;
     MonRideTask monRideTask;
     UnkStruct_ov5_021D1BEC *unk_2C;
+    OverworldAnimManager *followerBall;
+    BOOL followerRecalled;
 } RockClimbTaskEnv;
 
 typedef struct WaterfallTaskEnv {
@@ -667,7 +669,7 @@ static BOOL FieldTask_UseSurf(FieldTask *task)
             FieldBGM_TryFadeOut(taskEnv->fieldSystem, SEQ_NAMINORI_sseq, 1);
         }
 
-        PokemonFollower_RecallForSurf(taskEnv->fieldSystem);
+        PokemonFollower_RecallToBall(taskEnv->fieldSystem);
 
         if (taskEnv->monRideTask.playCutIn == TRUE) {
             NewMonRideCutIn(taskEnv->fieldSystem, &taskEnv->monRideTask);
@@ -1064,6 +1066,16 @@ static BOOL FieldTask_UseRockClimb(FieldTask *task)
 
 static int SubTask_RockClimb_PlayCutIn(RockClimbTaskEnv *taskEnv)
 {
+    // Following Platinum: the follower returns to its Poke Ball before the climb
+    if (!taskEnv->followerRecalled) {
+        taskEnv->followerBall = PokemonFollower_RecallToBall(taskEnv->fieldSystem);
+        taskEnv->followerRecalled = TRUE;
+    }
+
+    if (taskEnv->followerBall != NULL && OverworldAnimManager_IsActive(taskEnv->followerBall)) {
+        return 0;
+    }
+
     NewMonRideCutIn(taskEnv->fieldSystem, &taskEnv->monRideTask);
 
     taskEnv->state++;
@@ -1161,6 +1173,8 @@ static int SubTask_RockClimb_WaitFinished(RockClimbTaskEnv *taskEnv)
     }
 
     sub_020656AC(taskEnv->playerObject);
+    // ...and pops back out once the player steps away
+    PokemonFollower_ReturnToPlayer(taskEnv->fieldSystem, TRUE);
     FieldEffectManager_FinishAnimManager(taskEnv->unk_18);
     return 1;
 }

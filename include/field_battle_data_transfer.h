@@ -88,6 +88,7 @@ typedef struct FieldBattleDTO {
     u8 recordedChatter[MAX_BATTLERS];
     SaveData *saveData;
     u32 recordingStopped;
+    u8 pokemonFollowerSlot; // Following Platinum: party slot + 1 of the Pokemon walking with the player, 0 = none
 } FieldBattleDTO;
 
 FieldBattleDTO *FieldBattleDTO_New(enum HeapID heapID, u32 battleType);

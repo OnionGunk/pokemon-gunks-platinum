@@ -78,6 +78,9 @@
 #include "res/graphics/field_effects/field_effects.naix"
 #include "res/sound/pl_sound_data.naix"
 
+// Following Platinum moves this from 0xFD, which is the Pokemon follower's local ID
+#define DIST_WORLD_MOVING_PLATFORM_LOCAL_ID 0xFC
+
 #define DISTORTION_WORLD_CAMERA_BASE_ANGLE_X            -10750
 #define DISTORTION_WORLD_CAMERA_BASE_ANGLE_Y            0
 #define DISTORTION_WORLD_CAMERA_BASE_ANGLE_Z            0
@@ -5898,7 +5901,7 @@ static void InitMovingPlatformPropsForCurrentAndNextMaps(DistWorldSystem *system
         MapObjectManager *mapObjMan = system->fieldSystem->mapObjMan;
 
         while (MapObjectMan_FindObjectWithStatus(mapObjMan, &mapObj, &startIdx, MAP_OBJ_STATUS_0) == TRUE) {
-            if (MapObject_GetLocalID(mapObj) == 0xFD) {
+            if (MapObject_GetLocalID(mapObj) == DIST_WORLD_MOVING_PLATFORM_LOCAL_ID) {
                 animator = FindUnusedMovingPlatformPropAnimator(system);
                 DistWorldMovingPlatformPropAnimator_InitFromMapObject(system, animator, mapObj);
             }
@@ -6027,7 +6030,7 @@ static MapObject *AddMovingPlatformMapObject(DistWorldSystem *system, int tileX,
     MapObject *mapObj = MapObjectMan_AddMapObject(system->fieldSystem->mapObjMan, tileX, tileZ, 0, OBJ_EVENT_GFX_INVISIBLE, 0x0, DistWorldSystem_GetMapHeaderID(system));
 
     MapObject_SetY(mapObj, tileY);
-    MapObject_SetLocalID(mapObj, 0xFD);
+    MapObject_SetLocalID(mapObj, DIST_WORLD_MOVING_PLATFORM_LOCAL_ID);
     MapObject_SetDataAt(mapObj, index, MOVING_PLATFORM_MAP_OBJ_DATA_INDEX);
     MapObject_SetDataAt(mapObj, mapHeaderID, MOVING_PLATFORM_MAP_OBJ_DATA_MAP_HEADER_ID);
     MapObject_SetDataAt(mapObj, elevatorPathIndex, MOVING_PLATFORM_MAP_OBJ_DATA_EVELATOR_PATH_INDEX);

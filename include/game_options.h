@@ -19,6 +19,7 @@ Options *Options_New(enum HeapID heapID);
 void Options_Copy(const Options *src, Options *dest);
 void Options_Init(Options *options);
 void Options_SetSystemButtonMode(SaveData *saveData, enum OptionsButtonMode mode);
+BOOL Options_IsFrameRateUnlocked(void);
 int Options_TextSpeed(const Options *options);
 void Options_SetTextSpeed(Options *options, enum OptionsTextSpeed speed);
 u8 Options_TextFrameDelay(const Options *options);

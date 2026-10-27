@@ -226,7 +226,7 @@ fldeff_narc = custom_target('field_effects.narc',
         'follower_emote_poison.nsbtx',
         'follower_emote_silence.nsbtx',
         'follower_emote_sleep.nsbtx',
-        'follower_unknown_221.nsbmd',
+        'follower_reflection_large.nsbmd',
     )),
 
     command: [

@@ -104,6 +104,13 @@ Billboard *ov5_021EB1A0(MapObject *mapObj)
 {
     int v0 = MapObject_GetGraphicsID(mapObj);
 
+    // Following Platinum: Pokemon follower sprites keep their billboard where the ov5_021ECA70
+    // renderer does (reading it like a plain billboard object returned garbage, which crashed the
+    // reflection over water)
+    if (PokemonFollowerRenderer_IsFollowerSprite(mapObj)) {
+        return ov5_021ECB80(mapObj);
+    }
+
     switch (v0) {
     case OBJ_EVENT_GFX_PLAYER_M:
     case OBJ_EVENT_GFX_PLAYER_F:

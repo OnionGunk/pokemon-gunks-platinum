@@ -3,12 +3,15 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "constants/map_object.h"
+
 #include "struct_decls/map_object.h"
 #include "struct_decls/map_object_manager.h"
 
 #include "field/field_system.h"
 #include "overlay005/field_effect_manager.h"
 #include "overlay005/ov5_021EB1A0.h"
+#include "overlay005/ov5_021ECA70.h"
 #include "overlay005/ov5_021ECE40.h"
 
 #include "berry_patch_graphics.h"
@@ -18,6 +21,10 @@
 #include "overworld_anim_manager.h"
 
 #include "res/graphics/field_effects/field_effects.naix"
+
+// Following Platinum: 64x64 Pokemon followers reflect with a bigger mirror model
+#define REFLECTION_MODEL_KEY       2
+#define REFLECTION_LARGE_MODEL_KEY 22
 
 typedef struct {
     FieldEffectManager *unk_00;
@@ -85,12 +92,14 @@ void ov5_021F17D4(void *param0)
 
 static void ov5_021F17E4(UnkStruct_ov5_021F17E4 *param0)
 {
-    ov5_021DF9E0(param0->unk_00, 2, mirror_nsbmd);
+    ov5_021DF9E0(param0->unk_00, REFLECTION_MODEL_KEY, mirror_nsbmd);
+    ov5_021DF9E0(param0->unk_00, REFLECTION_LARGE_MODEL_KEY, follower_reflection_large_nsbmd);
 }
 
 static void ov5_021F17F4(UnkStruct_ov5_021F17E4 *param0)
 {
-    ov5_021DFA08(param0->unk_00, 2);
+    ov5_021DFA08(param0->unk_00, REFLECTION_MODEL_KEY);
+    ov5_021DFA08(param0->unk_00, REFLECTION_LARGE_MODEL_KEY);
 }
 
 void ov5_021F1800(MapObject *param0, int param1)
@@ -237,6 +246,8 @@ static void ov5_021F1978(OverworldAnimManager *param0, void *param1)
 
         Billboard_SetAnimNum(v0->unk_24, Billboard_GetAnimNum(v4));
         Billboard_SetFrameNum(v0->unk_24, Billboard_GetFrameNum(v4));
+        // a shiny follower's reflection uses its shiny palette too
+        v0->unk_24->gfxSequence.plttIdx = v4->gfxSequence.plttIdx;
     }
 }
 
@@ -260,10 +271,39 @@ static void ov5_021F1A24(UnkStruct_ov5_021F1A24 *param0, MapObject *param1, VecF
     MapObject_GetSpriteJumpOffset(param1, param2);
 
     v1 = param2->x;
-    v2 = -param2->z;
+    // Following Platinum: the reflection also follows half of a jump's height
+    v2 = -param2->z + param2->y / 2;
 
     MapObject_GetPosPtr(param1, param2);
     v0 = MapObject_RecalculatePositionHeight(param0->unk_14.fieldSystem, param2);
+
+    // Following Platinum (fp_023cce04): a Pokemon follower's reflection takes the same push-back and
+    // bob as its sprite, and big ones sit lower
+    if (PokemonFollowerRenderer_IsFollowerSprite(param1)) {
+        VecFx32 spriteOffset;
+        int dir = MapObject_GetFacingDir(param1);
+
+        PokemonFollowerRenderer_ApplyOffset(param1, dir, param2);
+        MapObject_GetSpritePosOffset(param1, &spriteOffset);
+        param2->z += spriteOffset.y / 2;
+
+        if (PokemonFollowerRenderer_IsLargeSprite(param1)) {
+            if (param0->unk_10 == 1) {
+                param2->z -= FX32_CONST(4);
+
+                if (dir == DIR_NORTH) {
+                    param2->z -= FX32_CONST(8);
+                }
+            } else {
+                param2->y -= FX32_CONST(6);
+                param2->z -= FX32_CONST(10);
+
+                if (dir == DIR_NORTH) {
+                    param2->z -= FX32_CONST(4);
+                }
+            }
+        }
+    }
 
     param2->x += v1;
     param2->z += v2 + (FX32_ONE * -7);
@@ -294,7 +334,7 @@ static void ov5_021F1A8C(OverworldAnimManager *param0, UnkStruct_ov5_021F1A24 *p
         }
     }
 
-    v1 = ov5_021DF9FC(param1->unk_14.unk_04, 2);
+    v1 = ov5_021DF9FC(param1->unk_14.unk_04, PokemonFollowerRenderer_IsLargeSprite(param1->unk_14.unk_0C) ? REFLECTION_LARGE_MODEL_KEY : REFLECTION_MODEL_KEY);
     v3.modelRes = v1;
 
     OverworldAnimManager_GetPosition(param0, &v2);

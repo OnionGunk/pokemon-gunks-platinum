@@ -31,7 +31,7 @@
     },
     {
       "id": "OptionsMenu_Text_ButtonModeLabel",
-      "en_US": "BUTTON MODE"
+      "en_US": "UNLOCK FPS"
     },
     {
       "id": "OptionsMenu_Text_MessageBoxStyleLabel",
@@ -79,15 +79,15 @@
     },
     {
       "id": "OptionsMenu_Text_ButtonModeNormal",
-      "en_US": "NORMAL"
+      "en_US": "OFF"
     },
     {
       "id": "OptionsMenu_Text_ButtonModeStartIs_x",
-      "en_US": "START = X"
+      "en_US": "BATTLE"
     },
     {
       "id": "OptionsMenu_Text_ButtonMode_l_is_a",
-      "en_US": "L = A"
+      "en_US": "ALWAYS"
     },
     {
       "id": "OptionsMenu_Text_MessageBoxStyle_01",
@@ -201,8 +201,8 @@
     {
       "id": "OptionsMenu_Text_ButtonModeDescription",
       "en_US": [
-        "Choose one of three sets of button\n",
-        "settings."
+        "Use at your own risk.\n",
+        "Framerate may not be consistent."
       ]
     },
     {

@@ -24,6 +24,14 @@ static const Location sRoute202TutorialLocation = {
     .faceDirection = FACE_LEFT,
 };
 
+static const Location sRoute201BriefcaseLocation = {
+    .mapHeaderID = MAP_HEADER_ROUTE_201,
+    .warpId = WARP_ID_NONE,
+    .x = 113,
+    .z = 854,
+    .faceDirection = FACE_LEFT,
+};
+
 // test builds start on Twinleaf's north road: Route 201's grass and the map border are a few steps north
 static const Location sPlayerStartLocation = {
     .mapHeaderID = MAP_HEADER_TWINLEAF_TOWN,
@@ -60,6 +68,11 @@ void SetPlayerStartLocation(Location *outLocation)
 
     if (gTestSaveMode == 2) {
         *outLocation = sRoute202TutorialLocation;
+        return;
+    }
+
+    if (gTestSaveMode == 3) {
+        *outLocation = sRoute201BriefcaseLocation;
         return;
     }
 #endif

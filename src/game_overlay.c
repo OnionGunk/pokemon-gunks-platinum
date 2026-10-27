@@ -72,6 +72,21 @@ void LoadOverlayGDB(const FSOverlayID overlayID)
 }
 #endif // GDB_DEBUGGING
 
+BOOL Overlay_IsLoaded(const FSOverlayID overlayID)
+{
+    for (int region = 0; region < OVERLAY_REGION_NUM; region++) {
+        PMiLoadedOverlay *loaded = GetLoadedOverlaysInRegion(region);
+
+        for (int i = 0; i < 8; i++) {
+            if (loaded[i].isActive == TRUE && loaded[i].id == overlayID) {
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}
+
 static void FreeOverlayAllocation(PMiLoadedOverlay *loadedOverlays)
 {
     GF_ASSERT(loadedOverlays->isActive == TRUE);

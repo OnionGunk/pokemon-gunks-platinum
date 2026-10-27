@@ -333,10 +333,13 @@ static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
 
     FieldSystem *fieldSystem = MapObject_FieldSystem(mapObj);
 
-    // while surfing the follower stays in its Poke Ball
-    if (PlayerAvatar_GetPlayerState(FieldSystem_GetPlayerAvatar(fieldSystem)) == PLAYER_AVATAR_SURFING) {
+    // while surfing or cycling the follower stays in its Poke Ball
+    int playerState = PlayerAvatar_GetPlayerState(FieldSystem_GetPlayerAvatar(fieldSystem));
+
+    if (playerState == PLAYER_AVATAR_SURFING || playerState == PLAYER_AVATAR_CYCLING) {
         return;
     }
+
     int spawnX = MapObject_GetXInitial(mapObj);
     int spawnZ = MapObject_GetZInitial(mapObj);
     BOOL onSpawnTile = MapObject_GetX(mapObj) == spawnX && MapObject_GetZ(mapObj) == spawnZ;

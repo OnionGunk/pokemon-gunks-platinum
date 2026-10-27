@@ -116,7 +116,7 @@ typedef struct BattleMon {
     u32 OTId;
 
     u16 heldItem;
-    u16 padding007A; // unused
+    u16 entersWithoutBall; // Following Platinum: slides in and out of battle without a Poke Ball
 
     u8 timesDamaged;
     u8 trainerMessageFlags;

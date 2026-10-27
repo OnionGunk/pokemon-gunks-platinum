@@ -132,7 +132,9 @@ enum HeapSize {
     HEAP_SIZE_SYSTEM = 0xD200,
     HEAP_SIZE_SAVE = 0x20E00 + 0x14000,
     HEAP_SIZE_DEBUG = 0x10,
-    HEAP_SIZE_APPLICATION = 0x10D800,
+    // +32 KB of the unclaimed main arena, all of it passed on to the field heap (HEAP_SIZE_FIELD_MAP)
+    // for Pokemon followers and the cutscene objects Following Platinum adds
+    HEAP_SIZE_APPLICATION = 0x10D800 + 0x8000,
 
     HEAP_SIZE_BATTLE_HALL_APP = 0x20000,
     HEAP_SIZE_BATTLE_FACTORY_APP = 0x20000,
@@ -147,6 +149,7 @@ enum HeapSize {
     HEAP_SIZE_BOX_GRAPHICS = 0x3C000,
 
     HEAP_SIZE_FIELD1 = 0x20000,
+    HEAP_SIZE_FIELD_MAP = 0xC4000 + 0x8000,
     HEAP_SIZE_FIELD2 = 0x1C000,
     HEAP_SIZE_FIELD3 = 0x4000,
 

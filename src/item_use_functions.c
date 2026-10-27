@@ -4,6 +4,7 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "constants/player_avatar.h"
 #include "constants/savedata/vars_flags.h"
 
 #include "struct_decls/map_object.h"
@@ -60,6 +61,7 @@
 #include "terrain_collision_manager.h"
 #include "unk_0203C954.h"
 #include "unk_0203D1B8.h"
+#include "unk_020655F4.h"
 #include "unk_0206B9D8.h"
 #include "vars_flags.h"
 
@@ -431,9 +433,26 @@ static BOOL MountOrUnmountBicycle(FieldTask *task)
     int *state = FieldTask_GetState(task);
 
     switch (*state) {
-    case 0:
+    case 0: {
+        // Following Platinum: the follower goes back into its Poke Ball while the player cycles and
+        // pops out again after they get off (once it has finished its current step)
+        MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+
+        if (follower != NULL) {
+            if (!LocalMapObj_CheckAnimationFinished(follower)) {
+                break;
+            }
+
+            if (PlayerAvatar_GetPlayerState(fieldSystem->playerAvatar) == PLAYER_AVATAR_CYCLING) {
+                PokemonFollower_ReturnToPlayer(fieldSystem, TRUE);
+            } else {
+                PokemonFollower_RecallToBall(fieldSystem);
+            }
+        }
+
         (*state)++;
         break;
+    }
     case 1:
         if (PlayerAvatar_GetPlayerState(fieldSystem->playerAvatar) == 0x1) {
             MapObject_SetPauseMovementOff(PlayerAvatar_GetMapObject(fieldSystem->playerAvatar));

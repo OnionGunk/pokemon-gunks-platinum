@@ -10,6 +10,7 @@ typedef enum OverlayLoadType {
 } OverlayLoadType;
 
 void Overlay_UnloadByID(const FSOverlayID overlayID);
+BOOL Overlay_IsLoaded(const FSOverlayID overlayID);
 int Overlay_GetLoadDestination(const FSOverlayID overlayID);
 BOOL Overlay_LoadByID(const FSOverlayID overlayID, enum OverlayLoadType loadType);
 

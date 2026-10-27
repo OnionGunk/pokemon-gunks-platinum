@@ -80,7 +80,8 @@ typedef struct DexNavSearch {
 static DexNavSearch sSearch;
 
 // Test hooks: the emulator harness writes these before a new game. gTestLeadSpecies picks the
-// test save's lead Pokemon; gTestSaveMode picks post-game (0) or story start (1).
+// test save's lead Pokemon; gTestSaveMode: 0 post-game, 1 story start, 2 Route 202 tutorial,
+// 3 Route 201 briefcase, 4 post-game with the Bicycle on Select.
 u16 gTestLeadSpecies;
 u16 gTestSaveMode;
 

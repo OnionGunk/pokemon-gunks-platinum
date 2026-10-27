@@ -15,6 +15,7 @@
 #include "generated/trainer_classes.h"
 
 #include "struct_decls/battle_system.h"
+#include "struct_defs/battle_system.h"
 #include "struct_defs/battler_data.h"
 #include "struct_defs/fraction.h"
 #include "struct_defs/move_animation.h"
@@ -100,6 +101,9 @@ static void Task_SetGiratinaEncounter(SysTask *task, void *data);
 static void Task_ShowEncounter(SysTask *task, void *data);
 static void Task_ShowPokemon(SysTask *task, void *data);
 static void Task_ReturnPokemon(SysTask *task, void *data);
+static void Task_ShowEncounterWithoutBall(SysTask *task, void *data);
+static void Task_ShowPokemonWithoutBall(SysTask *task, void *data);
+static void Task_ReturnPokemonWithoutBall(SysTask *task, void *data);
 static void Task_OpenCaptureBall(SysTask *task, void *data);
 static void Task_SetTrainerEncounter(SysTask *task, void *data);
 static void Task_ThrowTrainerBall(SysTask *task, void *data);
@@ -308,6 +312,13 @@ void BattleDisplay_InitTaskSetEncounter(BattleSystem *battleSys, BattlerData *ba
     Sound_Set2PokemonCriesAllowed(TRUE);
 }
 
+// Following Platinum: the Pokemon following the player slides into and out of battle (see
+// BattleSystem_InitBattleMon) instead of using its Poke Ball.
+static BOOL BattleDisplay_MonEntersWithoutBall(BattleSystem *battleSys, BattlerData *battlerData)
+{
+    return battleSys->battleCtx->battleMons[battlerData->battler].entersWithoutBall;
+}
+
 typedef struct MonShowData {
     BattleSystem *battleSys;
     BattlerData *battlerData;
@@ -379,7 +390,7 @@ void BattleDisplay_InitTaskShowEncounter(BattleSystem *battleSys, BattlerData *b
     monShowData->isQuickSendOut = 0;
 
     Sound_Set2PokemonCriesAllowed(TRUE);
-    SysTask_Start(Task_ShowEncounter, monShowData, 0);
+    SysTask_Start(BattleDisplay_MonEntersWithoutBall(battleSys, battlerData) ? Task_ShowEncounterWithoutBall : Task_ShowEncounter, monShowData, 0);
 }
 
 void BattleDisplay_InitTaskShowPokemon(BattleSystem *battleSys, BattlerData *battlerData, MonShowMessage *message)
@@ -431,7 +442,7 @@ void BattleDisplay_InitTaskShowPokemon(BattleSystem *battleSys, BattlerData *bat
         monShowData->moveAnim.personalities[i] = message->battleMonPersonalities[i];
     }
 
-    SysTask_Start(Task_ShowPokemon, monShowData, 0);
+    SysTask_Start(BattleDisplay_MonEntersWithoutBall(battleSys, battlerData) ? Task_ShowPokemonWithoutBall : Task_ShowPokemon, monShowData, 0);
 }
 
 typedef struct MonReturnData {
@@ -472,7 +483,7 @@ void BattleDisplay_InitTaskReturnPokemon(BattleSystem *battleSys, BattlerData *b
         monReturnData->moveAnim.personalities[i] = message->battleMonPersonalities[i];
     }
 
-    SysTask_Start(Task_ReturnPokemon, monReturnData, 0);
+    SysTask_Start(BattleDisplay_MonEntersWithoutBall(battleSys, battlerData) ? Task_ReturnPokemonWithoutBall : Task_ReturnPokemon, monReturnData, 0);
 }
 
 typedef struct OpenCaptureBallData {
@@ -562,6 +573,7 @@ typedef struct TrainerThrowBallData {
     int ballTypeIn;
     int delay;
     int ballTargetState;
+    u8 followerMode; // Following Platinum: 1 = follower in singles (no throw), 2 = in doubles (only the partner's ball)
 } TrainerThrowBallData;
 
 void BattleDisplay_InitTaskThrowTrainerBall(BattleSystem *battleSys, BattlerData *battlerData, TrainerThrowBallMessage *message)
@@ -582,6 +594,14 @@ void BattleDisplay_InitTaskThrowTrainerBall(BattleSystem *battleSys, BattlerData
         Trainer *trainer = BattleSystem_GetTrainer(battleSys, battlerData->battler);
         trainerThrowBallData->face = FACE_BACK;
         trainerThrowBallData->backSpriteIdx = SpriteSystem_TrainerClassBackSpriteIndex(BattleDisplay_GetLinkTrainerClass(battleSys, battlerData->battler, trainer->header.trainerType));
+    }
+
+    trainerThrowBallData->followerMode = 0;
+
+    if (BattleDisplay_MonEntersWithoutBall(battleSys, battlerData)) {
+        u32 battleType = BattleSystem_GetBattleType(battleSys);
+
+        trainerThrowBallData->followerMode = (battleType & BATTLE_TYPE_DOUBLES) && !(battleType & BATTLE_TYPE_2vs2) ? 2 : 1;
     }
 
     SysTask_Start(Task_ThrowTrainerBall, trainerThrowBallData, 0);
@@ -2592,6 +2612,311 @@ static void Task_ReturnPokemon(SysTask *task, void *data)
     }
 }
 
+// Following Platinum (Mikelan98 et al.): the Pokemon that follows the player in the overworld enters
+// and leaves battle on foot. It slides in from the edge of the screen at full size (no Poke Ball, no
+// fade) and cries on arrival; recalled, it runs off the other way.
+#define MON_SLIDE_SPEED       8
+#define MON_SLIDE_START_BACK  (-80)
+#define MON_SLIDE_START_FRONT 256
+#define MON_SLIDE_END_BACK    (-80)
+#define MON_SLIDE_END_FRONT   296
+
+static void MonShowData_CreateOffscreenSprite(MonShowData *monShowData)
+{
+    SpriteAnimFrame animFrames[MAX_ANIMATION_FRAMES];
+    PokemonSprite *sprite;
+
+    PokemonSprite_LoadAnimFrames(monShowData->battlerData->narc, &animFrames[0], monShowData->species, monShowData->battlerType);
+    sprite = monShowData->battlerData->monSprite = BattleDisplay_NewPokemonSprite(monShowData->battleSys,
+        BattleSystem_GetPokemonSpriteManager(monShowData->battleSys),
+        &monShowData->spriteTemplate,
+        gBattlerEncounterX[monShowData->battlerType][0],
+        gEncounterCoords[monShowData->battlerType][1],
+        gEncounterCoords[monShowData->battlerType][2],
+        monShowData->yOffset,
+        monShowData->height,
+        monShowData->shadowXOffset,
+        monShowData->shadowSize,
+        monShowData->battler,
+        &animFrames[0],
+        NULL);
+
+    PokemonSprite_SetAttribute(sprite, MON_SPRITE_SCALE_X, 0x100);
+    PokemonSprite_SetAttribute(sprite, MON_SPRITE_SCALE_Y, 0x100);
+    PokemonSprite_SetAttribute(sprite, MON_SPRITE_SHADOW_SHOULD_FOLLOW_Y, FALSE);
+    PokemonSprite_SetAttribute(sprite, MON_SPRITE_HIDE, TRUE);
+    PokemonSprite_SetAttribute(sprite, MON_SPRITE_X_CENTER, monShowData->face == FACE_FRONT ? MON_SLIDE_START_FRONT : MON_SLIDE_START_BACK);
+}
+
+static void MonShowData_StartSlideIn(MonShowData *monShowData)
+{
+    PokemonSprite_SetAttribute(monShowData->battlerData->monSprite, MON_SPRITE_HIDE, FALSE);
+    Sound_PlayPannedEffect(SEQ_SE_DP_NIGERU_sseq, monShowData->face == FACE_FRONT ? BATTLE_SOUND_PAN_RIGHT : BATTLE_SOUND_PAN_LEFT);
+}
+
+// returns TRUE once the sprite has reached its battle position
+static BOOL MonShowData_SlideIn(MonShowData *monShowData)
+{
+    PokemonSprite *sprite = monShowData->battlerData->monSprite;
+    int target = gBattlerEncounterX[monShowData->battlerType][0];
+    int x = PokemonSprite_GetAttribute(sprite, MON_SPRITE_X_CENTER);
+
+    if ((monShowData->face == FACE_FRONT && x <= target) || (monShowData->face == FACE_BACK && x >= target)) {
+        PokemonSprite_SetAttribute(sprite, MON_SPRITE_X_CENTER, target);
+        return TRUE;
+    }
+
+    PokemonSprite_AddAttribute(sprite, MON_SPRITE_X_CENTER, monShowData->face == FACE_FRONT ? -MON_SLIDE_SPEED : MON_SLIDE_SPEED);
+    return FALSE;
+}
+
+static void MonShowData_PlayArrivalCryAndAnim(MonShowData *monShowData)
+{
+    PokemonSprite *sprite = monShowData->battlerData->monSprite;
+    u8 cryDelay;
+
+    PokemonSprite_InitAnim(sprite, 1);
+
+    if (monShowData->face == FACE_FRONT) {
+        PokemonSprite_SetAttribute(sprite, MON_SPRITE_SHADOW_IS_AFFINE, FALSE);
+    }
+
+    PokemonSprite_LoadCryDelay(monShowData->battlerData->narc, &cryDelay, monShowData->species, monShowData->battlerType);
+    Species_PlayDelayedCry(BattleSystem_GetChatotCry(monShowData->battleSys, monShowData->battler),
+        monShowData->cryMod,
+        monShowData->species,
+        monShowData->formNum,
+        monShowData->face == FACE_FRONT ? BATTLE_SOUND_PAN_RIGHT : BATTLE_SOUND_PAN_LEFT,
+        SOUND_VOLUME_MAX,
+        NULL,
+        HEAP_ID_BATTLE,
+        cryDelay);
+    PokemonSprite_LoadAnim(monShowData->battlerData->narc,
+        BattleSystem_GetPokemonAnimManager(monShowData->battleSys),
+        sprite,
+        monShowData->species,
+        monShowData->face,
+        0,
+        monShowData->battler);
+}
+
+static BOOL MonShowData_IsArrivalAnimDone(MonShowData *monShowData)
+{
+    return PokemonAnimManager_HasAnimCompleted(BattleSystem_GetPokemonAnimManager(monShowData->battleSys), monShowData->battler) == TRUE
+        && PokemonSprite_IsAnimActive(monShowData->battlerData->monSprite) == FALSE;
+}
+
+static void Task_ShowEncounterWithoutBall(SysTask *task, void *data)
+{
+    MonShowData *monShowData = data;
+
+    switch (monShowData->state) {
+    case 0:
+        monShowData->btlMonObjData = NULL;
+
+        if ((BattleSystem_GetBattleStatusMask(monShowData->battleSys) & BATTLE_STATUS_RECORDED) == FALSE
+            && (monShowData->battlerType == BATTLER_TYPE_SOLO_PLAYER || monShowData->battlerType == BATTLER_TYPE_PLAYER_SIDE_SLOT_1)) {
+            monShowData->btlMonObjData = BattleMonOBJData_NewAll(monShowData->battleSys, HEAP_ID_BATTLE);
+        }
+
+        monShowData->state++;
+        break;
+    case 1:
+        MonShowData_CreateOffscreenSprite(monShowData);
+        MonShowData_StartSlideIn(monShowData);
+
+        if (monShowData->btlMonObjData) {
+            BattleMonOBJData_Free(monShowData->btlMonObjData);
+            monShowData->btlMonObjData = NULL;
+        }
+
+        monShowData->state++;
+        break;
+    case 2:
+        if (MonShowData_SlideIn(monShowData)) {
+            MonShowData_PlayArrivalCryAndAnim(monShowData);
+            monShowData->state++;
+        }
+        break;
+    case 3:
+        if (MonShowData_IsArrivalAnimDone(monShowData)) {
+            // the trainer's ball was never shown
+            if (monShowData->battlerData->ballRotation) {
+                ov12_0223783C(monShowData->battlerData->ballRotation);
+                monShowData->battlerData->ballRotation = NULL;
+            }
+
+            if (monShowData->isShiny) {
+                MoveAnimation moveAnim;
+
+                monShowData->battleAnimSys = BattleAnimSystem_New(HEAP_ID_BATTLE);
+                BattleController_SetMoveAnimation(monShowData->battleSys, NULL, &moveAnim, 1, 11, monShowData->battler, monShowData->battler, NULL);
+                BattleDisplay_PlayMoveAnimation(monShowData->battleSys, monShowData->battlerData, monShowData->battleAnimSys, &moveAnim);
+                monShowData->state = 4;
+            } else {
+                monShowData->state = 0xFF;
+            }
+        }
+        break;
+    case 4:
+        BattleAnimSystem_ExecuteScript(monShowData->battleAnimSys);
+
+        if (BattleAnimSystem_IsMoveActive(monShowData->battleAnimSys) == FALSE) {
+            BattleAnimSystem_FreeScriptData(monShowData->battleAnimSys);
+            BattleAnimSystem_Delete(monShowData->battleAnimSys);
+            monShowData->state = 0xFF;
+        }
+        break;
+    default:
+        Sound_Set2PokemonCriesAllowed(FALSE);
+        BattleController_EmitClearCommand(monShowData->battleSys, monShowData->battler, monShowData->command);
+        Heap_Free(data);
+        SysTask_Done(task);
+        break;
+    }
+}
+
+static void Task_ShowPokemonWithoutBall(SysTask *task, void *data)
+{
+    MonShowData *monShowData = data;
+    BattleAnimSystem *battleAnimSys = BattleSystem_GetBattleAnimSystem(monShowData->battleSys);
+
+    switch (monShowData->state) {
+    case 0:
+        MonShowData_CreateOffscreenSprite(monShowData);
+        monShowData->btlMonObjData = BattleMonOBJData_NewAll(monShowData->battleSys, HEAP_ID_BATTLE);
+        monShowData->state++;
+        break;
+    case 1:
+        if (monShowData->btlMonObjData) {
+            BattleMonOBJData_Free(monShowData->btlMonObjData);
+            monShowData->btlMonObjData = NULL;
+        }
+
+        MonShowData_StartSlideIn(monShowData);
+        monShowData->state++;
+        break;
+    case 2:
+        if (MonShowData_SlideIn(monShowData)) {
+            MonShowData_PlayArrivalCryAndAnim(monShowData);
+            monShowData->state++;
+        }
+        break;
+    case 3:
+        if (MonShowData_IsArrivalAnimDone(monShowData)) {
+            if (monShowData->isShiny) {
+                MoveAnimation moveAnim;
+
+                BattleController_SetMoveAnimation(monShowData->battleSys, NULL, &moveAnim, 1, 11, monShowData->battler, monShowData->battler, NULL);
+                BattleDisplay_PlayMoveAnimation(monShowData->battleSys, monShowData->battlerData, battleAnimSys, &moveAnim);
+                monShowData->state = 4;
+            } else {
+                monShowData->state = 5;
+            }
+        }
+        break;
+    case 4:
+    case 6:
+    case 8:
+        BattleAnimSystem_ExecuteScript(battleAnimSys);
+
+        if (BattleAnimSystem_IsMoveActive(battleAnimSys) == FALSE) {
+            BattleAnimSystem_FreeScriptData(battleAnimSys);
+            monShowData->state++;
+        }
+        break;
+    case 5:
+        if (monShowData->isSubstitute) {
+            MoveAnimation moveAnim;
+
+            BattleController_SetMoveAnimation(monShowData->battleSys, NULL, &moveAnim, 1, 15, monShowData->battler, monShowData->battler, NULL);
+            BattleDisplay_PlayMoveAnimation(monShowData->battleSys, monShowData->battlerData, battleAnimSys, &moveAnim);
+            monShowData->state++;
+        } else {
+            monShowData->state = 0xFF;
+        }
+        break;
+    case 7: {
+        BattlerSpriteContext battlerSpriteCtx;
+        MoveAnimation moveAnim;
+
+        BattleDisplay_PopulateBattlerContext(monShowData->battleSys, &monShowData->moveAnim, &battlerSpriteCtx, monShowData->battler);
+        ov12_02238390(&battlerSpriteCtx, HEAP_ID_BATTLE);
+        BattleController_SetMoveAnimation(monShowData->battleSys, NULL, &moveAnim, 1, 16, monShowData->battler, monShowData->battler, NULL);
+        BattleDisplay_PlayMoveAnimation(monShowData->battleSys, monShowData->battlerData, battleAnimSys, &moveAnim);
+
+        monShowData->battlerData->isAlternateSprite = 1;
+        monShowData->state++;
+        break;
+    }
+    default:
+        BattleController_EmitClearCommand(monShowData->battleSys, monShowData->battler, monShowData->command);
+        Heap_Free(data);
+        SysTask_Done(task);
+        break;
+    }
+}
+
+static void Task_ReturnPokemonWithoutBall(SysTask *task, void *data)
+{
+    MonReturnData *monReturnData = data;
+    BattleAnimSystem *battleAnimSys = BattleSystem_GetBattleAnimSystem(monReturnData->battleSys);
+    BOOL enemySide = (monReturnData->battlerType & BATTLER_THEM) != 0;
+
+    switch (monReturnData->state) {
+    case 0:
+        if (monReturnData->isSubstitute) {
+            MoveAnimation moveAnim;
+
+            BattleController_SetMoveAnimation(monReturnData->battleSys, NULL, &moveAnim, 1, 15, monReturnData->battler, monReturnData->battler, NULL);
+            BattleDisplay_PlayMoveAnimation(monReturnData->battleSys, monReturnData->battlerData, battleAnimSys, &moveAnim);
+            monReturnData->state++;
+        } else {
+            monReturnData->state = 4;
+        }
+        break;
+    case 2: {
+        BattlerSpriteContext battlerSpriteCtx;
+        MoveAnimation moveAnim;
+
+        BattleDisplay_PopulateBattlerContext(monReturnData->battleSys, &monReturnData->moveAnim, &battlerSpriteCtx, monReturnData->battler);
+        ov12_022382BC(&battlerSpriteCtx, HEAP_ID_BATTLE);
+        BattleController_SetMoveAnimation(monReturnData->battleSys, NULL, &moveAnim, 1, 16, monReturnData->battler, monReturnData->battler, NULL);
+        BattleDisplay_PlayMoveAnimation(monReturnData->battleSys, monReturnData->battlerData, battleAnimSys, &moveAnim);
+        monReturnData->battlerData->isAlternateSprite = 0;
+        monReturnData->state++;
+        break;
+    }
+    case 1:
+    case 3:
+        BattleAnimSystem_ExecuteScript(battleAnimSys);
+
+        if (BattleAnimSystem_IsMoveActive(battleAnimSys) == FALSE) {
+            BattleAnimSystem_FreeScriptData(battleAnimSys);
+            monReturnData->state++;
+        }
+        break;
+    case 4:
+        Sound_PlayPannedEffect(SEQ_SE_DP_NIGERU_sseq, enemySide ? BATTLE_SOUND_PAN_RIGHT : BATTLE_SOUND_PAN_LEFT);
+        monReturnData->state++;
+        break;
+    case 5:
+        PokemonSprite_AddAttribute(monReturnData->monSprite, MON_SPRITE_X_CENTER, enemySide ? MON_SLIDE_SPEED : -MON_SLIDE_SPEED);
+
+        if ((enemySide && PokemonSprite_GetAttribute(monReturnData->monSprite, MON_SPRITE_X_CENTER) >= MON_SLIDE_END_FRONT)
+            || (!enemySide && PokemonSprite_GetAttribute(monReturnData->monSprite, MON_SPRITE_X_CENTER) <= MON_SLIDE_END_BACK)) {
+            PokemonSprite_Delete(monReturnData->monSprite);
+            monReturnData->state++;
+        }
+        break;
+    default:
+        BattleController_EmitClearCommand(monReturnData->battleSys, monReturnData->battler, monReturnData->command);
+        Heap_Free(data);
+        SysTask_Done(task);
+        break;
+    }
+}
+
 static void Task_OpenCaptureBall(SysTask *task, void *data)
 {
     OpenCaptureBallData *captureOpenBallData = data;
@@ -2898,18 +3223,45 @@ static void Task_ThrowTrainerBall(SysTask *task, void *data)
             ManagedSprite_GetPositionXY(trainerThrowBallData->battlerData->managedSprite, &x, &y);
 
             if (x >= (256 - 48) - 48 && ov12_02237890(trainerThrowBallData->battlerData->ballRotation) != 0) {
-                ov12_02237E0C(trainerThrowBallData->battlerData->ballRotation, 1);
+                if (trainerThrowBallData->followerMode == 0) {
+                    ov12_02237E0C(trainerThrowBallData->battlerData->ballRotation, 1);
+                }
+
                 ov12_0223786C(trainerThrowBallData->battlerData->ballRotation, 0);
 
                 if (battleType & BATTLE_TYPE_DOUBLES && (battleType & BATTLE_TYPE_2vs2) == 0) {
                     BattlerData *battlerData = BattleSystem_GetBattlerData(trainerThrowBallData->battleSys, BattleSystem_GetPartner(trainerThrowBallData->battleSys, trainerThrowBallData->battler));
 
-                    ov12_02237E0C(battlerData->ballRotation, 1);
+                    if (trainerThrowBallData->followerMode == 0) {
+                        ov12_02237E0C(battlerData->ballRotation, 1);
+                    }
+
                     ov12_0223786C(battlerData->ballRotation, 0);
                     ov12_02237E4C(battlerData->ballRotation, 12);
                 }
             } else if (x >= (256 + 40)) {
                 SpriteManager *spriteMan = BattleSystem_GetSpriteManager(trainerThrowBallData->battleSys);
+                Sprite_DeleteAndFreeResources(trainerThrowBallData->battlerData->managedSprite);
+                trainerThrowBallData->battlerData->managedSprite = NULL;
+
+                SpriteManager_UnloadCharObjById(spriteMan, 20015 + trainerThrowBallData->battlerData->battlerType);
+                SpriteManager_UnloadPlttObjById(spriteMan, 20010 + trainerThrowBallData->battlerData->battlerType);
+                SpriteManager_UnloadCellObjById(spriteMan, 20007 + trainerThrowBallData->battlerData->battlerType);
+                SpriteManager_UnloadAnimObjById(spriteMan, 20007 + trainerThrowBallData->battlerData->battlerType);
+                trainerThrowBallData->state = 6;
+            }
+        } else if (trainerThrowBallData->followerMode == 1) {
+            // Following Platinum: the follower runs in by itself, so the player just slides out
+            ManagedSprite_OffsetPositionXY(trainerThrowBallData->battlerData->managedSprite, -5, 0);
+            ManagedSprite_GetPositionXY(trainerThrowBallData->battlerData->managedSprite, &x, &y);
+
+            if (trainerThrowBallData->battlerData->ballRotation != NULL && ov12_02237890(trainerThrowBallData->battlerData->ballRotation) != 0) {
+                ov12_0223786C(trainerThrowBallData->battlerData->ballRotation, 0);
+            }
+
+            if (x <= -40) {
+                SpriteManager *spriteMan = BattleSystem_GetSpriteManager(trainerThrowBallData->battleSys);
+
                 Sprite_DeleteAndFreeResources(trainerThrowBallData->battlerData->managedSprite);
                 trainerThrowBallData->battlerData->managedSprite = NULL;
 
@@ -2934,7 +3286,11 @@ static void Task_ThrowTrainerBall(SysTask *task, void *data)
             animFrame = ManagedSprite_GetAnimationFrame(trainerThrowBallData->battlerData->managedSprite);
 
             if (v5[trainerThrowBallData->backSpriteIdx][animFrame][0] != 0x7FFF) {
-                ov12_02237E0C(trainerThrowBallData->battlerData->ballRotation, 1);
+                // the follower's own ball stays hidden; only the partner's is thrown
+                if (trainerThrowBallData->followerMode != 2) {
+                    ov12_02237E0C(trainerThrowBallData->battlerData->ballRotation, 1);
+                }
+
                 ov12_02237E18(trainerThrowBallData->battlerData->ballRotation, x + v5[trainerThrowBallData->backSpriteIdx][animFrame][0], y + v5[trainerThrowBallData->backSpriteIdx][animFrame][1]);
 
                 if (animFrame == 3 && ov12_02237890(trainerThrowBallData->battlerData->ballRotation) != 0) {

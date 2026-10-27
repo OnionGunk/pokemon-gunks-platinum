@@ -1,5 +1,7 @@
 #include "overlay005/ov5_021ECE40.h"
 
+#include "generated/object_events_gfx.h"
+
 #include <nitro.h>
 #include <string.h>
 
@@ -1598,10 +1600,19 @@ static void ov5_021EE030(SysTask *param0, void *param1)
 
 static void ov5_021EE0E8(UnkStruct_ov5_021ED0A4 *param0, int param1, void *param2, int param3)
 {
-    TextureResource *v0 = TextureResourceManager_AddTextureAndAllocVRam(param0->unk_F0, param2, param1, 1, HEAP_ID_FIELD1);
+    // Pokemon follower sheets (8 frames, 4 KB) stay in RAM and get no texture VRAM: their
+    // billboards then keep only the current frame in VRAM, like the player's. Following Platinum's
+    // scenes put several Pokemon on maps whose texture VRAM is nearly full.
+    if (param1 >= OBJ_EVENT_GFX_FOLLOWER_BULBASAUR && param1 <= OBJ_EVENT_GFX_FOLLOWER_ARCEUS_FORM_17) {
+        TextureResource *v0 = TextureResourceManager_AddTexture(param0->unk_F0, param2, param1, TEX_RESOURCE_MODE_NORMAL, HEAP_ID_FIELD1);
 
-    GF_ASSERT(v0 != NULL);
-    ov5_021EE134(param0, param1);
+        GF_ASSERT(v0 != NULL);
+    } else {
+        TextureResource *v0 = TextureResourceManager_AddTextureAndAllocVRam(param0->unk_F0, param2, param1, 1, HEAP_ID_FIELD1);
+
+        GF_ASSERT(v0 != NULL);
+        ov5_021EE134(param0, param1);
+    }
 
     if (param3 == 0) {
         ov5_021ED7E4(param0, param1);

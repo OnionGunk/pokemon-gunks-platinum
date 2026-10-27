@@ -7,6 +7,7 @@
 #include "constants/field_base_tiles.h"
 #include "constants/heap.h"
 #include "constants/overworld_weather.h"
+#include "constants/player_avatar.h"
 
 #include "struct_defs/map_load_mode.h"
 #include "struct_defs/player_data.h"
@@ -175,10 +176,10 @@ static void FieldTask_FadeInFieldWarp(FieldTask *task);
 static BOOL FieldTask_StartUndergroundMapTransition(FieldTask *task, enum UGMapTransition param1);
 
 static const MapLoadMode sMapLoadMode[] = {
-    { 0x1, FALSE, FALSE, 0x0, FALSE, TRUE, 0x0, 0xC4000 },
-    { 0x2, TRUE, TRUE, 0x1, TRUE, FALSE, 0x10, 0xC4000 },
-    { 0x3, FALSE, FALSE, 0x0, FALSE, TRUE, 0x0, 0xC4000 },
-    { 0x4, TRUE, TRUE, 0x0, TRUE, TRUE, 0x1, 0xC4000 },
+    { 0x1, FALSE, FALSE, 0x0, FALSE, TRUE, 0x0, HEAP_SIZE_FIELD_MAP },
+    { 0x2, TRUE, TRUE, 0x1, TRUE, FALSE, 0x10, HEAP_SIZE_FIELD_MAP },
+    { 0x3, FALSE, FALSE, 0x0, FALSE, TRUE, 0x0, HEAP_SIZE_FIELD_MAP },
+    { 0x4, TRUE, TRUE, 0x0, TRUE, TRUE, 0x1, HEAP_SIZE_FIELD_MAP },
     { 0x1, TRUE, TRUE, 0x0, TRUE, TRUE, 0x1, 0xA0000 }
 };
 
@@ -492,7 +493,7 @@ void PokemonFollower_SetScriptHidden(MapObject *follower, BOOL hidden)
 }
 
 // The follower goes back under the player and follows again, appearing once the player steps away
-// (popping out of its Poke Ball when release is set): after cutscenes and after surfing.
+// (popping out of its Poke Ball when release is set): after cutscenes, surfing and cycling.
 void PokemonFollower_ReturnToPlayer(FieldSystem *fieldSystem, BOOL release)
 {
     MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
@@ -512,30 +513,51 @@ void PokemonFollower_ReturnToPlayer(FieldSystem *fieldSystem, BOOL release)
     MapObject_SwitchMovementType(follower, MOVEMENT_TYPE_POKEMON_FOLLOWER);
 }
 
-// Starting to surf: the follower returns to its Poke Ball and waits there until the player lands.
-void PokemonFollower_RecallForSurf(FieldSystem *fieldSystem)
+// Starting to surf or cycle: the follower returns to its Poke Ball and waits there until the player
+// lands or gets off the bike (Following Platinum's surf and bicycle hooks).
+OverworldAnimManager *PokemonFollower_RecallToBall(FieldSystem *fieldSystem)
 {
     MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+    OverworldAnimManager *ballAnim = NULL;
 
     if (follower == NULL) {
-        return;
+        return NULL;
     }
 
     sub_020656AC(follower);
 
     if (!MapObject_IsHidden(follower)) {
-        PokemonFollowerBall_Play(follower, POKE_BALL_ANIMATION_RECALL, MapObject_GetDataAt(follower, POKEMON_FOLLOWER_DATA_SPECIES));
+        ballAnim = PokemonFollowerBall_Play(follower, POKE_BALL_ANIMATION_RECALL, MapObject_GetDataAt(follower, POKEMON_FOLLOWER_DATA_SPECIES));
     }
 
     PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_ARRIVING | POKEMON_FOLLOWER_FLAG_RELEASE, FALSE);
     PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_SCRIPT_HIDDEN, TRUE);
-    // it waits on the shore instead of trailing the player over the water
+    // it waits where it is instead of trailing the player (over water, at bike speed)
     MapObject_SwitchMovementType(follower, MOVEMENT_TYPE_NONE);
+
+    return ballAnim;
+}
+
+// Following Platinum: before a door/stairs/warp transition to a map the lead isn't allowed on (see
+// PokemonFollower_CanSpawn), the visible follower returns to its Poke Ball; it pops out again on
+// the next map where it may follow (see the spawn below).
+OverworldAnimManager *PokemonFollower_RecallIfCannotEnter(FieldSystem *fieldSystem, enum MapHeaderID mapHeaderID)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+    Pokemon *lead = PokemonFollower_GetLead(fieldSystem->saveData);
+
+    if (follower == NULL || lead == NULL || MapObject_IsHidden(follower)
+        || PlayerAvatar_GetPlayerState(fieldSystem->playerAvatar) == PLAYER_AVATAR_CYCLING
+        || PokemonFollower_CanSpawn(Pokemon_GetValue(lead, MON_DATA_SPECIES, NULL), mapHeaderID)) {
+        return NULL;
+    }
+
+    return PokemonFollower_RecallToBall(fieldSystem);
 }
 
 // Ported from Following Platinum's spawn routine: the lead Pokemon follows the player, starting
 // hidden on the player's own tile.
-static void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
+void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
 {
     Pokemon *lead = PokemonFollower_GetLead(fieldSystem->saveData);
 
@@ -557,12 +579,29 @@ static void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
     MapObject_SetScript(follower, SCRIPT_ID(POKEMON_FOLLOWER, 0));
     MapObject_SetDataAt(follower, species, POKEMON_FOLLOWER_DATA_SPECIES);
     MapObject_SetDataAt(follower, POKEMON_FOLLOWER_FLAG_ARRIVING | (Pokemon_IsShiny(lead) ? POKEMON_FOLLOWER_FLAG_SHINY : 0), POKEMON_FOLLOWER_DATA_FLAGS);
+
+    // back from a map where it wasn't allowed, it pops out of its Poke Ball
+    if (!PokemonFollower_CanSpawn(species, FieldOverworldState_GetPrevLocation(SaveData_GetFieldOverworldState(fieldSystem->saveData))->mapHeaderID)) {
+        PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_RELEASE, TRUE);
+    }
     MapObject_SetHidden(follower, TRUE);
     // like the player, survive walking across a map border (other objects of the old map are deleted)
     MapObject_SetFlagIsPersistent(follower, TRUE);
     MapObject_SetMovementRangeX(follower, -1);
     MapObject_SetMovementRangeZ(follower, -1);
     MapObject_SetDynamicHeightCalculationEnabled(follower, TRUE);
+
+    // while someone walks with the player (Barry on the way to Lake Verity), or the player cycles or
+    // surfs, the Pokemon stays in its Poke Ball until a script, getting off the bike or landing
+    // brings it back
+    int playerState = PlayerAvatar_GetPlayerState(fieldSystem->playerAvatar);
+
+    if (SystemFlag_CheckHasPartner(SaveData_GetVarsFlags(fieldSystem->saveData))
+        || playerState == PLAYER_AVATAR_CYCLING || playerState == PLAYER_AVATAR_SURFING) {
+        PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_ARRIVING, FALSE);
+        PokemonFollower_SetScriptHidden(follower, TRUE);
+        MapObject_SwitchMovementType(follower, MOVEMENT_TYPE_NONE);
+    }
 }
 
 static void FieldMapChange_CreateObjects(FieldSystem *fieldSystem)
@@ -727,7 +766,7 @@ void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem)
     fieldSystem->mapLoadType = MAP_LOAD_TYPE_OVERWORLD;
     FieldSystem_InitNewGameState(fieldSystem);
 #ifdef TEST_SKIP_INTRO
-    if (gTestSaveMode == 0) {
+    if (gTestSaveMode == 0 || gTestSaveMode == 4) {
         TestSave_ApplyPostgame(SaveData_GetVarsFlags(fieldSystem->saveData));
     } else if (gTestSaveMode == 2) {
         VarsFlags *varsFlags = SaveData_GetVarsFlags(fieldSystem->saveData);
@@ -736,6 +775,30 @@ void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem)
         VarsFlags_SetFlag(varsFlags, FLAG_RECEIVED_PARCEL);
         VarsFlags_ClearFlag(varsFlags, FLAG_HIDE_ROUTE_202_COUNTERPART);
         *VarsFlags_GetVarAddress(varsFlags, VAR_ROUTE_202_STATE) = 0;
+    } else if (gTestSaveMode == 3) {
+        VarsFlags *varsFlags = SaveData_GetVarsFlags(fieldSystem->saveData);
+
+        // Route 201 just before the player opens Rowan's briefcase. Following Platinum's starter
+        // objects share the counterpart's hide flag, so they need valid graphics on map load.
+        VarsFlags_ClearFlag(varsFlags, FLAG_HIDE_ROUTE_201_BRIEFCASE);
+        VarsFlags_ClearFlag(varsFlags, FLAG_HIDE_ROUTE_201_PROF_ROWAN);
+        VarsFlags_ClearFlag(varsFlags, FLAG_HIDE_ROUTE_201_COUNTERPART);
+        VarsFlags_ClearFlag(varsFlags, FLAG_HIDE_ROUTE_201_RIVAL);
+        *VarsFlags_GetVarAddress(varsFlags, VAR_FOLLOWER_RIVAL_STATE) = 1;
+
+        // the opening before it: Barry's house and Mom (Following Platinum moves the lake visit
+        // after the starters)
+        VarsFlags_SetFlag(varsFlags, FLAG_RIVAL_LEFT_HOME);
+        VarsFlags_SetFlag(varsFlags, FLAG_TALKED_TO_MOM);
+        VarsFlags_SetFlag(varsFlags, FLAG_HIDE_TWINLEAF_TOWN_PLAYER_HOUSE_2F_RIVAL);
+        *VarsFlags_GetVarAddress(varsFlags, VAR_RIVAL_HOUSE_STATE) = 1;
+        *VarsFlags_GetVarAddress(varsFlags, VAR_PLAYER_HOUSE_RIVAL_STATE) = 1;
+        *VarsFlags_GetVarAddress(varsFlags, VAR_PLAYER_HOUSE_STATE) = 2;
+        *VarsFlags_GetVarAddress(varsFlags, VAR_PLAYER_HOUSE_SPECIAL_PROGRAM_STATE) = 1;
+        *VarsFlags_GetVarAddress(varsFlags, VAR_TWINLEAF_TOWN_GUITARIST_TRIGGER_STATE) = 2;
+        *VarsFlags_GetVarAddress(varsFlags, VAR_TWINLEAF_TOWN_RIVAL_TRIGGER_STATE) = 1;
+        *VarsFlags_GetVarAddress(varsFlags, VAR_OBJ_GFX_ID_1) = OBJ_EVENT_GFX_FOLLOWER_CHIMCHAR;
+        *VarsFlags_GetVarAddress(varsFlags, VAR_OBJ_GFX_ID_2) = OBJ_EVENT_GFX_FOLLOWER_TURTWIG;
     }
 #endif
     FieldSystem_CreateTask(fieldSystem, FieldTask_LoadNewGameSpawn, NULL);

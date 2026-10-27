@@ -36,7 +36,7 @@ NEW = {
     218: 'follower_emote_poison.nsbtx',
     219: 'follower_emote_silence.nsbtx',
     220: 'follower_emote_sleep.nsbtx',
-    221: 'follower_unknown_221.nsbmd',
+    221: 'follower_reflection_large.nsbmd',
 }
 EDITED = [20, 69, 70, 72, 73]
 

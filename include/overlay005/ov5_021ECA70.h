@@ -20,5 +20,8 @@ Billboard *ov5_021ECB8C(UnkStruct_ov5_021ECB8C *param0);
 
 void PokemonFollowerRenderer_Update(MapObject *mapObj);
 void PokemonFollowerRenderer_Refresh(MapObject *mapObj);
+BOOL PokemonFollowerRenderer_IsFollowerSprite(MapObject *mapObj);
+BOOL PokemonFollowerRenderer_IsLargeSprite(MapObject *mapObj);
+void PokemonFollowerRenderer_ApplyOffset(MapObject *mapObj, int dir, VecFx32 *offset);
 
 #endif // POKEPLATINUM_OV5_021ECA70_H

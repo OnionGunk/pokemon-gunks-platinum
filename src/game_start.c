@@ -137,7 +137,7 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     String_Free(rivalNameString);
 
     // story start: a plain new game, so story cutscenes can be tested from the beginning
-    if (gTestSaveMode == 1) {
+    if (gTestSaveMode == 1 || gTestSaveMode == 3) {
         goto testSaveDone;
     }
 
@@ -168,6 +168,12 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_MASTER_BALL, 99, HEAP_ID_GAME_START);
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_DEXNAV, 1, HEAP_ID_GAME_START);
     Bag_RegisterItem(SaveData_GetBag(saveData), ITEM_DEXNAV);
+    Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_BICYCLE, 1, HEAP_ID_GAME_START);
+
+    // post-game test save with the Bicycle on Select instead of the DexNav
+    if (gTestSaveMode == 4) {
+        Bag_RegisterItem(SaveData_GetBag(saveData), ITEM_BICYCLE);
+    }
     // six varied Pokemon for follower checks; the emulator harness picks the lead via gTestLeadSpecies
     static const u16 sTestParty[] = { SPECIES_PIKACHU, SPECIES_PIPLUP, SPECIES_LUCARIO, SPECIES_STARAPTOR, SPECIES_STEELIX, SPECIES_GYARADOS };
     // bit 15 of gTestLeadSpecies makes the lead shiny

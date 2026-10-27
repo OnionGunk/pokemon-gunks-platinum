@@ -15,6 +15,7 @@
 #include "field_task.h"
 #include "location.h"
 #include "menu.h"
+#include "overworld_anim_manager.h"
 #include "string.h"
 
 typedef struct MapChangeUndergroundContext {
@@ -67,6 +68,8 @@ MapObject *PokemonFollower_GetMapObject(FieldSystem *fieldSystem);
 void PokemonFollower_SetFlag(MapObject *follower, int flag, BOOL set);
 void PokemonFollower_SetScriptHidden(MapObject *follower, BOOL hidden);
 void PokemonFollower_ReturnToPlayer(FieldSystem *fieldSystem, BOOL release);
-void PokemonFollower_RecallForSurf(FieldSystem *fieldSystem);
+OverworldAnimManager *PokemonFollower_RecallToBall(FieldSystem *fieldSystem);
+void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem);
+OverworldAnimManager *PokemonFollower_RecallIfCannotEnter(FieldSystem *fieldSystem, enum MapHeaderID mapHeaderID);
 
 #endif // POKEPLATINUM_FIELD_MAP_CHANGE_H

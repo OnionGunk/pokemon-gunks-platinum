@@ -25,6 +25,8 @@ typedef struct FieldWarp {
     MapObject *player;
     FieldSystem *fieldSystem;
     Pokemon *mon;
+    MapObject *follower; // Following Platinum: spins with the player
+    SysTask *followerAnimationTask;
 } FieldWarp;
 
 FieldWarp *FieldWarp_InitEscapeRope(FieldSystem *fieldSystem, enum HeapID heapID);

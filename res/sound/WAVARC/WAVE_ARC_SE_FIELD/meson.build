@@ -25,6 +25,7 @@ WAVE_ARC_SE_FIELD = custom_target('WAVE_ARC_SE_FIELD.swar',
         '022.wav',
         '023.wav',
         '024.wav',
+        '025.wav',
     ]),],
     output: 'WAVE_ARC_SE_FIELD.swar',
     command: [

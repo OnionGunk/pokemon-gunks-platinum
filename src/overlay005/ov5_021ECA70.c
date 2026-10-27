@@ -203,15 +203,36 @@ static void PokemonFollowerRenderer_ApplyShiny(MapObject *mapObj, Billboard *bil
     }
 }
 
-static void PokemonFollowerRenderer_ApplyOffset(MapObject *mapObj, int dir, VecFx32 *offset)
+static const u8 *PokemonFollowerRenderer_GetSpriteOffsets(MapObject *mapObj)
 {
     int index = MapObject_GetGraphicsID(mapObj) - FOLLOWER_FIRST_GFX;
 
     if (index < 0 || index >= NELEMS(sFollowerSpriteOffsets)) {
-        return;
+        return NULL;
     }
 
-    const u8 *push = sFollowerSpriteOffsets[index];
+    return sFollowerSpriteOffsets[index];
+}
+
+BOOL PokemonFollowerRenderer_IsLargeSprite(MapObject *mapObj)
+{
+    const u8 *offsets = PokemonFollowerRenderer_GetSpriteOffsets(mapObj);
+
+    return offsets != NULL && offsets[3] == 2;
+}
+
+BOOL PokemonFollowerRenderer_IsFollowerSprite(MapObject *mapObj)
+{
+    return PokemonFollowerRenderer_GetSpriteOffsets(mapObj) != NULL;
+}
+
+void PokemonFollowerRenderer_ApplyOffset(MapObject *mapObj, int dir, VecFx32 *offset)
+{
+    const u8 *push = PokemonFollowerRenderer_GetSpriteOffsets(mapObj);
+
+    if (push == NULL) {
+        return;
+    }
 
     switch (dir) {
     case DIR_NORTH:

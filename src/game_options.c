@@ -3,6 +3,7 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "game_overlay.h"
 #include "heap.h"
 #include "save_player.h"
 #include "savedata.h"
@@ -34,23 +35,32 @@ void Options_Init(Options *options)
     options->frame = OPTIONS_FRAME_1;
 }
 
+FS_EXTERN_OVERLAY(battle);
+
+static enum OptionsButtonMode sFrameRateUnlockMode;
+
+// Following Platinum replaces the button mode option with "UNLOCK FPS": the stored button mode
+// is OFF (normal), BATTLE (unlocked in battles) or ALWAYS, and the buttons are never remapped.
 void Options_SetSystemButtonMode(SaveData *saveData, enum OptionsButtonMode mode)
 {
     if (saveData != NULL) {
         mode = Options_ButtonMode(SaveData_GetOptions(saveData));
     }
 
-    switch (mode) {
-    case OPTIONS_BUTTON_MODE_START_IS_X:
-        gSystem.buttonMode = BUTTON_MODE_START_IS_X;
-        break;
-    case OPTIONS_BUTTON_MODE_L_IS_A:
-        gSystem.buttonMode = BUTTON_MODE_L_IS_A;
-        break;
-    case OPTIONS_BUTTON_MODE_NORMAL:
+    sFrameRateUnlockMode = mode;
+    gSystem.buttonMode = BUTTON_MODE_NORMAL;
+}
+
+// The game runs its main loop at 30 fps (two V-blanks per frame); unlocked, it waits for one.
+BOOL Options_IsFrameRateUnlocked(void)
+{
+    switch (sFrameRateUnlockMode) {
+    case OPTIONS_FRAME_RATE_UNLOCK_BATTLE:
+        return Overlay_IsLoaded(FS_OVERLAY_ID(battle));
+    case OPTIONS_FRAME_RATE_UNLOCK_ALWAYS:
+        return TRUE;
     default:
-        gSystem.buttonMode = BUTTON_MODE_NORMAL;
-        break;
+        return FALSE;
     }
 }
 

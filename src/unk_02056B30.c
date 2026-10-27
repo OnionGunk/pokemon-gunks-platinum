@@ -29,6 +29,7 @@
 #include "map_header.h"
 #include "map_object.h"
 #include "map_tile_behavior.h"
+#include "overworld_anim_manager.h"
 #include "player_avatar.h"
 #include "screen_fade.h"
 #include "sound_playback.h"
@@ -41,6 +42,7 @@ typedef struct {
     Location unk_08;
     void *unk_1C;
     int unk_20;
+    OverworldAnimManager *followerBall;
 } UnkStruct_02056BDC;
 
 typedef struct {
@@ -144,6 +146,7 @@ void sub_02056BDC(FieldSystem *fieldSystem, const int param1, const int param2, 
 
     v0->unk_00 = 0;
     v0->unk_04 = 0;
+    v0->followerBall = NULL;
 
     Location_Set(&v0->unk_08, param1, param2, param3, param4, param5);
 
@@ -158,6 +161,7 @@ void sub_02056C18(FieldSystem *fieldSystem, const int param1, const int param2, 
 
     v2->unk_00 = 0;
     v2->unk_04 = 0;
+    v2->followerBall = NULL;
 
     Location_Set(&v2->unk_08, param1, param2, param3, param4, param5);
 
@@ -209,6 +213,17 @@ static BOOL sub_02056CFC(FieldTask *taskMan)
 
     switch (v1->unk_00) {
     case 0:
+        // Following Platinum: going through a door, stairs or warp to a map where the follower
+        // can't go, it first returns to its Poke Ball
+        if (v1->unk_04 == 0) {
+            v1->unk_04 = 1;
+            v1->followerBall = PokemonFollower_RecallIfCannotEnter(fieldSystem, v2->mapHeaderID);
+        }
+
+        if (v1->followerBall != NULL && OverworldAnimManager_IsActive(v1->followerBall)) {
+            break;
+        }
+
         v1->unk_04 = 0;
         FieldBGM_TryFadeIn(fieldSystem, v2->mapHeaderID);
         FieldTask_InitCall(taskMan, Unk_020EC560[v1->unk_20], v1);

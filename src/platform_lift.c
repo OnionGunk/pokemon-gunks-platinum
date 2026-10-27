@@ -15,7 +15,9 @@
 
 #include "field_system.h"
 #include "field_task.h"
+#include "field_map_change.h"
 #include "heap.h"
+#include "map_object.h"
 #include "persisted_map_features.h"
 #include "player_avatar.h"
 #include "savedata_misc.h"
@@ -91,6 +93,21 @@ typedef struct PlatformLiftFieldTaskEnv {
     BOOL isIronIslandB2FLeftRoom;
     int kind;
 } PlatformLiftFieldTaskEnv;
+
+// Following Platinum: the Pokemon following the player rides the lift with them
+static void PlatformLift_MovePokemonFollower(FieldSystem *fieldSystem, fx32 y)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+    VecFx32 pos;
+
+    if (follower == NULL) {
+        return;
+    }
+
+    MapObject_GetPosPtr(follower, &pos);
+    pos.y = y;
+    MapObject_SetPos(follower, &pos);
+}
 
 static BOOL FieldTask_PlatformLiftGoUp(FieldTask *taskMan);
 static BOOL FieldTask_PlatformLiftGoDown(FieldTask *taskMan);
@@ -398,6 +415,7 @@ static BOOL FieldTask_PlatformLiftGoUp(FieldTask *taskMan)
         }
 
         Player_SetYPos(fieldSystem->playerAvatar, platformLiftPosition.y);
+        PlatformLift_MovePokemonFollower(fieldSystem, platformLiftPosition.y);
         MapProp_SetPosition(platformLiftMapProp, &platformLiftPosition);
 
         break;
@@ -460,6 +478,7 @@ static BOOL FieldTask_PlatformLiftGoDown(FieldTask *taskMan)
         }
 
         Player_SetYPos(fieldSystem->playerAvatar, platformLiftPosition.y);
+        PlatformLift_MovePokemonFollower(fieldSystem, platformLiftPosition.y);
         MapProp_SetPosition(platformLiftMapProp, &platformLiftPosition);
 
         break;

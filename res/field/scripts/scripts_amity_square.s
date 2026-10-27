@@ -2,6 +2,7 @@
 #include "res/text/bank/amity_square.h"
 #include "res/field/events/events_amity_square.h"
 #include "generated/object_events_gfx.h"
+#define LOCALID_POKEMON_FOLLOWER 253
 
 #define LOCAL_VAR_HAS_NATIONAL_DEX        VAR_MAP_LOCAL_0x00
 #define LOCAL_VAR_FOLLOWER_MON_ID         VAR_0x8002
@@ -10,12 +11,11 @@
 #define PICKUP_TYPE_ITEM                  0
 #define PICKUP_TYPE_ACCESSORY             1
 
-
     ScriptEntry AmitySquare_OnTransition
-    ScriptEntry AmitySquare_CoordEvent_WestGate
-    ScriptEntry AmitySquare_CoordEvent_ExitAmitySquare
-    ScriptEntry AmitySquare_CoordEvent_EastGate
-    ScriptEntry AmitySquare_CoordEvent_ExitAmitySquare
+    ScriptEntry AmitySquare_ListPermittedSpecies
+    ScriptEntry AmitySquare_CheckCurrentSlotAllowedMon
+    ScriptEntry AmitySquare_ListPermittedSpecies_NationalDex
+    ScriptEntry AmitySquare_CheckCurrentSlotAllowedMon
     ScriptEntry AmitySquare_FollowerMon
     ScriptEntry AmitySquare_WestReceptionist
     ScriptEntry AmitySquare_EastReceptionist
@@ -60,6 +60,9 @@
 
 AmitySquare_OnTransition:
     SetFlag FLAG_FIRST_ARRIVAL_AMITY_SQUARE
+    GetPokemonFollowerPartySlot VAR_MAP_LOCAL_0x02
+    SetVarFromVar VAR_FOLLOWER_MON_PARTY_ID, VAR_MAP_LOCAL_0x02
+    GetPartyMonSpecies VAR_FOLLOWER_MON_PARTY_ID, VAR_FOLLOWER_MON_SPECIES
     SetFlag FLAG_HIDE_AMITY_SQUARE_FOLLOWER_MON
     CalcAmitySquareBerryAndAccessoryManOptionID VAR_AMITY_SQUARE_GIFT_ID
     GetRandom VAR_MAP_LOCAL_0x02, 5
@@ -86,139 +89,50 @@ AmitySquare_SetGiftManPosition3:
     End
 
 AmitySquare_CoordEvent_WestGate:
-    LockAll
-    SetVar VAR_0x8001, 1
-    ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerWalkOnSpotWest
-    WaitMovement
-    GoTo AmitySquare_CheckHasNationalDex
     End
 
 AmitySquare_CoordEvent_EastGate:
-    LockAll
-    SetVar VAR_0x8001, 2
-    ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerWalkOnSpotEast
-    WaitMovement
-    GoTo AmitySquare_CheckHasNationalDex
     End
 
 AmitySquare_CheckHasNationalDex:
-    GetNationalDexEnabled VAR_RESULT
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_HasNationalDex
-    GoTo AmitySquare_DoesntHaveNationalDex
     End
 
 AmitySquare_DoesntHaveNationalDex:
-    SetVar LOCAL_VAR_HAS_NATIONAL_DEX, FALSE
-    GoTo AmitySquare_CheckPartyHasSpecies
     End
 
 AmitySquare_ListPermittedSpecies:
-    Message AmitySquare_Text_PermittedList
-    CloseMessage
-    ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerWalkSouth
-    WaitMovement
-    ReleaseAll
     End
 
 AmitySquare_HasNationalDex:
-    SetVar LOCAL_VAR_HAS_NATIONAL_DEX, TRUE
-    GoTo AmitySquare_CheckPartyHasSpecies_NationalDex
     End
 
 AmitySquare_ListPermittedSpecies_NationalDex:
-    Message AmitySquare_Text_PermittedListNationalDex
-    CloseMessage
-    ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerWalkSouth
-    WaitMovement
-    ReleaseAll
     End
 
 AmitySquare_InitCheckAllowedMonVars:
-    SetVar VAR_MAP_LOCAL_0x0A, 0
-    GetPartyCount VAR_MAP_LOCAL_0x0B
-    SetVar VAR_MAP_LOCAL_0x0C, 0
-    GoTo AmitySquare_CheckCurrentSlotAllowedMon
     End
 
 AmitySquare_CheckCurrentSlotAllowedMon:
-    GetPartyMonSpecies VAR_MAP_LOCAL_0x0A, VAR_RESULT
-    GoToIfEq VAR_RESULT, SPECIES_NONE, AmitySquare_TryCheckNextSlotAllowedMon
-    CallIfEq LOCAL_VAR_HAS_NATIONAL_DEX, FALSE, AmitySquare_CheckAllowedMon
-    CallIfEq LOCAL_VAR_HAS_NATIONAL_DEX, TRUE, AmitySquare_CheckAllowedMon_NationalDex
-    GoToIfEq VAR_RESULT, FALSE, AmitySquare_TryCheckNextSlotAllowedMon
-    BufferPartyMonNickname 0, VAR_MAP_LOCAL_0x0A
-    GoToIfEq VAR_MAP_LOCAL_0x0C, 0, AmitySquare_AskGoWithFirstAllowedMon
-    GoToIfNe VAR_MAP_LOCAL_0x0C, 0, AmitySquare_AskGoWithOtherAllowedMon
     End
 
 AmitySquare_AskGoWithFirstAllowedMon:
-    AddVar VAR_MAP_LOCAL_0x0C, 1
-    Message AmitySquare_Text_OkWouldYouLikeToGoForAStrollWithYourPokemon
-    ShowYesNoMenu VAR_RESULT
-    GoToIfEq VAR_RESULT, MENU_YES, AmitySquare_SetFollowerMon
-    GoTo AmitySquare_TryCheckNextSlotAllowedMon
     End
 
 AmitySquare_AskGoWithOtherAllowedMon:
-    AddVar VAR_MAP_LOCAL_0x0C, 1
-    Message AmitySquare_Text_OhOkThenYouWouldRatherGoForAStrollWithYourPokemon
-    ShowYesNoMenu VAR_RESULT
-    GoToIfEq VAR_RESULT, MENU_YES, AmitySquare_SetFollowerMon
-    GoTo AmitySquare_TryCheckNextSlotAllowedMon
     End
 
 AmitySquare_TryCheckNextSlotAllowedMon:
-    AddVar VAR_MAP_LOCAL_0x0A, 1
-    SubVar VAR_MAP_LOCAL_0x0B, 1
-    GoToIfNe VAR_MAP_LOCAL_0x0B, 0, AmitySquare_CheckCurrentSlotAllowedMon
-    Message AmitySquare_Text_ISeePleaseComeBack
-    CloseMessage
-    ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerWalkSouth
-    WaitMovement
-    ReleaseAll
-    End
 
 AmitySquare_SetFollowerMon:
-    HealParty
-    FadeScreenOut
-    WaitFadeScreen
-    SetVar VAR_FOLLOWER_MON_PARTY_ID, VAR_MAP_LOCAL_0x0A
-    GetPartyMonSpecies VAR_MAP_LOCAL_0x0A, VAR_FOLLOWER_MON_SPECIES
-    GoTo AmitySquare_SetFollowerGfx
     End
 
 AmitySquare_FadeIn:
-    FadeScreenIn
-    WaitFadeScreen
-    End
 
 AmitySquare_EnterWithFollowerMon:
-    AddObject LOCAL_VAR_FOLLOWER_MON_ID
-    CallIfEq VAR_0x8001, 1, AmitySquare_SetFollowerMonPositionWestGate
-    CallIfEq VAR_0x8001, 2, AmitySquare_SetFollowerMonPositionEastGate
-    FadeScreenIn
-    WaitFadeScreen
-    SetVar VAR_FOLLOWER_MON_ACTIVE, TRUE
-    ClearAmitySquareStepCount
-    Call AmitySquare_FollowerMon_SetNextPickUpType
-    ScrCmd_27C 0, VAR_FOLLOWER_MON_PARTY_ID
-    Message AmitySquare_Text_PleaseDoEnjoyYourTimeTogether
-    CloseMessage
-    ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_WalkNorth
-    ApplyMovement LOCAL_VAR_FOLLOWER_MON_ID, AmitySquare_Movement_WalkNorth
-    WaitMovement
-    SetHasPartner
-    SetMovementType LOCAL_VAR_FOLLOWER_MON_ID, MOVEMENT_TYPE_FOLLOW_PLAYER
-    ReleaseAll
-    End
 
 AmitySquare_SetFollowerMonPositionWestGate:
-    SetPosition LOCAL_VAR_FOLLOWER_MON_ID, 12, 2, 47, DIR_WEST
-    Return
 
 AmitySquare_SetFollowerMonPositionEastGate:
-    SetPosition LOCAL_VAR_FOLLOWER_MON_ID, 51, 2, 47, DIR_EAST
-    Return
 
 AmitySquare_Unused:
     FadeScreenIn
@@ -231,48 +145,24 @@ AmitySquare_Unused:
     End
 
 AmitySquare_CoordEvent_ExitAmitySquare:
-    LockAll
-    FadeScreenOut
-    WaitFadeScreen
-    ClearHasPartner
-    GoTo AmitySquare_RemoveFollower
     End
 
 AmitySquare_RemoveFollower:
-    RemoveObject LOCALID_FOLLOWER_MON
-    GoTo AmitySquare_CoordEvent_ExitAmitySquare_End
     End
 
 AmitySquare_CoordEvent_ExitAmitySquare_End:
-    FadeScreenIn
-    WaitFadeScreen
-    SetVar VAR_FOLLOWER_MON_ACTIVE, FALSE
-    Message AmitySquare_Text_AreYouFeelingRefreshedPleaseComeAgainOk
-    CloseMessage
-    ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerWalkSouth
-    WaitMovement
-    ReleaseAll
-    End
 
     .balign 4, 0
 AmitySquare_Movement_PlayerWalkOnSpotWest:
-    WalkOnSpotNormalWest
-    EndMovement
 
     .balign 4, 0
 AmitySquare_Movement_PlayerWalkOnSpotEast:
-    WalkOnSpotNormalEast
-    EndMovement
 
     .balign 4, 0
 AmitySquare_Movement_PlayerWalkSouth:
-    WalkNormalSouth
-    EndMovement
 
     .balign 4, 0
 AmitySquare_Movement_WalkNorth:
-    WalkNormalNorth
-    EndMovement
 
 AmitySquare_Movement_Unused:
     WalkFastestSouth 2
@@ -644,264 +534,81 @@ AmitySquare_Clefairy:
     End
 
 AmitySquare_CheckPartyHasSpecies:
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PIKACHU
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_CLEFAIRY
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PSYDUCK
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PACHIRISU
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_DRIFLOON
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_BUNEARY
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_HAPPINY
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_TURTWIG
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_GROTLE
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_TORTERRA
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_CHIMCHAR
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_MONFERNO
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_INFERNAPE
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PIPLUP
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PRINPLUP
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_EMPOLEON
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    GoTo AmitySquare_ListPermittedSpecies
     End
 
 AmitySquare_CheckPartyHasSpecies_NationalDex:
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PIKACHU
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_CLEFAIRY
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PSYDUCK
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PACHIRISU
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_DRIFLOON
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_BUNEARY
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_HAPPINY
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_JIGGLYPUFF
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_TORCHIC
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_SKITTY
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_SHROOMISH
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_TURTWIG
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_GROTLE
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_TORTERRA
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_CHIMCHAR
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_MONFERNO
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_INFERNAPE
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PIPLUP
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_PRINPLUP
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    CheckPartyHasSpecies VAR_RESULT, SPECIES_EMPOLEON
-    GoToIfEq VAR_RESULT, TRUE, AmitySquare_InitCheckAllowedMonVars
-    GoTo AmitySquare_ListPermittedSpecies_NationalDex
     End
 
 AmitySquare_CheckAllowedMon:
-    GetPartyMonSpecies VAR_MAP_LOCAL_0x0A, VAR_RESULT
-    GoToIfEq VAR_RESULT, SPECIES_PIKACHU, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_CLEFAIRY, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PSYDUCK, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PACHIRISU, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_DRIFLOON, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_BUNEARY, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_HAPPINY, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_TURTWIG, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_GROTLE, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_TORTERRA, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_CHIMCHAR, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_MONFERNO, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_INFERNAPE, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PIPLUP, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PRINPLUP, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_EMPOLEON, AmitySquare_SetMonAllowedFlag
-    SetVar VAR_RESULT, FALSE
-    Return
 
 AmitySquare_SetMonAllowedFlag:
-    SetVar VAR_RESULT, TRUE
-    Return
 
 AmitySquare_CheckAllowedMon_NationalDex:
-    GetPartyMonSpecies VAR_MAP_LOCAL_0x0A, VAR_RESULT
-    GoToIfEq VAR_RESULT, SPECIES_PIKACHU, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_CLEFAIRY, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PSYDUCK, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PACHIRISU, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_DRIFLOON, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_BUNEARY, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_HAPPINY, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_JIGGLYPUFF, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_TORCHIC, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_SKITTY, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_SHROOMISH, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_TURTWIG, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_GROTLE, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_TORTERRA, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_CHIMCHAR, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_MONFERNO, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_INFERNAPE, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PIPLUP, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_PRINPLUP, AmitySquare_SetMonAllowedFlag
-    GoToIfEq VAR_RESULT, SPECIES_EMPOLEON, AmitySquare_SetMonAllowedFlag
-    SetVar VAR_RESULT, FALSE
-    Return
 
 AmitySquare_SetFollowerGfx:
-    SetVar VAR_0x8008, VAR_FOLLOWER_MON_SPECIES
-    GoToIfEq VAR_0x8008, SPECIES_PIKACHU, AmitySquare_SetFollowerGfx_Pikachu
-    GoToIfEq VAR_0x8008, SPECIES_TORCHIC, AmitySquare_SetFollowerGfx_Torchic
-    GoToIfEq VAR_0x8008, SPECIES_CLEFAIRY, AmitySquare_SetFollowerGfx_Clefairy
-    GoToIfEq VAR_0x8008, SPECIES_PSYDUCK, AmitySquare_SetFollowerGfx_Psyduck
-    GoToIfEq VAR_0x8008, SPECIES_PACHIRISU, AmitySquare_SetFollowerGfx_Pachirisu
-    GoToIfEq VAR_0x8008, SPECIES_DRIFLOON, AmitySquare_SetFollowerGfx_Drifloon
-    GoToIfEq VAR_0x8008, SPECIES_BUNEARY, AmitySquare_SetFollowerGfx_Buneary
-    GoToIfEq VAR_0x8008, SPECIES_HAPPINY, AmitySquare_SetFollowerGfx_Happiny
-    GoToIfEq VAR_0x8008, SPECIES_JIGGLYPUFF, AmitySquare_SetFollowerGfx_Jigglypuff
-    GoToIfEq VAR_0x8008, SPECIES_SKITTY, AmitySquare_SetFollowerGfx_Skitty
-    GoToIfEq VAR_0x8008, SPECIES_SHROOMISH, AmitySquare_SetFollowerGfx_Shroomish
-    GoToIfEq VAR_0x8008, SPECIES_TURTWIG, AmitySquare_SetFollowerGfx_Turtwig
-    GoToIfEq VAR_0x8008, SPECIES_GROTLE, AmitySquare_SetFollowerGfx_Grottle
-    GoToIfEq VAR_0x8008, SPECIES_TORTERRA, AmitySquare_SetFollowerGfx_Torterra
-    GoToIfEq VAR_0x8008, SPECIES_CHIMCHAR, AmitySquare_SetFollowerGfx_Chimchar
-    GoToIfEq VAR_0x8008, SPECIES_MONFERNO, AmitySquare_SetFollowerGfx_Monferno
-    GoToIfEq VAR_0x8008, SPECIES_INFERNAPE, AmitySquare_SetFollowerGfx_Infernape
-    GoToIfEq VAR_0x8008, SPECIES_PIPLUP, AmitySquare_SetFollowerGfx_Piplup
-    GoToIfEq VAR_0x8008, SPECIES_PRINPLUP, AmitySquare_SetFollowerGfx_Prinplup
-    GoToIfEq VAR_0x8008, SPECIES_EMPOLEON, AmitySquare_SetFollowerGfx_Empoleon
-    GoTo AmitySquare_FadeIn
     End
 
 AmitySquare_SetFollowerGfx_Pikachu:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_PIKACHU
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Torchic:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_TORCHIC
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Clefairy:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_CLEFAIRY
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Psyduck:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_PSYDUCK
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Pachirisu:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_PACHIRISU
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Drifloon:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_DRIFLOON
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Buneary:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_BUNEARY
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Happiny:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_HAPPINY
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Jigglypuff:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_JIGGLYPUFF
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Skitty:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_SKITTY
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Shroomish:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_SHROOMISH
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Turtwig:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_TURTWIG
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Grottle:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_GROTLE
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Torterra:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_TORTERRA
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Chimchar:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_CHIMCHAR
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Monferno:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_MONFERNO
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Infernape:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_INFERNAPE
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Piplup:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_PIPLUP
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Prinplup:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_PRINPLUP
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_SetFollowerGfx_Empoleon:
-    SetVar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_EMPOLEON
-    GoTo AmitySquare_PrepareShowFollower
     End
 
 AmitySquare_PrepareShowFollower:
-    SetVar LOCAL_VAR_FOLLOWER_MON_ID, LOCALID_FOLLOWER_MON
-    ClearFlag FLAG_HIDE_AMITY_SQUARE_FOLLOWER_MON
-    GoTo AmitySquare_EnterWithFollowerMon
     End
 
 AmitySquare_FollowerMon:
@@ -1119,8 +826,7 @@ AmitySquare_DoWarp:
     WaitTime 1, VAR_RESULT
     ScrCmd_32D
     ScrCmd_338
-    ApplyMovement LOCALID_FOLLOWER_MON, AmitySquare_Movement_FollowerMonFaceSouthSetInvisible
-    WaitMovement
+    HidePokemonFollower
     PlaySE SEQ_SE_DP_GYURU_sseq
     CallIfEq VAR_0x8003, 1, AmitySquare_SetPositionsWarp1
     CallIfEq VAR_0x8003, 2, AmitySquare_SetPositionsWarp2
@@ -1153,8 +859,6 @@ AmitySquare_DoWarp:
     WaitMovement
     FadeScreenIn
     WaitFadeScreen
-    ApplyMovement LOCALID_FOLLOWER_MON, AmitySquare_Movement_FaceSouthSetVisible
-    WaitMovement
     ReleaseAll
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerExitHutWalkSouth
     WaitMovement
@@ -1166,163 +870,163 @@ AmitySquare_DoWarp:
 AmitySquare_SetPositionsWarp1:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp1
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 35, 2, 15, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 35, 2, 17, 1
     Return
 
 AmitySquare_SetPositionsWarp2:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp2
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 35, 2, 15, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 35, 2, 17, 1
     Return
 
 AmitySquare_SetPositionsWarp3:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp3
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 35, 2, 15, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 35, 2, 17, 1
     Return
 
 AmitySquare_SetPositionsWarp4:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp4
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 17, 2, 16, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 17, 2, 18, 1
     Return
 
 AmitySquare_SetPositionsWarp5:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp5
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 17, 2, 16, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 17, 2, 18, 1
     Return
 
 AmitySquare_SetPositionsWarp6:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp6
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 17, 2, 16, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 17, 2, 18, 1
     Return
 
 AmitySquare_SetPositionsWarp7:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp7
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 47, 4, 8, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 47, 4, 10, 1
     Return
 
 AmitySquare_SetPositionsWarp8:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp8
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 33, 5, 7, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 33, 5, 9, 1
     Return
 
 AmitySquare_SetPositionsWarp9:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp9
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 15, 4, 10, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 15, 4, 12, 1
     Return
 
 AmitySquare_SetPositionsWarp10:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp10
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 52, 4, 25, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 52, 4, 27, 1
     Return
 
 AmitySquare_SetPositionsWarp11:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp11
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 15, 4, 10, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 15, 4, 12, 1
     Return
 
 AmitySquare_SetPositionsWarp12:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp12
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 33, 5, 7, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 33, 5, 9, 1
     Return
 
 AmitySquare_SetPositionsWarp13:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp13
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 52, 4, 25, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 52, 4, 27, 1
     Return
 
 AmitySquare_SetPositionsWarp14:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp14
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 26, 6, 9, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 26, 6, 11, 1
     Return
 
 AmitySquare_SetPositionsWarp15:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp15
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 41, 3, 16, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 41, 3, 18, 1
     Return
 
 AmitySquare_SetPositionsWarp16:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp16
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 52, 4, 25, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 52, 4, 27, 1
     Return
 
 AmitySquare_SetPositionsWarp17:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp17
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 41, 3, 16, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 41, 3, 18, 1
     Return
 
 AmitySquare_SetPositionsWarp18:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp18
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 26, 6, 9, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 26, 6, 11, 1
     Return
 
 AmitySquare_SetPositionsWarp19:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp19
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 47, 4, 8, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 47, 4, 10, 1
     Return
 
 AmitySquare_SetPositionsWarp20:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp20
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 47, 2, 34, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 47, 2, 36, 1
     Return
 
 AmitySquare_SetPositionsWarp21:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp21
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 15, 4, 10, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 15, 4, 12, 1
     Return
 
 AmitySquare_SetPositionsWarp22:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp22
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 47, 4, 8, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 47, 4, 10, 1
     Return
 
 AmitySquare_SetPositionsWarp23:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp23
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 33, 5, 7, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 33, 5, 9, 1
     Return
 
 AmitySquare_SetPositionsWarp24:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp24
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 47, 2, 34, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 47, 2, 36, 1
     Return
 
 AmitySquare_SetPositionsWarp25:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp25
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 52, 4, 25, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 52, 4, 27, 1
     Return
 
 AmitySquare_SetPositionsWarp26:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp26
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 15, 4, 10, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 15, 4, 12, 1
     Return
 
 AmitySquare_SetPositionsWarp27:
     ApplyMovement LOCALID_PLAYER, AmitySquare_Movement_PlayerGoToDestinationWarp27
     WaitMovement
-    SetPosition LOCALID_FOLLOWER_MON, 33, 5, 7, DIR_SOUTH
+    SetPosition LOCALID_POKEMON_FOLLOWER, 33, 5, 9, 1
     Return
 
 AmitySquare_Dummy45:
@@ -1333,9 +1037,6 @@ AmitySquare_Dummy45:
 
     .balign 4, 0
 AmitySquare_Movement_FollowerMonFaceSouthSetInvisible:
-    FaceSouth
-    SetInvisible
-    EndMovement
 
     .balign 4, 0
 AmitySquare_Movement_FaceSouthSetVisible:

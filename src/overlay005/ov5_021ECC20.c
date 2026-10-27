@@ -9,6 +9,7 @@
 #include "overlay005/object_event_gfx_data.h"
 #include "overlay005/ov5_021ECE40.h"
 #include "overlay005/struct_ov5_021ED0A4.h"
+#include "overlay005/ov5_021ECA70.h"
 
 #include "heap.h"
 #include "map_object.h"
@@ -70,7 +71,9 @@ void MapObject_Draw(MapObject *param0)
         return;
     }
 
-    if ((MapObject_IsMovementPaused(param0) == 0) || sub_02062F7C(param0)) {
+    // Following Platinum: Pokemon (the follower, starters, scripted Pokemon) keep walking in place
+    // during conversations
+    if ((MapObject_IsMovementPaused(param0) == 0) || sub_02062F7C(param0) || PokemonFollowerRenderer_IsFollowerSprite(param0)) {
         sub_02062B68(param0);
     }
 }

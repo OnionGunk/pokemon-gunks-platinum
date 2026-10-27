@@ -15,8 +15,10 @@
 #include "generated/abilities.h"
 #include "generated/game_records.h"
 #include "generated/genders.h"
+#include "generated/trainers.h"
 
 #include "struct_decls/battle_system.h"
+#include "struct_defs/battle_system.h"
 #include "struct_defs/battler_data.h"
 #include "struct_defs/fraction.h"
 
@@ -66,6 +68,24 @@ static BOOL MoveCannotTriggerAnticipation(BattleContext *battleCtx, int move);
 static int CalcMoveType(BattleSystem *battleSys, BattleContext *battleCtx, int item, int move);
 
 static const Fraction sStatStageBoosts[];
+
+// Following Platinum: the player's follower runs in and out of battle instead of using its Poke Ball,
+// and so do both starters in the first rival battle, which were sent out on Route 201 beforehand
+static BOOL BattleSystem_MonEntersWithoutBall(BattleSystem *battleSys, int battler, int partySlot)
+{
+    u16 enemyTrainer = battleSys->trainerIDs[BATTLER_ENEMY_1];
+    u32 battleType = BattleSystem_GetBattleType(battleSys);
+
+    if (battleType & (BATTLE_TYPE_LINK | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PAL_PARK | BATTLE_TYPE_CATCH_TUTORIAL)) {
+        return FALSE;
+    }
+
+    if ((battleType & BATTLE_TYPE_TRAINER) && enemyTrainer >= TRAINER_RIVAL_ROUTE_201_PIPLUP && enemyTrainer <= TRAINER_RIVAL_ROUTE_201_CHIMCHAR) {
+        return TRUE;
+    }
+
+    return battler == BATTLER_PLAYER_1 && battleSys->pokemonFollowerSlot == partySlot;
+}
 
 void BattleSystem_InitBattleMon(BattleSystem *battleSys, BattleContext *battleCtx, int battler, int partySlot)
 {
@@ -164,6 +184,8 @@ void BattleSystem_InitBattleMon(BattleSystem *battleSys, BattleContext *battleCt
     } else if (battleCtx->battleMons[battler].heldItem) {
         battleCtx->battleMons[battler].moveEffectsData.canUnburden = TRUE;
     }
+
+    battleCtx->battleMons[battler].entersWithoutBall = BattleSystem_MonEntersWithoutBall(battleSys, battler, partySlot);
 }
 
 void BattleSystem_ReloadPokemon(BattleSystem *battleSys, BattleContext *battleCtx, int battler, int partySlot)
