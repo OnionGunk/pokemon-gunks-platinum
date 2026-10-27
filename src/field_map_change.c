@@ -685,6 +685,13 @@ void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem)
 #ifdef TEST_SKIP_INTRO
     if (gTestSaveMode == 0) {
         TestSave_ApplyPostgame(SaveData_GetVarsFlags(fieldSystem->saveData));
+    } else if (gTestSaveMode == 2) {
+        VarsFlags *varsFlags = SaveData_GetVarsFlags(fieldSystem->saveData);
+
+        // what the story has done by the time Dawn's catching tutorial starts
+        VarsFlags_SetFlag(varsFlags, FLAG_RECEIVED_PARCEL);
+        VarsFlags_ClearFlag(varsFlags, FLAG_HIDE_ROUTE_202_COUNTERPART);
+        *VarsFlags_GetVarAddress(varsFlags, VAR_ROUTE_202_STATE) = 0;
     }
 #endif
     FieldSystem_CreateTask(fieldSystem, FieldTask_LoadNewGameSpawn, NULL);

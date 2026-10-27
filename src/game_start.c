@@ -141,6 +141,13 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
         goto testSaveDone;
     }
 
+    // Route 202 tutorial: just a starter (the story flags are set after the new-game script)
+    if (gTestSaveMode == 2) {
+        Pokemon_GiveMonFromScript(HEAP_ID_GAME_START, saveData, SPECIES_PIPLUP, 10, 0, 0, 0);
+        SystemVars_SetPlayerStarter(varsFlags, SPECIES_PIPLUP);
+        goto testSaveDone;
+    }
+
     // test save: Poketch, Pokedex, all badges, every town visited, Master Balls and a flyer
     Poketch_Enable(SaveData_GetPoketch(saveData));
     Poketch_RegisterApp(SaveData_GetPoketch(saveData), POKETCH_APPID_DEXNAV);
