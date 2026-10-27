@@ -5,6 +5,7 @@
 #include "constants/field/field_effect_renderer.h"
 #include "constants/heap.h"
 #include "constants/pokemon_follower.h"
+#include "constants/species.h"
 
 #include "overlay005/field_effect_manager.h"
 #include "overlay005/ov5_021ECA70.h"
@@ -175,7 +176,9 @@ static void FollowerBall_UpdateRelease(OverworldAnimManager *animMan, FollowerBa
         // fall through
     case 2:
         if (Easy3DAnim_Update(&renderer->releaseAnim, FX32_ONE) == TRUE) {
-            Sound_PlayPokemonCry(ball->params.species, 0);
+            if (ball->params.species != SPECIES_NONE) {
+                Sound_PlayPokemonCry(ball->params.species, 0);
+            }
             FieldEffectManager_FinishAnimManager(animMan);
         }
         break;

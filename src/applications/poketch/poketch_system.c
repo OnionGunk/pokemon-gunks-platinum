@@ -54,6 +54,7 @@ FS_EXTERN_OVERLAY(poketch_calendar);
 FS_EXTERN_OVERLAY(poketch_link_searcher);
 FS_EXTERN_OVERLAY(poketch_trainer_counter);
 FS_EXTERN_OVERLAY(poketch_pokemon_history);
+FS_EXTERN_OVERLAY(poketch_dexnav);
 FS_EXTERN_OVERLAY(poketch_unused_4);
 
 static PoketchSystem *PoketchSystem_GetFromFieldSystem(void);
@@ -108,7 +109,8 @@ static const struct {
     { POKETCH_APPID_CALENDAR, FS_OVERLAY_ID(poketch_calendar) },
     { POKETCH_APPID_LINKSEARCHER, FS_OVERLAY_ID(poketch_link_searcher) },
     { POKETCH_APPID_TRAINERCOUNTER, FS_OVERLAY_ID(poketch_trainer_counter) },
-    { POKETCH_APPID_POKEMONHISTORY, FS_OVERLAY_ID(poketch_pokemon_history) }
+    { POKETCH_APPID_POKEMONHISTORY, FS_OVERLAY_ID(poketch_pokemon_history) },
+    { POKETCH_APPID_DEXNAV, FS_OVERLAY_ID(poketch_dexnav) }
 };
 
 static PoketchSystem *PoketchSystem_GetFromFieldSystem(void)

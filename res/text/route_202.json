@@ -221,6 +221,37 @@
         "same kind of Pokémon, you should\f",
         "consider using Repels.\r"
       ]
+    },
+    {
+      "id": "Route202_Text_DawnAlsoTakeThisDexNav",
+      "en_US": [
+        "Dawn: Oh! I almost forgot!\n",
+        "Professor Rowan wanted you to have\r",
+        "this, too!\r"
+      ]
+    },
+    {
+      "id": "Route202_Text_LucasAlsoTakeThisDexNav",
+      "en_US": [
+        "Lucas: Oh, right! Before I forget...\n",
+        "The Professor asked me to give you\r",
+        "this, too.\r"
+      ]
+    },
+    {
+      "id": "Route202_Text_DexNavExplanation",
+      "en_US": [
+        "That’s a DexNav! It shows which\n",
+        "Pokémon live wherever you are.\r",
+        "Pick a Pokémon you’ve seen, then press\n",
+        "R in tall grass to search for it.\r",
+        "Sneak up on the shaking grass, and\n",
+        "you’ll find the Pokémon hiding there!\r",
+        "The more you search for one kind of\n",
+        "Pokémon, the better the ones you find.\r",
+        "Once you get a Pokétch, there’s\n",
+        "a DexNav app for it, too!\r"
+      ]
     }
   ]
 }

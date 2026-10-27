@@ -1078,6 +1078,13 @@ Overlay poketch_pokemon_history
 	Object src/applications/poketch/pokemon_history/graphics.c
 }
 
+Overlay poketch_dexnav
+{
+	After poketch
+	Object src/applications/poketch/dexnav/main.c
+	Object src/applications/poketch/dexnav/graphics.c
+}
+
 Overlay poketch_unused_4
 {
 	After poketch

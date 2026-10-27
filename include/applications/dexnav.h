@@ -1,6 +1,8 @@
 #ifndef POKEPLATINUM_APPLICATIONS_DEXNAV_H
 #define POKEPLATINUM_APPLICATIONS_DEXNAV_H
 
+#include "field/field_system_decl.h"
+
 #include "overlay_manager.h"
 #include "savedata.h"
 
@@ -32,6 +34,9 @@ typedef struct DexNavData {
     SaveData *saveData;
     DexNavEntry slots[DEXNAV_TOTAL_SLOTS];
 } DexNavData;
+
+// Fills a DexNavData from the current map's encounter table (also used by the DexNav Pokétch app).
+void DexNav_BuildAreaData(FieldSystem *fieldSystem, DexNavData *data);
 
 BOOL DexNav_Init(ApplicationManager *appMan, int *state);
 BOOL DexNav_Main(ApplicationManager *appMan, int *state);

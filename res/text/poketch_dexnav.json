@@ -1,0 +1,13 @@
+{
+  "key": 4127,
+  "messages": [
+    {
+      "id": "PoketchDexNav_Text_Title",
+      "en_US": "DEXNAV"
+    },
+    {
+      "id": "PoketchDexNav_Text_NothingHere",
+      "en_US": "No Pokémon here"
+    }
+  ]
+}

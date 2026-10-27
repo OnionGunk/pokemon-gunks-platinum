@@ -3878,7 +3878,7 @@ static void DexNav_AddSlot(DexNavEntry *slots, int *count, int species, int meth
 }
 
 // Fills the land and water halves of the DexNav grid from the current map's encounter table.
-static void DexNav_BuildAreaData(FieldSystem *fieldSystem, DexNavData *data)
+void DexNav_BuildAreaData(FieldSystem *fieldSystem, DexNavData *data)
 {
     const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
     DexNavEntry *land = &data->slots[0];
@@ -7562,19 +7562,18 @@ static BOOL ScrCmd_ShowPokemonFollower(ScriptContext *ctx)
     return FALSE;
 }
 
-// Following Platinum (command 855): an object pops out of (mode 0) or returns to (mode 1) the Poke Ball
-// of a party Pokemon, e.g. the new starter on Route 201 and the party in the Hall of Fame.
+// Following Platinum (command 855): an object pops out of (mode 0) or returns to (mode 1) its Poke Ball
+// and cries as the given species, e.g. the new starters on Route 201 and the party in the Hall of Fame.
 static BOOL ScrCmd_PlayPokeBallAnimation(ScriptContext *ctx)
 {
     u16 localID = ScriptContext_GetVar(ctx);
-    u16 partySlot = ScriptContext_GetVar(ctx);
+    u16 species = ScriptContext_GetVar(ctx);
     u16 mode = ScriptContext_GetVar(ctx);
     MapObject *mapObj = MapObjMan_LocalMapObjByIndex(ctx->fieldSystem->mapObjMan, localID);
-    Pokemon *mon = Party_GetPokemonBySlotIndex(SaveData_GetParty(ctx->fieldSystem->saveData), partySlot);
 
     if (mapObj != NULL) {
         sub_020656AC(mapObj);
-        PokemonFollowerBall_Play(mapObj, mode, Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL));
+        PokemonFollowerBall_Play(mapObj, mode, species);
     }
 
     return FALSE;

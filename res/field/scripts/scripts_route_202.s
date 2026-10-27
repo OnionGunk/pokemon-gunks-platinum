@@ -144,6 +144,25 @@ Route202_GivePokeballs:
     SetVar VAR_0x8005, 5
     Common_GiveItemQuantity
     GetPlayerGender VAR_RESULT
+    GoToIfEq VAR_RESULT, GENDER_MALE, Route202_DawnGiveDexNav
+    GoToIfEq VAR_RESULT, GENDER_FEMALE, Route202_LucasGiveDexNav
+    End
+
+Route202_DawnGiveDexNav:
+    Message Route202_Text_DawnAlsoTakeThisDexNav
+    GoTo Route202_GiveDexNav
+
+Route202_LucasGiveDexNav:
+    Message Route202_Text_LucasAlsoTakeThisDexNav
+    GoTo Route202_GiveDexNav
+
+Route202_GiveDexNav:
+    SetVar VAR_0x8004, ITEM_DEXNAV
+    SetVar VAR_0x8005, 1
+    Common_GiveItemQuantity
+    RegisterPoketchApp POKETCH_APPID_DEXNAV
+    Message Route202_Text_DexNavExplanation
+    GetPlayerGender VAR_RESULT
     GoToIfEq VAR_RESULT, GENDER_MALE, Route202_DawnLeave
     GoToIfEq VAR_RESULT, GENDER_FEMALE, Route202_LucasLeave
     End

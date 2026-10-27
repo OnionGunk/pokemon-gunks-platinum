@@ -143,6 +143,8 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
 
     // test save: Poketch, Pokedex, all badges, every town visited, Master Balls and a flyer
     Poketch_Enable(SaveData_GetPoketch(saveData));
+    Poketch_RegisterApp(SaveData_GetPoketch(saveData), POKETCH_APPID_DEXNAV);
+    SaveData_GetPoketch(saveData)->appIndex = POKETCH_APPID_DEXNAV; // show it first
     Pokedex_ObtainPokedex(SaveData_GetPokedex(saveData));
     Pokedex_ObtainNationalDex(SaveData_GetPokedex(saveData));
     SystemFlag_SetBagAcquired(varsFlags);

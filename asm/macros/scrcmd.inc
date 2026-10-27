@@ -5067,10 +5067,10 @@
     .short SCRCMD_SHOWPOKEMONFOLLOWER
     .endm
 
-    .macro PlayPokeBallAnimation localID, partySlot, mode
+    .macro PlayPokeBallAnimation localID, species, mode
     .short SCRCMD_PLAYPOKEBALLANIMATION
     .short \localID
-    .short \partySlot
+    .short \species
     .short \mode
     .endm
 
