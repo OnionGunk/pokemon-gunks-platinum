@@ -66,5 +66,7 @@ BOOL PokemonFollower_CanSpawn(int species, enum MapHeaderID mapHeaderID);
 MapObject *PokemonFollower_GetMapObject(FieldSystem *fieldSystem);
 void PokemonFollower_SetFlag(MapObject *follower, int flag, BOOL set);
 void PokemonFollower_SetScriptHidden(MapObject *follower, BOOL hidden);
+void PokemonFollower_ReturnToPlayer(FieldSystem *fieldSystem, BOOL release);
+void PokemonFollower_RecallForSurf(FieldSystem *fieldSystem);
 
 #endif // POKEPLATINUM_FIELD_MAP_CHANGE_H

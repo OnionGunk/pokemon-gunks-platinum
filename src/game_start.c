@@ -195,6 +195,10 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
         if (Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL) == SPECIES_STARAPTOR) {
             Pokemon_ResetMoveSlot(mon, MOVE_FLY, 0);
         }
+
+        if (Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL) == SPECIES_GYARADOS) {
+            Pokemon_ResetMoveSlot(mon, MOVE_SURF, 0);
+        }
     }
 
     // Route 201 dex state for DexNav testing: Starly caught, Bidoof seen, the rest unseen

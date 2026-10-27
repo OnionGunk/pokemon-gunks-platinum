@@ -7489,28 +7489,8 @@ static BOOL ScrCmd_PokemonFollowerPlaceNearPlayer(ScriptContext *ctx)
     return FALSE;
 }
 
-// After a cutscene the follower goes back under the player and follows again, appearing once the
-// player steps away (popping out of its Poke Ball when release is set).
-static void PokemonFollower_ReturnToPlayer(FieldSystem *fieldSystem, BOOL release)
-{
-    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
-    MapObject *player = PlayerAvatar_GetMapObject(fieldSystem->playerAvatar);
-
-    if (follower == NULL) {
-        return;
-    }
-
-    sub_020656AC(follower);
-    MapObject_SetPosDirFromCoords(follower, MapObject_GetX(player), MapObject_GetY(player), MapObject_GetZ(player), MapObject_GetFacingDir(player));
-    MapObject_SetXInitial(follower, MapObject_GetX(player));
-    MapObject_SetZInitial(follower, MapObject_GetZ(player));
-    PokemonFollower_SetScriptHidden(follower, TRUE);
-    PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_ARRIVING, TRUE);
-    PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_RELEASE, release);
-    MapObject_SwitchMovementType(follower, MOVEMENT_TYPE_POKEMON_FOLLOWER);
-}
-
-// Following Platinum (command 850)
+// Following Platinum (command 850): after a cutscene the follower goes back under the player and
+// pops out of its Poke Ball once the player steps away
 static BOOL ScrCmd_PokemonFollowerEndCutscene(ScriptContext *ctx)
 {
     PokemonFollower_ReturnToPlayer(ctx->fieldSystem, TRUE);

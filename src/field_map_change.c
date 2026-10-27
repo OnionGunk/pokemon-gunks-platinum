@@ -12,6 +12,7 @@
 #include "struct_defs/player_data.h"
 
 #include "field/field_system.h"
+#include "overlay005/pokemon_follower_ball.h"
 #include "overlay005/map_name_popup.h"
 #include "overlay005/ov5_021E135C.h"
 #include "overlay005/save_info_window.h"
@@ -76,6 +77,7 @@
 #include "unk_020559DC.h"
 #include "unk_0205B33C.h"
 #include "unk_0205C22C.h"
+#include "unk_020655F4.h"
 #include "vars_flags.h"
 
 #include "res/text/bank/pokemon_center_2f_common.h"
@@ -487,6 +489,48 @@ void PokemonFollower_SetScriptHidden(MapObject *follower, BOOL hidden)
     MapObject_SetHidden(follower, hidden);
     sub_02062DB4(follower, hidden);
     PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_SCRIPT_HIDDEN, hidden);
+}
+
+// The follower goes back under the player and follows again, appearing once the player steps away
+// (popping out of its Poke Ball when release is set): after cutscenes and after surfing.
+void PokemonFollower_ReturnToPlayer(FieldSystem *fieldSystem, BOOL release)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+    MapObject *player = PlayerAvatar_GetMapObject(fieldSystem->playerAvatar);
+
+    if (follower == NULL) {
+        return;
+    }
+
+    sub_020656AC(follower);
+    MapObject_SetPosDirFromCoords(follower, MapObject_GetX(player), MapObject_GetY(player), MapObject_GetZ(player), MapObject_GetFacingDir(player));
+    MapObject_SetXInitial(follower, MapObject_GetX(player));
+    MapObject_SetZInitial(follower, MapObject_GetZ(player));
+    PokemonFollower_SetScriptHidden(follower, TRUE);
+    PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_ARRIVING, TRUE);
+    PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_RELEASE, release);
+    MapObject_SwitchMovementType(follower, MOVEMENT_TYPE_POKEMON_FOLLOWER);
+}
+
+// Starting to surf: the follower returns to its Poke Ball and waits there until the player lands.
+void PokemonFollower_RecallForSurf(FieldSystem *fieldSystem)
+{
+    MapObject *follower = PokemonFollower_GetMapObject(fieldSystem);
+
+    if (follower == NULL) {
+        return;
+    }
+
+    sub_020656AC(follower);
+
+    if (!MapObject_IsHidden(follower)) {
+        PokemonFollowerBall_Play(follower, POKE_BALL_ANIMATION_RECALL, MapObject_GetDataAt(follower, POKEMON_FOLLOWER_DATA_SPECIES));
+    }
+
+    PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_ARRIVING | POKEMON_FOLLOWER_FLAG_RELEASE, FALSE);
+    PokemonFollower_SetFlag(follower, POKEMON_FOLLOWER_FLAG_SCRIPT_HIDDEN, TRUE);
+    // it waits on the shore instead of trailing the player over the water
+    MapObject_SwitchMovementType(follower, MOVEMENT_TYPE_NONE);
 }
 
 // Ported from Following Platinum's spawn routine: the lead Pokemon follows the player, starting

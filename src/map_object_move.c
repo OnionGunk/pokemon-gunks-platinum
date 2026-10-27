@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "constants/map_object.h"
+#include "constants/pokemon_follower.h"
 #include "generated/movement_types.h"
 
 #include "struct_decls/map_object.h"
@@ -628,10 +629,15 @@ int sub_02063F00(const MapObject *mapObj, int x, int y, int z)
 
     maxObjects = MapObjectMan_GetMaxObjects(mapObjMan);
 
+    // the Pokemon follower never blocks the player, on land or water (Following Platinum hooks every
+    // player collision check for this)
+    BOOL isPlayer = MapObject_GetMovementType(mapObj) == MOVEMENT_TYPE_PLAYER;
+
     do {
         if (v4 != mapObj
             && MapObject_CheckStatus(v4, MAP_OBJ_STATUS_0)
-            && !MapObject_CheckStatus(v4, MAP_OBJ_STATUS_18)) {
+            && !MapObject_CheckStatus(v4, MAP_OBJ_STATUS_18)
+            && !(isPlayer && MapObject_GetLocalID(v4) == POKEMON_FOLLOWER_LOCAL_ID)) {
             objX = MapObject_GetX(v4);
             objZ = MapObject_GetZ(v4);
 

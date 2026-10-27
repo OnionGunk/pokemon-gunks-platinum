@@ -30,6 +30,7 @@
 #include "encounter.h"
 #include "field_battle_data_transfer.h"
 #include "field_bgm.h"
+#include "field_map_change.h"
 #include "field_task.h"
 #include "game_records.h"
 #include "heap.h"
@@ -666,6 +667,8 @@ static BOOL FieldTask_UseSurf(FieldTask *task)
             FieldBGM_TryFadeOut(taskEnv->fieldSystem, SEQ_NAMINORI_sseq, 1);
         }
 
+        PokemonFollower_RecallForSurf(taskEnv->fieldSystem);
+
         if (taskEnv->monRideTask.playCutIn == TRUE) {
             NewMonRideCutIn(taskEnv->fieldSystem, &taskEnv->monRideTask);
             taskEnv->state++;
@@ -834,6 +837,7 @@ static BOOL ov5_021E03C8(FieldTask *param0)
         PlayerAvatar_SetSurfMountAnimManager(v0->playerAvatar, NULL);
         PlayerAvatar_SetPlayerState(v0->playerAvatar, 0x0);
         FieldBGM_TryFadeOut(v0->fieldSystem, FieldBGM_GetForMapHeader(v0->fieldSystem, v0->fieldSystem->location->mapHeaderID), 1);
+        PokemonFollower_ReturnToPlayer(v0->fieldSystem, TRUE);
         MonRideTaskEnv_Free(v0);
         return 1;
     }

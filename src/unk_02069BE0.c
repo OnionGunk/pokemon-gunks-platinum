@@ -3,6 +3,7 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "constants/player_avatar.h"
 #include "generated/movement_actions.h"
 
 #include "struct_decls/map_object.h"
@@ -331,6 +332,11 @@ static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
     }
 
     FieldSystem *fieldSystem = MapObject_FieldSystem(mapObj);
+
+    // while surfing the follower stays in its Poke Ball
+    if (PlayerAvatar_GetPlayerState(FieldSystem_GetPlayerAvatar(fieldSystem)) == PLAYER_AVATAR_SURFING) {
+        return;
+    }
     int spawnX = MapObject_GetXInitial(mapObj);
     int spawnZ = MapObject_GetZInitial(mapObj);
     BOOL onSpawnTile = MapObject_GetX(mapObj) == spawnX && MapObject_GetZ(mapObj) == spawnZ;
@@ -358,7 +364,7 @@ static void PokemonFollower_RevealAfterArrival(MapObject *mapObj)
     if (flags & POKEMON_FOLLOWER_FLAG_RELEASE) {
         PokemonFollowerBall_Play(mapObj, POKE_BALL_ANIMATION_RELEASE, species);
     } else {
-        MapObject_SetHidden(mapObj, FALSE);
+        PokemonFollower_SetScriptHidden(mapObj, FALSE);
     }
 }
 
