@@ -1113,11 +1113,8 @@ static void TeachMove(PartyMenuApplication *application, Pokemon *mon, u32 moveS
     tempVar = MoveTable_CalcMaxPP(application->partyMenu->learnedMove, 0);
     Pokemon_SetValue(mon, MON_DATA_MOVE1_PP + moveSlot, &tempVar);
 
+    // quality of life: TMs are not used up, like HMs
     if (application->partyMenu->usedItemID != ITEM_NONE) {
-        if (Item_IsHMMove(application->partyMenu->learnedMove) == FALSE) {
-            Bag_TryRemoveItem(application->partyMenu->bag, application->partyMenu->usedItemID, 1, HEAP_ID_PARTY_MENU);
-        }
-
         Pokemon_UpdateFriendship(mon, FRIENDSHIP_EVENT_LEARN_TMHM, (u16)GetCurrentMapLabel(application));
     }
 }

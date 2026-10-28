@@ -88,6 +88,7 @@
     ScriptEntry CommonScript_DexNavBattle @ 0x80B
     ScriptEntry CommonScript_DexNavMenu @ 0x80C
     ScriptEntry CommonScript_EndlessRepel @ 0x80D
+    ScriptEntry CommonScript_MoveTutor @ 0x80E
     ScriptEntryEnd
 
 CommonScript_Dummy2010:
@@ -1790,6 +1791,107 @@ CommonScript_EndlessRepel:
     PlaySE SEQ_SE_DP_CARD2_sseq
     Message CommonStrings_Text_EndlessRepelOn
     WaitABPress
+    CloseMessage
+    ReleaseAll
+    End
+
+@ Quality of life: a Move Tutor in every Pokemon Center remembers and forgets moves for free.
+CommonScript_MoveTutor:
+    PlaySE SE_CONFIRM_sseq_3
+    LockAll
+    FacePlayer
+    Message CommonStrings_Text_MoveTutorHello
+    InitLocalTextMenu 31, 9, 0, VAR_RESULT
+    SetMenuXOriginToRight
+    AddMenuEntryImm CommonStrings_Text_MoveTutorRemember, 0
+    AddMenuEntryImm CommonStrings_Text_MoveTutorForget, 1
+    AddMenuEntryImm CommonStrings_Text_MoveTutorCancel, 2
+    ShowMenu
+    GoToIfEq VAR_RESULT, 0, CommonScript_MoveTutorRemember
+    GoToIfEq VAR_RESULT, 1, CommonScript_MoveTutorForget
+    GoTo CommonScript_MoveTutorBye
+
+CommonScript_MoveTutorRemember:
+    Message CommonStrings_Text_MoveTutorWhichPokemonRemember
+    CloseMessage
+    FadeScreenOut
+    WaitFadeScreen
+    SelectMoveTutorPokemon
+    GetSelectedPartySlot VAR_0x8005
+    ReturnToField
+    FadeScreenIn
+    WaitFadeScreen
+    GoToIfEq VAR_0x8005, PARTY_SLOT_NONE, CommonScript_MoveTutorBye
+    GetPartyMonSpecies VAR_0x8005, VAR_RESULT
+    GoToIfEq VAR_RESULT, 0, CommonScript_MoveTutorEgg
+    CheckHasLearnableReminderMoves VAR_RESULT, VAR_0x8005
+    GoToIfEq VAR_RESULT, FALSE, CommonScript_MoveTutorNoMoves
+    Message CommonStrings_Text_MoveTutorWhichMoveRemember
+    CloseMessage
+    FadeScreenOut
+    WaitFadeScreen
+    OpenMoveReminderMenu VAR_0x8005
+    CheckLearnedReminderMove VAR_RESULT
+    ReturnToField
+    FadeScreenIn
+    WaitFadeScreen
+    GoTo CommonScript_MoveTutorBye
+
+CommonScript_MoveTutorForget:
+    Message CommonStrings_Text_MoveTutorWhichPokemonForget
+    CloseMessage
+    FadeScreenOut
+    WaitFadeScreen
+    SelectMoveTutorPokemon
+    GetSelectedPartySlot VAR_0x8002
+    ReturnToField
+    FadeScreenIn
+    WaitFadeScreen
+    GoToIfEq VAR_0x8002, PARTY_SLOT_NONE, CommonScript_MoveTutorBye
+    GetPartyMonSpecies VAR_0x8002, VAR_0x8001
+    GoToIfEq VAR_0x8001, SPECIES_NONE, CommonScript_MoveTutorEgg
+    GetPartyMonMoveCount VAR_RESULT, VAR_0x8002
+    GoToIfEq VAR_RESULT, 1, CommonScript_MoveTutorOnlyOneMove
+    Message CommonStrings_Text_MoveTutorWhichMoveForget
+    CloseMessage
+    FadeScreenOut
+    WaitFadeScreen
+    SelectPartyMonMove VAR_0x8002
+    GetSelectedPartyMonMove VAR_0x8001
+    ReturnToField
+    FadeScreenIn
+    WaitFadeScreen
+    GoToIfEq VAR_0x8001, MOVE_NOT_SELECTED, CommonScript_MoveTutorBye
+    BufferPartyMoveName 0, VAR_0x8002, VAR_0x8001
+    Message CommonStrings_Text_MoveTutorShouldForget
+    ShowYesNoMenu VAR_RESULT
+    GoToIfEq VAR_RESULT, MENU_NO, CommonScript_MoveTutorBye
+    ClearPartyMonMoveSlot VAR_0x8002, VAR_0x8001
+    Message CommonStrings_Text_MoveTutorForgot
+    PlayFanfare SEQ_WASURE_sseq
+    WaitFanfare
+    WaitButton
+    GoTo CommonScript_MoveTutorEnd
+
+CommonScript_MoveTutorEgg:
+    Message CommonStrings_Text_MoveTutorEgg
+    WaitButton
+    GoTo CommonScript_MoveTutorEnd
+
+CommonScript_MoveTutorNoMoves:
+    Message CommonStrings_Text_MoveTutorNoMoves
+    WaitButton
+    GoTo CommonScript_MoveTutorEnd
+
+CommonScript_MoveTutorOnlyOneMove:
+    Message CommonStrings_Text_MoveTutorOnlyOneMove
+    WaitButton
+    GoTo CommonScript_MoveTutorEnd
+
+CommonScript_MoveTutorBye:
+    Message CommonStrings_Text_MoveTutorBye
+    WaitButton
+CommonScript_MoveTutorEnd:
     CloseMessage
     ReleaseAll
     End

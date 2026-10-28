@@ -7,10 +7,13 @@
 #include "constants/field_poison.h"
 #include "constants/heap.h"
 #include "constants/items.h"
+#include "constants/moves.h"
 
 #include "overlay005/daycare.h"
 
+#include "bag.h"
 #include "heap.h"
+#include "item.h"
 #include "party.h"
 #include "pokemon.h"
 #include "save_catchrecords.h"
@@ -82,6 +85,64 @@ void Party_ResetMonMoveSlot(Party *party, int partySlot, int moveSlot, u16 moveI
 }
 
 // In many of the functions below, C99-style iterator declaration doesn't match
+
+// Quality of life: the HM that teaches a field move, if the player owns it, else ITEM_NONE
+u16 Bag_GetOwnedHMForMove(Bag *bag, u16 moveID, enum HeapID heapID)
+{
+    for (u16 item = ITEM_HM01; item <= ITEM_HM08; item++) {
+        if (Item_MoveForTMHM(item) == moveID) {
+            return Bag_GetItemQuantity(bag, item, heapID) > 0 ? item : ITEM_NONE;
+        }
+    }
+
+    return ITEM_NONE;
+}
+
+BOOL Pokemon_KnowsMove(Pokemon *mon, u16 moveID)
+{
+    for (int i = 0; i < LEARNED_MOVES_MAX; i++) {
+        if (Pokemon_GetValue(mon, MON_DATA_MOVE1 + i, NULL) == moveID) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+// A Pokemon can use a field move if it knows it, or if it could learn it from an HM the player owns.
+BOOL Pokemon_CanUseFieldMove(Pokemon *mon, Bag *bag, u16 moveID, enum HeapID heapID)
+{
+    if (Pokemon_GetValue(mon, MON_DATA_IS_EGG, NULL) != FALSE) {
+        return FALSE;
+    }
+
+    if (Pokemon_KnowsMove(mon, moveID)) {
+        return TRUE;
+    }
+
+    u16 hm = Bag_GetOwnedHMForMove(bag, moveID, heapID);
+
+    return hm != ITEM_NONE && Pokemon_CanLearnTM(mon, Item_TMHMNumber(hm));
+}
+
+// The party slot to use a field move with: a Pokemon that knows it first, else one that could learn it
+// from an HM the player owns; PARTY_SLOT_NONE if there is none.
+int Party_FindMonForFieldMove(Party *party, Bag *bag, u16 moveID, enum HeapID heapID)
+{
+    int slot = Party_HasMonWithMove(party, moveID);
+
+    if (slot != PARTY_SLOT_NONE) {
+        return slot;
+    }
+
+    for (int i = 0; i < Party_GetCurrentCount(party); i++) {
+        if (Pokemon_CanUseFieldMove(Party_GetPokemonBySlotIndex(party, i), bag, moveID, heapID)) {
+            return i;
+        }
+    }
+
+    return PARTY_SLOT_NONE;
+}
 
 int Party_HasMonWithMove(Party *party, u16 moveID)
 {

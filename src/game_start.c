@@ -172,6 +172,12 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_ENDLESS_REPEL, 1, HEAP_ID_GAME_START);
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_REPEL, 5, HEAP_ID_GAME_START);
 
+    for (u16 item = ITEM_HM01; item <= ITEM_HM08; item++) {
+        Bag_TryAddItem(SaveData_GetBag(saveData), item, 1, HEAP_ID_GAME_START);
+    }
+
+    Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_TM06, 1, HEAP_ID_GAME_START);
+
     // post-game test save with the Bicycle on Y instead of the DexNav
     if (gTestSaveMode == 4) {
         Bag_RegisterItem(SaveData_GetBag(saveData), ITEM_BICYCLE);

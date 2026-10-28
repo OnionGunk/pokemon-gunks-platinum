@@ -216,7 +216,7 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
             playerEvent |= PLAYER_EVENT_USED_STRENGTH;
         }
 
-        if (Party_HasMonWithMove(SaveData_GetParty(fieldSystem->saveData), MOVE_WATERFALL) != PARTY_SLOT_NONE) {
+        if (Party_FindMonForFieldMove(SaveData_GetParty(fieldSystem->saveData), SaveData_GetBag(fieldSystem->saveData), MOVE_WATERFALL, HEAP_ID_FIELD1) != PARTY_SLOT_NONE) {
             playerEvent |= PLAYER_EVENT_USED_WATERFALL;
         }
 
@@ -706,7 +706,7 @@ u16 Field_TileBehaviorToScript(FieldSystem *fieldSystem, u8 behavior)
         u32 distortionBehavior = PlayerAvatar_GetDistortionCurrTileBehaviour(fieldSystem->playerAvatar);
 
         if (PlayerAvatar_CanUseSurf(fieldSystem->playerAvatar, distortionBehavior, behavior) && TrainerInfo_HasBadge(info, 3)) {
-            if (Party_HasMonWithMove(SaveData_GetParty(fieldSystem->saveData), MOVE_SURF) != PARTY_SLOT_NONE) {
+            if (Party_FindMonForFieldMove(SaveData_GetParty(fieldSystem->saveData), SaveData_GetBag(fieldSystem->saveData), MOVE_SURF, HEAP_ID_FIELD1) != PARTY_SLOT_NONE) {
                 return SCRIPT_ID(FIELD_MOVES, 4);
             }
         }

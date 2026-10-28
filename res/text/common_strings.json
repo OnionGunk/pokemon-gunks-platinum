@@ -902,6 +902,78 @@
     {
       "id": "CommonStrings_Text_EndlessRepelOff",
       "en_US": "The Endless Repel was turned off."
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorHello",
+      "en_US": [
+        "I’m a Move Tutor! I can help your\n",
+        "Pokémon remember moves or forget\n",
+        "them. What would you like?"
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorRemember",
+      "en_US": "REMEMBER"
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorForget",
+      "en_US": "FORGET"
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorCancel",
+      "en_US": "CANCEL"
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorWhichPokemonRemember",
+      "en_US": "Which Pokémon should remember a move?\r"
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorWhichMoveRemember",
+      "en_US": "Which move should it remember?\r"
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorWhichPokemonForget",
+      "en_US": "Which Pokémon should forget a move?\r"
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorWhichMoveForget",
+      "en_US": "Which move should be forgotten?\r"
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorShouldForget",
+      "en_US": [
+        "The move {STRVAR_1 6, 0, 0}?\n",
+        "Should that move be forgotten?"
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorForgot",
+      "en_US": [
+        "Done! Your Pokémon has forgotten\n",
+        "the move {STRVAR_1 6, 0, 0}."
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorEgg",
+      "en_US": "Hmm? That’s an Egg. It doesn’t know\nany moves yet."
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorNoMoves",
+      "en_US": [
+        "Sorry... There isn’t any move that\n",
+        "Pokémon can remember."
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorOnlyOneMove",
+      "en_US": [
+        "That Pokémon knows only one move,\n",
+        "so it can’t forget it."
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_MoveTutorBye",
+      "en_US": "Come back any time!"
     }
   ]
 }

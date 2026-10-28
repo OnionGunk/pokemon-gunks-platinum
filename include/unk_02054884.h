@@ -1,6 +1,7 @@
 #ifndef POKEPLATINUM_UNK_02054884_H
 #define POKEPLATINUM_UNK_02054884_H
 
+#include "bag.h"
 #include "party.h"
 #include "pokemon.h"
 #include "savedata.h"
@@ -10,6 +11,10 @@ BOOL Pokemon_GiveMonFromScript(enum HeapID heapID, SaveData *saveData, u16 speci
 BOOL sub_02054930(int unused, SaveData *saveData, u16 param2, u8 param3, int param4, int param5);
 void Party_ResetMonMoveSlot(Party *party, int partySlot, int moveSlot, u16 moveID);
 int Party_HasMonWithMove(Party *party, u16 moveID);
+u16 Bag_GetOwnedHMForMove(Bag *bag, u16 moveID, enum HeapID heapID);
+BOOL Pokemon_KnowsMove(Pokemon *mon, u16 moveID);
+BOOL Pokemon_CanUseFieldMove(Pokemon *mon, Bag *bag, u16 moveID, enum HeapID heapID);
+int Party_FindMonForFieldMove(Party *party, Bag *bag, u16 moveID, enum HeapID heapID);
 int Party_AliveMonsCount(const Party *party);
 Pokemon *Party_FindFirstEligibleBattler(const Party *party);
 Pokemon *Party_FindFirstHatchedMon(const Party *party);

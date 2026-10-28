@@ -38,6 +38,7 @@
 #include "heap.h"
 #include "height_weight_data.h"
 #include "item.h"
+#include "unk_02054884.h"
 #include "item_use_pokemon.h"
 #include "journal.h"
 #include "menu.h"
@@ -1814,6 +1815,22 @@ static u8 GetContextMenuEntriesForPartyMon(PartyMenuApplication *application, u8
                     PartyMenu_SetKnownFieldMove(application, move, fieldMoveIndex);
                     fieldMoveIndex++;
                 }
+            }
+
+            // quality of life: HM moves it could learn from an HM the player owns, while room is left
+            for (i = 0; i < NELEMS(sFieldMoves) && fieldMoveIndex < LEARNED_MOVES_MAX; i++) {
+                move = sFieldMoves[i];
+
+                if (Bag_GetOwnedHMForMove(application->partyMenu->bag, move, HEAP_ID_PARTY_MENU) == ITEM_NONE
+                    || Pokemon_CanUseFieldMove(mon, application->partyMenu->bag, move, HEAP_ID_PARTY_MENU) == FALSE
+                    || Pokemon_KnowsMove(mon, move)) {
+                    continue;
+                }
+
+                menuEntriesBuffer[count] = GetFieldMoveIndex(move);
+                count++;
+                PartyMenu_SetKnownFieldMove(application, move, fieldMoveIndex);
+                fieldMoveIndex++;
             }
 
             menuEntriesBuffer[count] = 0;
