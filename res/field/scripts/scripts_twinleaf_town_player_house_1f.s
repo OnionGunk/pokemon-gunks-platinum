@@ -137,7 +137,11 @@ TwinleafTownPlayerHouse1F_OnFrame_CutsceneAfterRivalBattle:
     PlayFanfare SEQ_FANFA4_sseq
     WaitFanfare
     Message TwinleafTownPlayerHouse1F_Text_LetMeReadTheInstructions
-    WaitButton
+    WaitABPress
+    Message TwinleafTownPlayerHouse1F_Text_TakeThisToo
+    SetVar VAR_0x8004, ITEM_ENDLESS_REPEL
+    SetVar VAR_0x8005, 1
+    Common_GiveItemQuantity
     CloseMessage
     SetVarFromValue VAR_RESULT, 0
     GetPartyMonSpecies VAR_RESULT, VAR_0x8004

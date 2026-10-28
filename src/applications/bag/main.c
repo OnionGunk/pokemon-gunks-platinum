@@ -14,6 +14,7 @@
 #include "applications/bag/windows.h"
 
 #include "bag.h"
+#include "dexnav_search.h"
 #include "bag_context.h"
 #include "bg_window.h"
 #include "font.h"
@@ -2263,6 +2264,7 @@ static String *TryUseRepel(BagController *controller, u16 item)
 
     u32 stepCount = Item_LoadParam(item, ITEM_PARAM_EFFECT_PARAM, HEAP_ID_BAG);
     SetRepelSteps(controller, stepCount);
+    DexNavSave_SetLastRepel(controller->bagCtx->saveData, item);
     controller->selectedItemCount = 1;
     Sound_PlayEffect(SEQ_SE_DP_CARD2_sseq);
 

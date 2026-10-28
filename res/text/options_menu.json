@@ -54,6 +54,10 @@
       "en_US": "FAST"
     },
     {
+      "id": "OptionsMenu_Text_TextSpeedInstant",
+      "en_US": "INSTANT"
+    },
+    {
       "id": "OptionsMenu_Text_BattleSceneOn",
       "en_US": "ON"
     },
@@ -176,7 +180,7 @@
     {
       "id": "OptionsMenu_Text_TextSpeedDescription",
       "en_US": [
-        "Choose one of three text-display\n",
+        "Choose one of four text-display\n",
         "speeds."
       ]
     },

@@ -880,6 +880,28 @@
         "{STRVAR_1 3, 0, 0} is feeling better, so you\n",
         "decided to take {STRVAR_1 3, 0, 0} with you!\r"
       ]
+    },
+    {
+      "id": "CommonStrings_Text_RepelsEffectWoreOffUseAnother",
+      "en_US": [
+        "Repel’s effect wore off...\n",
+        "Use another {STRVAR_1 8, 0, 0}?"
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_PlayerUsedRepel",
+      "en_US": "{STRVAR_1 3, 0, 0} used the {STRVAR_1 8, 1, 0}."
+    },
+    {
+      "id": "CommonStrings_Text_EndlessRepelOn",
+      "en_US": [
+        "The Endless Repel was turned on.\n",
+        "Weak wild Pokémon will stay away."
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_EndlessRepelOff",
+      "en_US": "The Endless Repel was turned off."
     }
   ]
 }

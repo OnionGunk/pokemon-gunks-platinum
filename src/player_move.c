@@ -2473,11 +2473,12 @@ static BOOL MovementAction_IsWalkOnSpotSlow(enum MovementAction movementAction)
  */
 BOOL PlayerAvatar_IsRunButtonHeld(PlayerAvatar *playerAvatar, u16 pad)
 {
+    // quality of life: with the Running Shoes the player runs by default and holding B walks
     if (pad & PAD_BUTTON_B) {
-        return TRUE;
+        return FALSE;
     }
 
-    return FALSE;
+    return TRUE;
 }
 
 /**

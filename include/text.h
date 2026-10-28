@@ -28,6 +28,9 @@ typedef u32 TextColor;
 #define TEXT_SPEED_NORMAL      4
 #define TEXT_SPEED_SLOW        8
 #define TEXT_SPEED_NO_TRANSFER 0xFF
+// a printer task like TEXT_SPEED_FAST that prints everything it can each frame, stopping at button
+// waits and scrolls (the INSTANT text-speed option)
+#define TEXT_SPEED_INSTANT_TASK 0xFE
 
 enum TextAlignment {
     TEXT_ALIGN_LEFT,

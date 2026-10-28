@@ -176,6 +176,12 @@ u8 Text_AddPrinter(const TextPrinterTemplate *template, u32 renderDelay, TextPri
 
     TextPrinter *printer = Heap_Alloc(HEAP_ID_SYSTEM, sizeof(TextPrinter));
 
+    printer->instant = renderDelay == TEXT_SPEED_INSTANT_TASK;
+
+    if (printer->instant) {
+        renderDelay = TEXT_SPEED_FAST;
+    }
+
     printer->active = TRUE;
     printer->state = 0;
     printer->textSpeedBottom = renderDelay;
@@ -237,7 +243,21 @@ static void SysTask_RunTextPrinter(SysTask *task, void *data)
         printer->callbackParam = 0;
         Text_GenerateFontHalfRowLookupTable(printer->template.fgColor, printer->template.bgColor, printer->template.shadowColor);
 
-        switch (TextPrinter_Render(printer)) {
+        enum RenderResult result = TextPrinter_Render(printer);
+
+        // instant text: keep printing characters until the printer waits for a button, scrolls or ends
+        if (printer->instant) {
+            for (int i = 0; result == RENDER_PRINT && i < 1024; i++) {
+                result = TextPrinter_Render(printer);
+
+                if (result == RENDER_UPDATE) {
+                    result = RENDER_PRINT; // the characters printed so far still need copying
+                    break;
+                }
+            }
+        }
+
+        switch (result) {
         case RENDER_PRINT:
             Window_CopyToVRAM(printer->template.window);
             // fall-through

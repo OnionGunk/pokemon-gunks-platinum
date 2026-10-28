@@ -11,9 +11,15 @@
 #include "constants/species.h"
 
 // Normal block (only ~100 bytes free there): just the player's selection.
+// repel steps kept topped up while the Endless Repel is on
+#define ENDLESS_REPEL_STEPS 250
+
 typedef struct DexNavSave {
     u16 selectedSpecies;
-    u16 unused;
+    // quality of life, in the block's spare field: the Repel to offer when one wears off, and the
+    // Endless Repel's on/off state
+    u16 lastRepel : 15;
+    u16 endlessRepelOn : 1;
 } DexNavSave;
 
 // Box block: rides in the ~3.5 KB of slack left by rounding the PC boxes up to whole sectors.
@@ -29,6 +35,10 @@ void DexNavLevels_Init(DexNavLevels *dexNavLevels);
 u8 DexNavSave_GetSearchLevel(SaveData *saveData, u16 species);
 u16 DexNavSave_GetSelectedSpecies(SaveData *saveData);
 void DexNavSave_SetSelectedSpecies(SaveData *saveData, u16 species);
+u16 DexNavSave_GetLastRepel(SaveData *saveData);
+void DexNavSave_SetLastRepel(SaveData *saveData, u16 item);
+BOOL DexNavSave_IsEndlessRepelOn(SaveData *saveData);
+void DexNavSave_SetEndlessRepelOn(SaveData *saveData, BOOL on);
 
 // Called by the DexNav screen when the player picks a species to search for.
 void DexNavSearch_Request(u16 species, u8 level);

@@ -727,7 +727,7 @@ static void PrintTitleAndEntries(OptionsMenuData *menuData)
 }
 
 static const int sNumChoicesPerEntry[MAX_ENTRIES] = {
-    3,
+    4,
     2,
     2,
     2,
@@ -814,7 +814,8 @@ static void PrintEntryChoices(OptionsMenuData *menuData, u16 entry)
             textSpeed = TEXT_SPEED_NO_TRANSFER;
         }
 
-        if (entry == ENTRY_BUTTON_MODE) {
+        // these rows have more or longer choices than fit at fixed spacing
+        if (entry == ENTRY_BUTTON_MODE || entry == ENTRY_TEXT_SPEED) {
             Text_AddPrinterWithParamsAndColor(&menuData->windows.entries,
                 FONT_SYSTEM,
                 menuData->entries.asArray[entry].choices[i],

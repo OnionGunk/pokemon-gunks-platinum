@@ -866,6 +866,9 @@ ScriptCommand(SCRCMD_POKEMONFOLLOWERHAPPYHOP,                              ScrCm
 ScriptCommand(SCRCMD_GETPARTYMONFOLLOWERGFX,                               ScrCmd_GetPartyMonFollowerGfx)
 ScriptCommand(SCRCMD_CHECKPOKEMONFOLLOWERACTIVE,                           ScrCmd_CheckPokemonFollowerActive)
 ScriptCommand(SCRCMD_GETPOKEMONFOLLOWERDIRFROMPLAYER,                      ScrCmd_GetPokemonFollowerDirFromPlayer)
+ScriptCommand(SCRCMD_GETREUSABLEREPEL,                                     ScrCmd_GetReusableRepel)
+ScriptCommand(SCRCMD_USEREPEL,                                             ScrCmd_UseRepel)
+ScriptCommand(SCRCMD_TOGGLEENDLESSREPEL,                                   ScrCmd_ToggleEndlessRepel)
 
 // clang-format on
 

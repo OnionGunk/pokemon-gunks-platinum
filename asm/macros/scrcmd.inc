@@ -5013,6 +5013,24 @@
     .short \messageID
     .endm
 
+    @ the last Repel the player used if one is still in the bag, else ITEM_NONE
+    .macro GetReusableRepel destVarID
+    .short SCRCMD_GETREUSABLEREPEL
+    .short \destVarID
+    .endm
+
+    @ uses one of the Repel in itemVarID: starts its steps and takes it from the bag
+    .macro UseRepel itemVarID
+    .short SCRCMD_USEREPEL
+    .short \itemVarID
+    .endm
+
+    @ switches the Endless Repel; destVarID is TRUE if it is now on
+    .macro ToggleEndlessRepel destVarID
+    .short SCRCMD_TOGGLEENDLESSREPEL
+    .short \destVarID
+    .endm
+
     .macro GetPokemonFollowerPartySlot destVarID
     .short SCRCMD_GETPOKEMONFOLLOWERPARTYSLOT
     .short \destVarID

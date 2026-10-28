@@ -1370,15 +1370,20 @@ static void HealthBox_DrawBallsLeftMessage(HealthBox *healthbox, u32 flags)
     String_Free(templateString);
 }
 
+// pixels per frame: a full HP bar (48 px) drains in 48 frames and a full EXP bar (96 px) fills in 48
+// frames, quick but still visibly moving
+#define HEALTHBOX_HP_PIXELS_PER_FRAME  1
+#define HEALTHBOX_EXP_PIXELS_PER_FRAME 2
+
 static s32 HealthBox_DrawGauge(HealthBox *healthbox, enum HealthBoxGaugeType gaugeType)
 {
     s32 result;
     s32 fillOffset;
 
     if (gaugeType == HEALTHBOX_GAUGE_HP) {
-        // move the bar one pixel per frame whatever the max HP (vanilla moved 1 HP per frame, so
-        // big HP pools drained for seconds); a full bar now drains in 48 frames
-        fillOffset = healthbox->maxHP / (HEALTHBOX_HP_CELL_COUNT * HEALTHBOX_NAME_BLOCK_COUNT_X);
+        // move the bar a fixed number of pixels per frame whatever the max HP (vanilla moved 1 HP per
+        // frame, so big HP pools drained for seconds)
+        fillOffset = healthbox->maxHP * HEALTHBOX_HP_PIXELS_PER_FRAME / (HEALTHBOX_HP_CELL_COUNT * HEALTHBOX_NAME_BLOCK_COUNT_X);
 
         if (fillOffset < 1) {
             fillOffset = 1;
@@ -1392,7 +1397,7 @@ static s32 HealthBox_DrawGauge(HealthBox *healthbox, enum HealthBoxGaugeType gau
             fillOffset = 1;
         }
 
-        fillOffset = abs(healthbox->expReward / fillOffset);
+        fillOffset = abs(healthbox->expReward * HEALTHBOX_EXP_PIXELS_PER_FRAME / fillOffset);
         result = UpdateGauge(healthbox->maxExp, healthbox->curExp, healthbox->expReward, &healthbox->expTemp, HEALTHBOX_EXP_CELL_COUNT, fillOffset);
     }
 
@@ -1520,7 +1525,7 @@ static s32 UpdateGauge(s32 max, s32 cur, s32 diff, s32 *temp, u8 size, u16 fillO
     }
 
     if (max < corrected) {
-        ratio = max * 0x100 / corrected;
+        ratio = max * 0x100 * (size == HEALTHBOX_EXP_CELL_COUNT ? HEALTHBOX_EXP_PIXELS_PER_FRAME : HEALTHBOX_HP_PIXELS_PER_FRAME) / corrected;
 
         if (diff < 0) {
             *temp += ratio;

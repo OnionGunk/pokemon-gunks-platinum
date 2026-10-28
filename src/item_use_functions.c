@@ -99,6 +99,7 @@ static void UseAzureFluteFromMenu(ItemMenuUseContext *usageContext, const ItemUs
 static void UseVsRecorderFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
 static void UseGracideaFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
 static void UseDexNavFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
+static void UseEndlessRepelFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
 static BOOL UseBicycleInField(ItemFieldUseContext *usageContext);
 static BOOL UseJournalInField(ItemFieldUseContext *usageContext);
 static BOOL UseOldRodInField(ItemFieldUseContext *usageContext);
@@ -116,6 +117,7 @@ static BOOL UseAzureFluteInField(ItemFieldUseContext *usageContext);
 static BOOL UseVsRecorderInField(ItemFieldUseContext *usageContext);
 static BOOL UseGracideaInField(ItemFieldUseContext *usageContext);
 static BOOL UseDexNavInField(ItemFieldUseContext *usageContext);
+static BOOL UseEndlessRepelInField(ItemFieldUseContext *usageContext);
 static void *sub_02068BEC(void *some_param);
 static void *sub_02068B9C(void *some_param);
 static void *sub_02068708(void *some_param);
@@ -168,6 +170,7 @@ static const ItemUseFuncDat sItemUseFuncs[] = {
     [ITEM_USE_FUNC_VS_RECORDER]  = { UseVsRecorderFromMenu,  UseVsRecorderInField,  NULL              },
     [ITEM_USE_FUNC_GRACIDEA]     = { UseGracideaFromMenu,    UseGracideaInField,    NULL              },
     [ITEM_USE_FUNC_DEXNAV]       = { UseDexNavFromMenu,      UseDexNavInField,      NULL              },
+    [ITEM_USE_FUNC_ENDLESS_REPEL] = { UseEndlessRepelFromMenu, UseEndlessRepelInField, NULL           },
 };
 // clang-format on
 
@@ -1193,5 +1196,17 @@ static void UseDexNavFromMenu(ItemMenuUseContext *usageContext, const ItemUseCon
 static BOOL UseDexNavInField(ItemFieldUseContext *usageContext)
 {
     sub_02068584(usageContext, SCRIPT_ID(COMMON_SCRIPTS, 0x80C - SCRIPT_ID_OFFSET_COMMON_SCRIPTS));
+    return FALSE;
+}
+
+// the Endless Repel's on/off script lives in the common scripts at 0x80D
+static void UseEndlessRepelFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext)
+{
+    sub_02068540(usageContext, additionalContext, SCRIPT_ID(COMMON_SCRIPTS, 0x80D - SCRIPT_ID_OFFSET_COMMON_SCRIPTS));
+}
+
+static BOOL UseEndlessRepelInField(ItemFieldUseContext *usageContext)
+{
+    sub_02068584(usageContext, SCRIPT_ID(COMMON_SCRIPTS, 0x80D - SCRIPT_ID_OFFSET_COMMON_SCRIPTS));
     return FALSE;
 }

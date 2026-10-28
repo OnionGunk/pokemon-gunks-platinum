@@ -138,6 +138,26 @@ void DexNavSave_SetSelectedSpecies(SaveData *saveData, u16 species)
     GetDexNavSave(saveData)->selectedSpecies = species;
 }
 
+u16 DexNavSave_GetLastRepel(SaveData *saveData)
+{
+    return GetDexNavSave(saveData)->lastRepel;
+}
+
+void DexNavSave_SetLastRepel(SaveData *saveData, u16 item)
+{
+    GetDexNavSave(saveData)->lastRepel = item;
+}
+
+BOOL DexNavSave_IsEndlessRepelOn(SaveData *saveData)
+{
+    return GetDexNavSave(saveData)->endlessRepelOn;
+}
+
+void DexNavSave_SetEndlessRepelOn(SaveData *saveData, BOOL on)
+{
+    GetDexNavSave(saveData)->endlessRepelOn = on;
+}
+
 static void DexNavSave_IncrementSearchLevel(SaveData *saveData, u16 species)
 {
     DexNavLevels *levels = GetDexNavLevels(saveData);

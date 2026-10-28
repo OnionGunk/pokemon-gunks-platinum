@@ -5,6 +5,7 @@
 
 #include "field/field_system_decl.h"
 
+#include "dexnav_search.h"
 #include "savedata.h"
 #include "script_manager.h"
 #include "special_encounter.h"
@@ -12,6 +13,11 @@
 BOOL Repel_UpdateSteps(SaveData *saveData, FieldSystem *fieldSystem)
 {
     u8 *repelSteps = SpecialEncounter_GetRepelSteps(SaveData_GetSpecialEncounters(saveData));
+
+    if (DexNavSave_IsEndlessRepelOn(saveData)) {
+        *repelSteps = ENDLESS_REPEL_STEPS;
+        return FALSE;
+    }
 
     if (*repelSteps > 0) {
         (*repelSteps)--;

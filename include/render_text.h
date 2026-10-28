@@ -68,6 +68,7 @@ typedef struct TextPrinter {
     u8 callbackResult;
     u16 callbackParam;
     void *iconGfx;
+    BOOL instant;
 } TextPrinter;
 
 enum RenderResult {

@@ -87,6 +87,7 @@
     ScriptEntry CommonScript_DexNav @ 0x80A
     ScriptEntry CommonScript_DexNavBattle @ 0x80B
     ScriptEntry CommonScript_DexNavMenu @ 0x80C
+    ScriptEntry CommonScript_EndlessRepel @ 0x80D
     ScriptEntryEnd
 
 CommonScript_Dummy2010:
@@ -1472,8 +1473,26 @@ CommonScript_HatchEgg:
 CommonScript_RepelsEffectWoreOff:
     PlaySE SE_CONFIRM_sseq_3
     LockAll
+    GetReusableRepel VAR_0x8004
+    GoToIfNe VAR_0x8004, ITEM_NONE, CommonScript_RepelsEffectWoreOffUseAnother
     Message CommonStrings_Text_RepelsEffectWoreOff
     WaitABPress
+    CloseMessage
+    ReleaseAll
+    End
+
+CommonScript_RepelsEffectWoreOffUseAnother:
+    BufferItemName 0, VAR_0x8004
+    Message CommonStrings_Text_RepelsEffectWoreOffUseAnother
+    ShowYesNoMenu VAR_RESULT
+    GoToIfEq VAR_RESULT, MENU_NO, CommonScript_RepelsEffectWoreOffEnd
+    UseRepel VAR_0x8004
+    PlaySE SEQ_SE_DP_CARD2_sseq
+    BufferPlayerName 0
+    BufferItemName 1, VAR_0x8004
+    Message CommonStrings_Text_PlayerUsedRepel
+    WaitABPress
+CommonScript_RepelsEffectWoreOffEnd:
     CloseMessage
     ReleaseAll
     End
@@ -1761,6 +1780,24 @@ CommonScript_DexNavBattle:
 
 CommonScript_DexNavBlackOut:
     BlackOutFromBattle
+    ReleaseAll
+    End
+
+CommonScript_EndlessRepel:
+    LockAll
+    ToggleEndlessRepel VAR_RESULT
+    GoToIfEq VAR_RESULT, FALSE, CommonScript_EndlessRepelOff
+    PlaySE SEQ_SE_DP_CARD2_sseq
+    Message CommonStrings_Text_EndlessRepelOn
+    WaitABPress
+    CloseMessage
+    ReleaseAll
+    End
+
+CommonScript_EndlessRepelOff:
+    Message CommonStrings_Text_EndlessRepelOff
+    WaitABPress
+    CloseMessage
     ReleaseAll
     End
 

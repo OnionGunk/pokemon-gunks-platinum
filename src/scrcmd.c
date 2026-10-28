@@ -121,6 +121,7 @@
 #include "great_marsh_lookout.h"
 #include "hall_of_fame_entries.h"
 #include "heap.h"
+#include "item.h"
 #include "inlines.h"
 #include "item_use_pokemon.h"
 #include "items.h"
@@ -448,6 +449,9 @@ static BOOL ScrCmd_GetPokemonFollowerDirFromPlayer(ScriptContext *ctx);
 static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx);
 static BOOL ScrCmd_DexNavStartBattle(ScriptContext *ctx);
 static BOOL ScrCmd_DexNavPrintMessage(ScriptContext *ctx);
+static BOOL ScrCmd_GetReusableRepel(ScriptContext *ctx);
+static BOOL ScrCmd_UseRepel(ScriptContext *ctx);
+static BOOL ScrCmd_ToggleEndlessRepel(ScriptContext *ctx);
 static BOOL ScrCmd_StartBattleClient(ScriptContext *ctx);
 static BOOL sub_02042F74(ScriptContext *ctx);
 static BOOL ScrCmd_StartBattleServer(ScriptContext *ctx);
@@ -3990,6 +3994,45 @@ static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx)
     }
 
     Heap_Free(area);
+    return FALSE;
+}
+
+// Quality of life: when a Repel wears off, the player can use another of the same kind.
+static BOOL ScrCmd_GetReusableRepel(ScriptContext *ctx)
+{
+    u16 *destVar = ScriptContext_GetVarPointer(ctx);
+    SaveData *saveData = ctx->fieldSystem->saveData;
+    u16 item = DexNavSave_GetLastRepel(saveData);
+
+    if (item == ITEM_NONE || Bag_GetItemQuantity(SaveData_GetBag(saveData), item, HEAP_ID_FIELD3) == 0) {
+        item = ITEM_NONE;
+    }
+
+    *destVar = item;
+    return FALSE;
+}
+
+static BOOL ScrCmd_UseRepel(ScriptContext *ctx)
+{
+    u16 item = ScriptContext_GetVar(ctx);
+    SaveData *saveData = ctx->fieldSystem->saveData;
+
+    if (Bag_TryRemoveItem(SaveData_GetBag(saveData), item, 1, HEAP_ID_FIELD3)) {
+        *SpecialEncounter_GetRepelSteps(SaveData_GetSpecialEncounters(saveData)) = Item_LoadParam(item, ITEM_PARAM_EFFECT_PARAM, HEAP_ID_FIELD3);
+    }
+
+    return FALSE;
+}
+
+static BOOL ScrCmd_ToggleEndlessRepel(ScriptContext *ctx)
+{
+    u16 *destVar = ScriptContext_GetVarPointer(ctx);
+    SaveData *saveData = ctx->fieldSystem->saveData;
+    BOOL on = !DexNavSave_IsEndlessRepelOn(saveData);
+
+    DexNavSave_SetEndlessRepelOn(saveData, on);
+    *SpecialEncounter_GetRepelSteps(SaveData_GetSpecialEncounters(saveData)) = on ? ENDLESS_REPEL_STEPS : 0;
+    *destVar = on;
     return FALSE;
 }
 

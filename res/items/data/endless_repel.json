@@ -1,0 +1,30 @@
+{
+  "name": "Endless Repel",
+  "plural": "Endless Repels",
+  "article": "an",
+  "description": [
+    "A reusable Repel. Use it to switch it\n",
+    "on or off. While it is on, weak wild\n",
+    "Pokémon stay away."
+  ],
+  "icon": {
+    "sprite": "repel_NCGR",
+    "palette": "max_repel_NCLR"
+  },
+  "gbaID": "GBA_ITEM_NONE",
+  "price": 0,
+  "effectParam": 0,
+  "holdEffect": "HOLD_EFFECT_NONE",
+  "pluckEffect": "PLUCK_EFFECT_NONE",
+  "flingEffect": "FLING_EFFECT_NONE",
+  "flingPower": 0,
+  "naturalGiftPower": 0,
+  "naturalGiftType": null,
+  "preventToss": true,
+  "canRegister": true,
+  "fieldPocket": "POCKET_KEY_ITEMS",
+  "battlePocket": "BATTLE_POCKET_MASK_NONE",
+  "fieldUseFunc": "ITEM_USE_FUNC_ENDLESS_REPEL",
+  "battleUseCategory": "BATTLE_USE_CATEGORY_NONE",
+  "itemUseParams": null
+}
