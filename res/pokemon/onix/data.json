@@ -113,6 +113,11 @@
     },
     "evolutions": [
         [
+            "EVO_USE_ITEM",
+            "ITEM_METAL_COAT",
+            "SPECIES_STEELIX"
+        ],
+        [
             "EVO_TRADE_WITH_HELD_ITEM",
             "ITEM_METAL_COAT",
             "SPECIES_STEELIX"

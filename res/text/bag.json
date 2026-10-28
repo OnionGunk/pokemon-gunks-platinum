@@ -511,6 +511,10 @@
     {
       "id": "Bag_Text_CannotUseNoFishing",
       "en_US": "There’s nothing to be caught here..."
+    },
+    {
+      "id": "Bag_Text_PokeRadarChainCount",
+      "en_US": "The Poké Radar chain is at {STRVAR_1 52, 0, 0}!"
     }
   ]
 }

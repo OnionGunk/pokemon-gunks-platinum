@@ -1059,6 +1059,7 @@ static void BattleSys_New(BattleSystem *battleSys, FieldBattleDTO *dto)
     battleSys->fieldWeather = dto->fieldWeather;
     battleSys->records = dto->records;
     battleSys->pokemonFollowerSlot = dto->pokemonFollowerSlot ? dto->pokemonFollowerSlot - 1 : MAX_PARTY_SIZE;
+    battleSys->expAllOn = dto->expAllOn;
 
     GF_ASSERT(dto->records != NULL);
 

@@ -345,6 +345,15 @@ typedef struct PokemonSummary {
     BOOL showContest;
 } PokemonSummary;
 
+#define SUMMARY_SKILLS_STAT_COUNT 6
+
+enum SummarySkillsDisplay {
+    SUMMARY_SKILLS_DISPLAY_STATS = 0,
+    SUMMARY_SKILLS_DISPLAY_IVS,
+    SUMMARY_SKILLS_DISPLAY_EVS,
+    SUMMARY_SKILLS_DISPLAY_MAX,
+};
+
 typedef struct PokemonSummaryMonData {
     String *speciesName;
     String *nickname;
@@ -374,6 +383,9 @@ typedef struct PokemonSummaryMonData {
     u16 speed;
     u8 ability;
     u8 nature;
+    // quality of life: shown on the Skills page, in its order (HP, Atk, Def, SpA, SpD, Spe)
+    u8 ivs[SUMMARY_SKILLS_STAT_COUNT];
+    u8 evs[SUMMARY_SKILLS_STAT_COUNT];
 
     u16 moves[LEARNED_MOVES_MAX];
     u8 curPP[LEARNED_MOVES_MAX];
@@ -438,6 +450,7 @@ typedef struct PokemonSummaryScreen {
     u8 cursor : 4;
     u8 cursorTmp : 4;
     u8 pageState;
+    u8 skillsDisplay; // enum SummarySkillsDisplay
 
     u8 subscreenType : 4;
     u8 subscreenExit : 4;

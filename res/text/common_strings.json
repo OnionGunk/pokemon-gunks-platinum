@@ -974,6 +974,38 @@
     {
       "id": "CommonStrings_Text_MoveTutorBye",
       "en_US": "Come back any time!"
+    },
+    {
+      "id": "CommonStrings_Text_ExpAllOn",
+      "en_US": [
+        "The Exp. All was turned on.\n",
+        "Your whole party will gain Exp. Points."
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_ExpAllOff",
+      "en_US": "The Exp. All was turned off."
+    },
+    {
+      "id": "CommonStrings_Text_HoneyTreeHoursLeft",
+      "en_US": [
+        "Pokémon should gather here in about\n",
+        "{STRVAR_1 52, 0, 0} hour(s)."
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_HoneyTreeHoursLeftRe",
+      "en_US": [
+        "Pokémon should gather here in about\n",
+        "{STRVAR_1 52, 0, 0} hour(s).\r"
+      ]
+    },
+    {
+      "id": "CommonStrings_Text_HoneyTreeComeBackLater",
+      "en_US": [
+        "Pokémon gather 6 to 24 hours after\n",
+        "the Honey is slathered."
+      ]
     }
   ]
 }

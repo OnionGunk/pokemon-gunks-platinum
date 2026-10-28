@@ -869,6 +869,8 @@ ScriptCommand(SCRCMD_GETPOKEMONFOLLOWERDIRFROMPLAYER,                      ScrCm
 ScriptCommand(SCRCMD_GETREUSABLEREPEL,                                     ScrCmd_GetReusableRepel)
 ScriptCommand(SCRCMD_USEREPEL,                                             ScrCmd_UseRepel)
 ScriptCommand(SCRCMD_TOGGLEENDLESSREPEL,                                   ScrCmd_ToggleEndlessRepel)
+ScriptCommand(SCRCMD_TOGGLEEXPALL,                                         ScrCmd_ToggleExpAll)
+ScriptCommand(SCRCMD_GETHONEYTREEHOURSLEFT,                                ScrCmd_GetHoneyTreeHoursLeft)
 
 // clang-format on
 

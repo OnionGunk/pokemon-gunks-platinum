@@ -100,6 +100,7 @@ static void UseVsRecorderFromMenu(ItemMenuUseContext *usageContext, const ItemUs
 static void UseGracideaFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
 static void UseDexNavFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
 static void UseEndlessRepelFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
+static void UseExpAllFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext);
 static BOOL UseBicycleInField(ItemFieldUseContext *usageContext);
 static BOOL UseJournalInField(ItemFieldUseContext *usageContext);
 static BOOL UseOldRodInField(ItemFieldUseContext *usageContext);
@@ -118,6 +119,7 @@ static BOOL UseVsRecorderInField(ItemFieldUseContext *usageContext);
 static BOOL UseGracideaInField(ItemFieldUseContext *usageContext);
 static BOOL UseDexNavInField(ItemFieldUseContext *usageContext);
 static BOOL UseEndlessRepelInField(ItemFieldUseContext *usageContext);
+static BOOL UseExpAllInField(ItemFieldUseContext *usageContext);
 static void *sub_02068BEC(void *some_param);
 static void *sub_02068B9C(void *some_param);
 static void *sub_02068708(void *some_param);
@@ -171,6 +173,7 @@ static const ItemUseFuncDat sItemUseFuncs[] = {
     [ITEM_USE_FUNC_GRACIDEA]     = { UseGracideaFromMenu,    UseGracideaInField,    NULL              },
     [ITEM_USE_FUNC_DEXNAV]       = { UseDexNavFromMenu,      UseDexNavInField,      NULL              },
     [ITEM_USE_FUNC_ENDLESS_REPEL] = { UseEndlessRepelFromMenu, UseEndlessRepelInField, NULL           },
+    [ITEM_USE_FUNC_EXP_ALL]      = { UseExpAllFromMenu,      UseExpAllInField,      NULL              },
 };
 // clang-format on
 
@@ -883,7 +886,7 @@ static BOOL UseBagMessageItem(ItemFieldUseContext *usageContext)
     v0->unk_16 = 0;
     v0->unk_10 = String_Init(128, HEAP_ID_FIELD2);
 
-    BagContext_FormatUsageMessage(usageContext->fieldSystem->saveData, v0->unk_10, Bag_GetRegisteredItem(SaveData_GetBag(usageContext->fieldSystem->saveData)), HEAP_ID_FIELD2);
+    BagContext_FormatUsageMessage(usageContext->fieldSystem->saveData, v0->unk_10, usageContext->unk_28, HEAP_ID_FIELD2);
     FieldSystem_CreateTask(usageContext->fieldSystem, PrintRegisteredKeyItemUseMessage, v0);
 
     return FALSE;
@@ -1065,6 +1068,12 @@ static void *OpenPartyMenuForGracidea(void *fieldSystem)
 
 BOOL sub_02069238(FieldSystem *fieldSystem)
 {
+    return RegisteredItem_Use(fieldSystem, FALSE);
+}
+
+// quality of life: second is the item registered before the one on Y, used with Select
+BOOL RegisteredItem_Use(FieldSystem *fieldSystem, BOOL second)
+{
     ItemFieldUseContext *usageContext;
     ItemFieldUseFunc useInField;
     ItemCheckUseFunc checkUse;
@@ -1080,7 +1089,7 @@ BOOL sub_02069238(FieldSystem *fieldSystem)
         return FALSE;
     }
 
-    item = (u16)Bag_GetRegisteredItem(SaveData_GetBag(fieldSystem->saveData));
+    item = (u16)(second ? Bag_GetSecondRegisteredItem(SaveData_GetBag(fieldSystem->saveData)) : Bag_GetRegisteredItem(SaveData_GetBag(fieldSystem->saveData)));
     itemUseFuncIdx = (u16)Item_LoadParam(item, ITEM_PARAM_FIELD_USE_FUNC, HEAP_ID_FIELD2);
     checkUse = (ItemCheckUseFunc)ItemUseFunction_Get(ITEM_FUNC_CHECK_CAN_USE, itemUseFuncIdx);
     useInField = (ItemFieldUseFunc)ItemUseFunction_Get(ITEM_FUNC_USE_IN_FIELD, itemUseFuncIdx);
@@ -1208,5 +1217,17 @@ static void UseEndlessRepelFromMenu(ItemMenuUseContext *usageContext, const Item
 static BOOL UseEndlessRepelInField(ItemFieldUseContext *usageContext)
 {
     sub_02068584(usageContext, SCRIPT_ID(COMMON_SCRIPTS, 0x80D - SCRIPT_ID_OFFSET_COMMON_SCRIPTS));
+    return FALSE;
+}
+
+// the Exp. All's on/off script lives in the common scripts at 0x80F
+static void UseExpAllFromMenu(ItemMenuUseContext *usageContext, const ItemUseContext *additionalContext)
+{
+    sub_02068540(usageContext, additionalContext, SCRIPT_ID(COMMON_SCRIPTS, 0x80F - SCRIPT_ID_OFFSET_COMMON_SCRIPTS));
+}
+
+static BOOL UseExpAllInField(ItemFieldUseContext *usageContext)
+{
+    sub_02068584(usageContext, SCRIPT_ID(COMMON_SCRIPTS, 0x80F - SCRIPT_ID_OFFSET_COMMON_SCRIPTS));
     return FALSE;
 }

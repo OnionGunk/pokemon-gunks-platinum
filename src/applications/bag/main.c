@@ -1143,7 +1143,7 @@ static void ItemListMenuPrintCB(ListMenu *menu, u32 index, u8 yOffset)
 
     if (pocket->pocketType == POCKET_KEY_ITEMS) {
         if (index != ITEM_LIST_EMPTY_ENTRY && index != MENU_CANCEL) {
-            if (Bag_GetRegisteredItem(controller->bag) == pocket->items[index].item) {
+            if (Bag_IsItemRegistered(controller->bag, pocket->items[index].item)) {
                 BagUI_DrawRegisteredIcon(controller, yOffset);
             }
         }
@@ -1216,11 +1216,30 @@ static int ProcessItemListInput_Normal(BagController *controller)
     return BAG_APP_STATE_WAIT_SELECT_ITEM_GENERAL;
 }
 
+// Quality of life: Start sorts the open pocket by item number.
+static void SortCurrentPocket(BagController *controller)
+{
+    BagApplicationPocket *pocket = &controller->bagCtx->accessiblePockets[controller->bagCtx->currPocketIdx];
+
+    Sound_PlayEffect(SE_CONFIRM_sseq_3);
+    Pocket_Sort(pocket->items, sPocketSizes[pocket->pocketType]);
+    StringList_Free(controller->itemListEntries);
+    LoadCurrentPocketItemNames(controller);
+    ListMenu_Free(controller->itemList, &pocket->cursorScroll, &pocket->cursorPos);
+    controller->itemList = NULL;
+    CreateItemListMenu(controller, pocket->cursorScroll, pocket->cursorPos);
+}
+
 static u8 ProcessItemListMenuInput(BagController *interface)
 {
     BagApplicationPocket *pocket = &interface->bagCtx->accessiblePockets[interface->bagCtx->currPocketIdx];
 
     ListMenu_GetListAndCursorPos(interface->itemList, &pocket->cursorScroll, &pocket->cursorPos);
+
+    if (JOY_NEW(PAD_BUTTON_START)) {
+        SortCurrentPocket(interface);
+        return ITEM_LIST_INPUT_NONE;
+    }
 
     if (JOY_NEW(PAD_BUTTON_SELECT)) {
         if (CanMoveSelectedEntry(interface) == TRUE) {
@@ -1985,7 +2004,7 @@ static void MakeItemActionsMenu(BagController *controller)
             }
         }
         if (Item_Get(itemData, ITEM_PARAM_CAN_REGISTER)) {
-            if (Bag_GetRegisteredItem(controller->bag) == controller->bagCtx->selectedItem) {
+            if (Bag_IsItemRegistered(controller->bag, controller->bagCtx->selectedItem)) {
                 itemActions[itemActionsIdx] = ITEM_ACTION_DESELECT;
             } else {
                 itemActions[itemActionsIdx] = ITEM_ACTION_REGISTER;
@@ -2499,7 +2518,7 @@ static int ItemActionFunc_Register(BagController *controller)
 
 static int ItemActionFunc_Deselect(BagController *controller)
 {
-    Bag_RegisterItem(controller->bag, ITEM_NONE);
+    Bag_UnregisterItem(controller->bag, controller->bagCtx->selectedItem);
     ListMenu_Draw(controller->itemList);
     BagUI_CloseItemActionsMenu(controller);
     Window_ScheduleCopyToVRAM(&controller->windows[BAG_UI_WINDOW_ITEM_DESCRIPTION]);

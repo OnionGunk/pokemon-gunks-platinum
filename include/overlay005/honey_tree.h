@@ -11,6 +11,7 @@ HoneyTreeShakeList *HoneyTree_ShakeDataInit(void);
 void HoneyTree_FreeShakeData(HoneyTreeShakeList **param0);
 BOOL HoneyTree_TryInteract(FieldSystem *fieldSystem, int *eventId);
 u16 HoneyTree_GetTreeSlatherStatus(FieldSystem *fieldSystem);
+u16 HoneyTree_GetHoursUntilReady(FieldSystem *fieldSystem);
 void HoneyTree_SlatherTree(FieldSystem *fieldSystem);
 void HoneyTree_StopShaking(FieldSystem *fieldSystem);
 int HoneyTree_GetSpecies(FieldSystem *fieldSystem);

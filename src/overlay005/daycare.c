@@ -790,13 +790,14 @@ static int Party_GetEggCyclesToSubtract(Party *party)
         if (Pokemon_GetValue(Party_GetPokemonBySlotIndex(party, i), MON_DATA_SANITY_IS_EGG, NULL) == FALSE) {
             ability = Pokemon_GetValue(Party_GetPokemonBySlotIndex(party, i), MON_DATA_ABILITY, NULL);
 
+            // quality of life: eggs hatch twice as fast (and four times with these abilities)
             if ((ability == ABILITY_MAGMA_ARMOR) || (ability == ABILITY_FLAME_BODY)) {
-                return 2;
+                return 4;
             }
         }
     }
 
-    return 1;
+    return 2;
 }
 
 static u8 Egg_AreEggGroupsCompatible(u16 *eggGroupSlots1, u16 *eggGroupSlots2)

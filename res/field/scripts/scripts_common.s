@@ -89,6 +89,7 @@
     ScriptEntry CommonScript_DexNavMenu @ 0x80C
     ScriptEntry CommonScript_EndlessRepel @ 0x80D
     ScriptEntry CommonScript_MoveTutor @ 0x80E
+    ScriptEntry CommonScript_ExpAll @ 0x80F
     ScriptEntryEnd
 
 CommonScript_Dummy2010:
@@ -512,6 +513,9 @@ CommonScript_HoneyTreeBareNoHoney:
 
 CommonScript_HoneyTreeSlatheredNoHoney:
     Message CommonStrings_Text_HoneyTreeSlatheredNoHoney
+    GetHoneyTreeHoursLeft VAR_0x8004
+    BufferNumber 0, VAR_0x8004
+    Message CommonStrings_Text_HoneyTreeHoursLeft
     WaitButton
     CloseMessage
     ReleaseAll
@@ -523,6 +527,9 @@ CommonScript_HoneyTreeBareWithHoney:
 
 CommonScript_HoneyTreeSlatheredWithHoney:
     Message CommonStrings_Text_HoneyTreeSlathered
+    GetHoneyTreeHoursLeft VAR_0x8004
+    BufferNumber 0, VAR_0x8004
+    Message CommonStrings_Text_HoneyTreeHoursLeftRe
     GoTo CommonScript_AskSlatherHoneyTree
 
 CommonScript_Unused2:
@@ -552,6 +559,7 @@ CommonScript_SlatherHoneyTree:
     SlatherHoneyTree
     WaitTime 10, VAR_RESULT
     Message CommonStrings_Text_BarkWasSlathered
+    Message CommonStrings_Text_HoneyTreeComeBackLater
     WaitButton
     CloseMessage
     ReleaseAll
@@ -1892,6 +1900,24 @@ CommonScript_MoveTutorBye:
     Message CommonStrings_Text_MoveTutorBye
     WaitButton
 CommonScript_MoveTutorEnd:
+    CloseMessage
+    ReleaseAll
+    End
+
+CommonScript_ExpAll:
+    LockAll
+    ToggleExpAll VAR_RESULT
+    GoToIfEq VAR_RESULT, FALSE, CommonScript_ExpAllOff
+    PlaySE SEQ_SE_DP_CARD2_sseq
+    Message CommonStrings_Text_ExpAllOn
+    WaitABPress
+    CloseMessage
+    ReleaseAll
+    End
+
+CommonScript_ExpAllOff:
+    Message CommonStrings_Text_ExpAllOff
+    WaitABPress
     CloseMessage
     ReleaseAll
     End

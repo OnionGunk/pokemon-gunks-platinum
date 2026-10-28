@@ -96,6 +96,11 @@
     "evolutions": [
         [
             "EVO_USE_ITEM",
+            "ITEM_KINGS_ROCK",
+            "SPECIES_POLITOED"
+        ],
+        [
+            "EVO_USE_ITEM",
             "ITEM_WATER_STONE",
             "SPECIES_POLIWRATH"
         ],

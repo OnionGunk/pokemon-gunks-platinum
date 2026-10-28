@@ -13,7 +13,7 @@ typedef struct FieldInput {
     u16 movement : 1;
     u16 dummy1 : 1;
     u16 dexNav : 1;
-    u16 dummy3 : 1;
+    u16 secondRegisteredItem : 1;
     u16 dummy4 : 1;
     u16 dummy5 : 1;
     u16 padding : 4;

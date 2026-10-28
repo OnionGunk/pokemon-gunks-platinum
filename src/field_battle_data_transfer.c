@@ -20,6 +20,8 @@
 #include "field/field_system.h"
 #include "savedata/save_table.h"
 
+#include "dexnav_search.h"
+
 #include "appearance.h"
 #include "bag.h"
 #include "battle_regulation.h"
@@ -272,6 +274,7 @@ void FieldBattleDTO_InitFromGameState(FieldBattleDTO *dto, const FieldSystem *fi
     if (fieldSystem != NULL) {
         SetBackgroundAndTerrain(dto, fieldSystem);
         dto->pokemonFollowerSlot = FieldBattleDTO_GetPokemonFollowerSlot(fieldSystem);
+        dto->expAllOn = DexNavSave_IsExpAllOn(saveData);
         dto->timeOfDay = FieldSystem_GetTimeOfDay(fieldSystem);
     } else {
         dto->background = MapHeader_GetBattleBG(mapHeaderID);

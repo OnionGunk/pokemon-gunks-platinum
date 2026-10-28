@@ -108,6 +108,11 @@
         ]
     },
     "evolutions": [
+        [
+            "EVO_LEVEL",
+            37,
+            "SPECIES_GENGAR"
+        ],
         [ "EVO_TRADE", "SPECIES_GENGAR" ]
     ],
     "offspring": "SPECIES_GASTLY",

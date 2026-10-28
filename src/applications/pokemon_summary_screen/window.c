@@ -1142,6 +1142,38 @@ static void DrawMemoPageWindows(PokemonSummaryScreen *summaryScreen)
     Window_ScheduleCopyToVRAM(&summaryScreen->extraWindows[SUMMARY_WINDOW_MEMO]);
 }
 
+static void DrawSkillsPageIVsOrEVs(PokemonSummaryScreen *summaryScreen)
+{
+    static const u8 sStatWindows[SUMMARY_SKILLS_STAT_COUNT] = {
+        SUMMARY_WINDOW_HP,
+        SUMMARY_WINDOW_ATTACK,
+        SUMMARY_WINDOW_DEFENSE,
+        SUMMARY_WINDOW_SP_ATTACK,
+        SUMMARY_WINDOW_SP_DEFENSE,
+        SUMMARY_WINDOW_SPEED,
+    };
+    BOOL ivs = summaryScreen->skillsDisplay == SUMMARY_SKILLS_DISPLAY_IVS;
+    const u8 *values = ivs ? summaryScreen->monData.ivs : summaryScreen->monData.evs;
+
+    for (int stat = 0; stat < SUMMARY_SKILLS_STAT_COUNT; stat++) {
+        SetAndFormatNumberBuf(summaryScreen, PokemonSummary_Text_TemplateAttack, values[stat], 3, PADDING_MODE_NONE);
+        PrintStringToWindow(summaryScreen, &summaryScreen->extraWindows[sStatWindows[stat]], SUMMARY_TEXT_BLACK, ALIGN_RIGHT);
+    }
+
+    StringTemplate_SetAbilityName(summaryScreen->strFormatter, 0, summaryScreen->monData.ability);
+    String *buf = MessageLoader_GetNewString(summaryScreen->msgLoader, PokemonSummary_Text_TemplateAbility);
+    StringTemplate_Format(summaryScreen->strFormatter, summaryScreen->string, buf);
+    String_Free(buf);
+    PrintStringToWindow(summaryScreen, &summaryScreen->extraWindows[SUMMARY_WINDOW_ABILITY], SUMMARY_TEXT_BLACK, ALIGN_LEFT);
+
+    MessageLoader_GetString(summaryScreen->msgLoader, ivs ? PokemonSummary_Text_ShowingIVs : PokemonSummary_Text_ShowingEVs, summaryScreen->string);
+    PrintStringToWindow(summaryScreen, &summaryScreen->extraWindows[SUMMARY_WINDOW_ABILITY_DESCRIPTION], SUMMARY_TEXT_BLACK, ALIGN_LEFT);
+
+    for (int i = SUMMARY_WINDOW_HP; i <= SUMMARY_WINDOW_ABILITY_DESCRIPTION; i++) {
+        Window_ScheduleCopyToVRAM(&summaryScreen->extraWindows[i]);
+    }
+}
+
 static void DrawSkillsPageWindows(PokemonSummaryScreen *summaryScreen)
 {
     Window_ScheduleCopyToVRAM(&summaryScreen->staticWindows[SUMMARY_WINDOW_LABEL_SKILLS]);
@@ -1163,6 +1195,12 @@ static void DrawSkillsPageWindows(PokemonSummaryScreen *summaryScreen)
     Window_FillTilemap(&summaryScreen->extraWindows[SUMMARY_WINDOW_ABILITY_DESCRIPTION], 0);
 
     u32 hpWindowWidth = Window_GetWidth(&summaryScreen->extraWindows[SUMMARY_WINDOW_HP]) * 8;
+
+    // quality of life: A switches the numbers to IVs or EVs, and the ability description says which
+    if (summaryScreen->skillsDisplay != SUMMARY_SKILLS_DISPLAY_STATS) {
+        DrawSkillsPageIVsOrEVs(summaryScreen);
+        return;
+    }
 
     PrintCurrentAndMaxInfo(summaryScreen, 0, PokemonSummary_Text_Slash, PokemonSummary_Text_TemplateCurrentHp, PokemonSummary_Text_TemplateMaxHp, summaryScreen->monData.curHP, summaryScreen->monData.maxHP, 3, hpWindowWidth / 2, 0);
     SetAndFormatNumberBuf(summaryScreen, PokemonSummary_Text_TemplateAttack, summaryScreen->monData.attack, 3, PADDING_MODE_NONE);

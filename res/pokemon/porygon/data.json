@@ -100,6 +100,11 @@
     },
     "evolutions": [
         [
+            "EVO_USE_ITEM",
+            "ITEM_UPGRADE",
+            "SPECIES_PORYGON2"
+        ],
+        [
             "EVO_TRADE_WITH_HELD_ITEM",
             "ITEM_UPGRADE",
             "SPECIES_PORYGON2"

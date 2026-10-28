@@ -449,6 +449,12 @@ BOOL RefreshRadarChain(FieldTask *taskMan)
     case 2:
         if (sub_02069690(fieldSystem->chain)) {
             *v1 = 4;
+
+            // quality of life: tell the player how long the chain is
+            if (GetChainCount(fieldSystem) > 0) {
+                ScriptManager_Start(taskMan, SCRIPT_ID(POKE_RADAR, 2), NULL, NULL);
+                *(u16 *)FieldSystem_GetScriptMemberPtr(fieldSystem, SCRIPT_DATA_PARAMETER_0) = GetChainCount(fieldSystem);
+            }
         }
         break;
     case 4:

@@ -2244,6 +2244,23 @@ static BOOL BtlCmd_CalcExpGain(BattleSystem *battleSys, BattleContext *battleCtx
     return FALSE;
 }
 
+// Quality of life: with the Exp. All on, party Pokemon that didn't battle get half the defeated
+// Pokemon's EXP (and its EVs), as the Exp. Share does from Generation VI on.
+static BOOL GetsExpAllShare(BattleSystem *battleSys, Pokemon *mon)
+{
+    return battleSys->expAllOn
+        && Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL) != SPECIES_NONE
+        && Pokemon_GetValue(mon, MON_DATA_IS_EGG, NULL) == FALSE;
+}
+
+static u32 ExpAllShare(BattleContext *battleCtx)
+{
+    u32 exp = SpeciesData_GetSpeciesValue(battleCtx->battleMons[battleCtx->faintedMon].species, SPECIES_DATA_BASE_EXP_REWARD);
+
+    exp = exp * battleCtx->battleMons[battleCtx->faintedMon].level / 7 / 2;
+    return exp > 0 ? exp : 1;
+}
+
 enum GetExpTaskState {
     SEQ_GET_EXP_START = 0,
     SEQ_GET_EXP_WAIT_MESSAGE_PRINT,
@@ -9706,7 +9723,7 @@ static void BattleScript_GetExpTask(SysTask *task, void *inData)
         item = Pokemon_GetValue(mon, MON_DATA_HELD_ITEM, NULL);
         itemEffect = Item_LoadParam(item, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_BATTLE);
 
-        if (itemEffect == HOLD_EFFECT_EXP_SHARE || (data->battleCtx->sideGetExpMask[battler] & FlagIndex(slot))) {
+        if (itemEffect == HOLD_EFFECT_EXP_SHARE || (data->battleCtx->sideGetExpMask[battler] & FlagIndex(slot)) || GetsExpAllShare(data->battleSys, mon)) {
             break;
         }
     }
@@ -9744,6 +9761,10 @@ static void BattleScript_GetExpTask(SysTask *task, void *inData)
 
             if (itemEffect == HOLD_EFFECT_EXP_SHARE) {
                 totalExp += data->battleCtx->sharedExp;
+            }
+
+            if (totalExp == 0 && GetsExpAllShare(data->battleSys, mon)) {
+                totalExp = ExpAllShare(data->battleCtx);
             }
 
             if (itemEffect == HOLD_EFFECT_EXP_UP) {

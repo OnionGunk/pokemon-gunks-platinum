@@ -41,7 +41,7 @@ typedef struct Bag {
     BagItem berries[BERRY_POCKET_SIZE];
     BagItem pokeballs[POKEBALL_POCKET_SIZE];
     BagItem battleItems[BATTLE_ITEM_POCKET_SIZE];
-    u32 registeredItem;
+    u32 registeredItem; // quality of life: low half on Y, high half (the previous one) on Select
 } Bag;
 
 typedef struct FieldBagCursor {
@@ -70,6 +70,9 @@ void Bag_Init(Bag *bag);
 void Bag_Copy(const Bag *src, Bag *dst);
 u32 Bag_GetRegisteredItem(const Bag *bag);
 void Bag_RegisterItem(Bag *bag, u32 item);
+u32 Bag_GetSecondRegisteredItem(const Bag *bag);
+BOOL Bag_IsItemRegistered(const Bag *bag, u16 item);
+void Bag_UnregisterItem(Bag *bag, u16 item);
 BOOL Bag_CanFitItem(Bag *bag, u16 item, u16 count, enum HeapID heapID);
 BOOL Bag_TryAddItem(Bag *bag, u16 item, u16 count, enum HeapID heapID);
 BOOL Bag_TryRemoveItem(Bag *bag, u16 item, u16 count, enum HeapID heapID);

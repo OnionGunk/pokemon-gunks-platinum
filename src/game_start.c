@@ -170,6 +170,7 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     Bag_RegisterItem(SaveData_GetBag(saveData), ITEM_DEXNAV);
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_BICYCLE, 1, HEAP_ID_GAME_START);
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_ENDLESS_REPEL, 1, HEAP_ID_GAME_START);
+    Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_EXP_ALL, 1, HEAP_ID_GAME_START);
     Bag_TryAddItem(SaveData_GetBag(saveData), ITEM_REPEL, 5, HEAP_ID_GAME_START);
 
     for (u16 item = ITEM_HM01; item <= ITEM_HM08; item++) {

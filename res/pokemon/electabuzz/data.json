@@ -100,6 +100,11 @@
     },
     "evolutions": [
         [
+            "EVO_USE_ITEM",
+            "ITEM_ELECTIRIZER",
+            "SPECIES_ELECTIVIRE"
+        ],
+        [
             "EVO_TRADE_WITH_HELD_ITEM",
             "ITEM_ELECTIRIZER",
             "SPECIES_ELECTIVIRE"

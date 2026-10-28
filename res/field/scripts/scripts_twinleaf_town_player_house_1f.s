@@ -142,6 +142,10 @@ TwinleafTownPlayerHouse1F_OnFrame_CutsceneAfterRivalBattle:
     SetVar VAR_0x8004, ITEM_ENDLESS_REPEL
     SetVar VAR_0x8005, 1
     Common_GiveItemQuantity
+    Message TwinleafTownPlayerHouse1F_Text_AndThisOne
+    SetVar VAR_0x8004, ITEM_EXP_ALL
+    SetVar VAR_0x8005, 1
+    Common_GiveItemQuantity
     CloseMessage
     SetVarFromValue VAR_RESULT, 0
     GetPartyMonSpecies VAR_RESULT, VAR_0x8004

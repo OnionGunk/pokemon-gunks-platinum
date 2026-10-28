@@ -158,6 +158,16 @@ void DexNavSave_SetEndlessRepelOn(SaveData *saveData, BOOL on)
     GetDexNavSave(saveData)->endlessRepelOn = on;
 }
 
+BOOL DexNavSave_IsExpAllOn(SaveData *saveData)
+{
+    return GetDexNavSave(saveData)->expAllOn;
+}
+
+void DexNavSave_SetExpAllOn(SaveData *saveData, BOOL on)
+{
+    GetDexNavSave(saveData)->expAllOn = on;
+}
+
 static void DexNavSave_IncrementSearchLevel(SaveData *saveData, u16 species)
 {
     DexNavLevels *levels = GetDexNavLevels(saveData);

@@ -102,12 +102,12 @@ static void FieldInput_Clear(FieldInput *input)
     input->endMovement = FALSE;
     input->menu = FALSE;
     input->registeredItem = FALSE;
+    input->secondRegisteredItem = FALSE;
     input->sign = FALSE;
     input->mapTransition = FALSE;
     input->movement = FALSE;
     input->dummy1 = FALSE;
     input->dexNav = FALSE;
-    input->dummy3 = FALSE;
     input->dummy4 = FALSE;
     input->dummy5 = FALSE;
     input->playerDir = DIR_NONE;
@@ -132,6 +132,11 @@ void FieldInput_Update(FieldInput *input, FieldSystem *fieldSystem, u16 pressedK
 
         if (pressedKeys & PAD_BUTTON_Y) {
             input->registeredItem = TRUE;
+        }
+
+        // quality of life: Select uses the second registered item
+        if (pressedKeys & PAD_BUTTON_SELECT) {
+            input->secondRegisteredItem = TRUE;
         }
 
         if (pressedKeys & PAD_BUTTON_A) {
@@ -337,6 +342,10 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
     }
 
     if (input->registeredItem && sub_02069238(fieldSystem) == TRUE) {
+        return TRUE;
+    }
+
+    if (input->secondRegisteredItem && RegisteredItem_Use(fieldSystem, TRUE) == TRUE) {
         return TRUE;
     }
 
@@ -546,6 +555,10 @@ int FieldInput_Process_BattleTower(const FieldInput *input, FieldSystem *fieldSy
     }
 
     if (input->registeredItem && sub_02069238(fieldSystem) == TRUE) {
+        return TRUE;
+    }
+
+    if (input->secondRegisteredItem && RegisteredItem_Use(fieldSystem, TRUE) == TRUE) {
         return TRUE;
     }
 

@@ -630,6 +630,12 @@ static int HandleInput_Main(PokemonSummaryScreen *summaryScreen)
                 summaryScreen->pageState = PAGE_STATE_INITIAL;
                 return SUMMARY_STATE_SETUP_RIBBON_INFO;
             }
+        } else if (summaryScreen->page == SUMMARY_PAGE_SKILLS) {
+            // quality of life: cycle the stat numbers through stats, IVs and EVs
+            Sound_PlayEffect(SEQ_SE_DP_DECIDE_sseq);
+            summaryScreen->skillsDisplay = (summaryScreen->skillsDisplay + 1) % SUMMARY_SKILLS_DISPLAY_MAX;
+            PokemonSummaryScreen_DrawExtraWindows(summaryScreen);
+            return SUMMARY_STATE_HANDLE_INPUT;
         } else if (summaryScreen->page == SUMMARY_PAGE_EXIT) {
             Sound_PlayEffect(SEQ_SE_DP_DECIDE_sseq);
             summaryScreen->data->returnMode = SUMMARY_RETURN_CANCEL;
@@ -1106,6 +1112,14 @@ static void SetMonDataFromMon(PokemonSummaryScreen *summaryScreen, Pokemon *mon,
     monData->speed = Pokemon_GetValue(mon, MON_DATA_SPEED, NULL);
     monData->ability = Pokemon_GetValue(mon, MON_DATA_ABILITY, NULL);
     monData->nature = Pokemon_GetNature(mon);
+
+    static const u8 sSkillsOrderIVs[SUMMARY_SKILLS_STAT_COUNT] = { MON_DATA_HP_IV, MON_DATA_ATK_IV, MON_DATA_DEF_IV, MON_DATA_SPATK_IV, MON_DATA_SPDEF_IV, MON_DATA_SPEED_IV };
+    static const u8 sSkillsOrderEVs[SUMMARY_SKILLS_STAT_COUNT] = { MON_DATA_HP_EV, MON_DATA_ATK_EV, MON_DATA_DEF_EV, MON_DATA_SPATK_EV, MON_DATA_SPDEF_EV, MON_DATA_SPEED_EV };
+
+    for (int stat = 0; stat < SUMMARY_SKILLS_STAT_COUNT; stat++) {
+        monData->ivs[stat] = Pokemon_GetValue(mon, sSkillsOrderIVs[stat], NULL);
+        monData->evs[stat] = Pokemon_GetValue(mon, sSkillsOrderEVs[stat], NULL);
+    }
 
     u16 i;
     u8 maxPP;

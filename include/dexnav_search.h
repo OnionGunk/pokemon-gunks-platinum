@@ -18,8 +18,9 @@ typedef struct DexNavSave {
     u16 selectedSpecies;
     // quality of life, in the block's spare field: the Repel to offer when one wears off, and the
     // Endless Repel's on/off state
-    u16 lastRepel : 15;
+    u16 lastRepel : 14;
     u16 endlessRepelOn : 1;
+    u16 expAllOn : 1;
 } DexNavSave;
 
 // Box block: rides in the ~3.5 KB of slack left by rounding the PC boxes up to whole sectors.
@@ -39,6 +40,8 @@ u16 DexNavSave_GetLastRepel(SaveData *saveData);
 void DexNavSave_SetLastRepel(SaveData *saveData, u16 item);
 BOOL DexNavSave_IsEndlessRepelOn(SaveData *saveData);
 void DexNavSave_SetEndlessRepelOn(SaveData *saveData, BOOL on);
+BOOL DexNavSave_IsExpAllOn(SaveData *saveData);
+void DexNavSave_SetExpAllOn(SaveData *saveData, BOOL on);
 
 // Called by the DexNav screen when the player picks a species to search for.
 void DexNavSearch_Request(u16 species, u8 level);

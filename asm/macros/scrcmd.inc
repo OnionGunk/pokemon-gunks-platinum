@@ -5031,6 +5031,18 @@
     .short \destVarID
     .endm
 
+    @ hours until Pokemon gather at the slathered honey tree in front of the player
+    .macro GetHoneyTreeHoursLeft destVarID
+    .short SCRCMD_GETHONEYTREEHOURSLEFT
+    .short \destVarID
+    .endm
+
+    @ switches the Exp. All; destVarID is TRUE if it is now on
+    .macro ToggleExpAll destVarID
+    .short SCRCMD_TOGGLEEXPALL
+    .short \destVarID
+    .endm
+
     .macro GetPokemonFollowerPartySlot destVarID
     .short SCRCMD_GETPOKEMONFOLLOWERPARTYSLOT
     .short \destVarID

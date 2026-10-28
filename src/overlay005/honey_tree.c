@@ -132,6 +132,19 @@ u16 HoneyTree_GetTreeSlatherStatus(FieldSystem *fieldSystem)
     }
 }
 
+// Quality of life: hours (rounded up) until Pokemon can gather at a slathered tree
+u16 HoneyTree_GetHoursUntilReady(FieldSystem *fieldSystem)
+{
+    u8 treeId = GetTreeIDFromMapHeaderID(fieldSystem->location->mapHeaderID);
+    GF_ASSERT(treeId != NUM_HONEY_TREES);
+
+    PlayerHoneyTreeStates *treeDat = SpecialEncounter_GetPlayerHoneyTreeStates(SaveData_GetSpecialEncounters(fieldSystem->saveData));
+    HoneyTree *tree = SpecialEncounter_GetHoneyTree(treeId, treeDat);
+    int minutes = tree->minutesRemaining - 18 * 60;
+
+    return minutes > 0 ? (minutes + 59) / 60 : 0;
+}
+
 void HoneyTree_SlatherTree(FieldSystem *fieldSystem)
 {
     u8 treeId = GetTreeIDFromMapHeaderID(fieldSystem->location->mapHeaderID);

@@ -452,6 +452,8 @@ static BOOL ScrCmd_DexNavPrintMessage(ScriptContext *ctx);
 static BOOL ScrCmd_GetReusableRepel(ScriptContext *ctx);
 static BOOL ScrCmd_UseRepel(ScriptContext *ctx);
 static BOOL ScrCmd_ToggleEndlessRepel(ScriptContext *ctx);
+static BOOL ScrCmd_ToggleExpAll(ScriptContext *ctx);
+static BOOL ScrCmd_GetHoneyTreeHoursLeft(ScriptContext *ctx);
 static BOOL ScrCmd_StartBattleClient(ScriptContext *ctx);
 static BOOL sub_02042F74(ScriptContext *ctx);
 static BOOL ScrCmd_StartBattleServer(ScriptContext *ctx);
@@ -4032,6 +4034,25 @@ static BOOL ScrCmd_ToggleEndlessRepel(ScriptContext *ctx)
 
     DexNavSave_SetEndlessRepelOn(saveData, on);
     *SpecialEncounter_GetRepelSteps(SaveData_GetSpecialEncounters(saveData)) = on ? ENDLESS_REPEL_STEPS : 0;
+    *destVar = on;
+    return FALSE;
+}
+
+static BOOL ScrCmd_GetHoneyTreeHoursLeft(ScriptContext *ctx)
+{
+    u16 *destVar = ScriptContext_GetVarPointer(ctx);
+
+    *destVar = HoneyTree_GetHoursUntilReady(ctx->fieldSystem);
+    return FALSE;
+}
+
+static BOOL ScrCmd_ToggleExpAll(ScriptContext *ctx)
+{
+    u16 *destVar = ScriptContext_GetVarPointer(ctx);
+    SaveData *saveData = ctx->fieldSystem->saveData;
+    BOOL on = !DexNavSave_IsExpAllOn(saveData);
+
+    DexNavSave_SetExpAllOn(saveData, on);
     *destVar = on;
     return FALSE;
 }
