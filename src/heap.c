@@ -200,8 +200,12 @@ static void *AllocFromHeapInternal(NNSFndHeapHandle heap, u32 size, s32 alignmen
     return ptr;
 }
 
+// failed allocations since boot; the emulator test suite reads it to catch out-of-memory paths
+u32 gHeapAllocFails;
+
 static void AllocFail(void)
 {
+    gHeapAllocFails++;
     if (CommManager_IsInitialized()) {
         ErrorMessageReset_PrintErrorAndReset();
     }

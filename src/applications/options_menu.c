@@ -771,7 +771,7 @@ static void PrintEntryChoices(OptionsMenuData *menuData, u16 entry)
     TextColor darkGray, red, color;
     u16 i;
     u8 textSpeed;
-    s8 xOffset = 0;
+    int xOffset = 0;
 
     darkGray = TEXT_COLOR(1, 2, 15);
     red = TEXT_COLOR(3, 4, 15);
@@ -800,6 +800,20 @@ static void PrintEntryChoices(OptionsMenuData *menuData, u16 entry)
         PrintEntryDescription(menuData, entry, FALSE);
     }
 
+    // packed rows: spread the choices so the last one ends inside the window, at most 12 px apart
+    int gap = 12;
+    if (entry == ENTRY_BUTTON_MODE || entry == ENTRY_TEXT_SPEED) {
+        int numChoices = menuData->entries.asArray[entry].numChoices;
+        int textWidth = 0;
+        for (i = 0; i < numChoices; i++) {
+            textWidth += Font_CalcStringWidth(FONT_SYSTEM, menuData->entries.asArray[entry].choices[i], 0);
+        }
+        int room = ENTRIES_WIDTH * 8 - CHOICES_X - 2 - textWidth;
+        if (numChoices > 1 && room < gap * (numChoices - 1)) {
+            gap = room / (numChoices - 1);
+        }
+    }
+
     xOffset = 0;
     for (i = 0; i < menuData->entries.asArray[entry].numChoices; i++) {
         if (i == menuData->entries.asArray[entry].selected) {
@@ -824,7 +838,7 @@ static void PrintEntryChoices(OptionsMenuData *menuData, u16 entry)
                 textSpeed,
                 color,
                 NULL);
-            xOffset += Font_CalcStringWidth(FONT_SYSTEM, menuData->entries.asArray[entry].choices[i], 0) + 12;
+            xOffset += Font_CalcStringWidth(FONT_SYSTEM, menuData->entries.asArray[entry].choices[i], 0) + gap;
         } else {
             Text_AddPrinterWithParamsAndColor(&menuData->windows.entries,
                 FONT_SYSTEM,
