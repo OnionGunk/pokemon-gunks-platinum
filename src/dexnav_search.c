@@ -10,11 +10,13 @@
 
 #include "field/field_system.h"
 #include "overlay005/ov5_021F2D20.h"
+#include "overlay006/wild_encounters.h"
 
 #include "bg_window.h"
 #include "font.h"
 #include "heap.h"
 #include "inlines.h"
+#include "map_header_data.h"
 #include "map_matrix.h"
 #include "map_tile_behavior.h"
 #include "math_util.h"
@@ -41,6 +43,10 @@
 #define NUM_STATS              6
 #define MAX_PERFECT_IVS        4
 #define SHINY_ODDS             4096
+// encounters rolled per search, and seed budgets (the rarest grass slot is 1%)
+#define MAX_CANDIDATES         512
+#define MAX_SEARCH_SEEDS       (MAX_CANDIDATES * 200)
+#define MAX_SHINY_SEARCH_SEEDS 0x100000
 
 #define HUD_LEFT               2
 #define HUD_TOP                19
@@ -169,17 +175,147 @@ static BOOL IsSearchableTile(FieldSystem *fieldSystem, int x, int z, fx32 player
     return MapMatrix_GetMapHeaderIDAtCoords(fieldSystem->mapMatrix, x / 32, z / 32) == fieldSystem->location->mapHeaderID;
 }
 
-// Higher search levels and longer chains give more perfect IVs and more shiny rolls.
-static void RollHiddenMon(FieldSystem *fieldSystem)
+// A wild grass encounter exactly as Platinum makes one (PIDIV "Method J"), so the caught Pokemon passes
+// legality checks: from an RNG seed, the encounter slot, then the nature, then personality values until
+// one has that nature, then the IVs. The species and level must come from the rolled slot.
+typedef struct GrassEncounterFrame {
+    u32 personality;
+    u8 ivs[NUM_STATS];
+    u8 slot;
+} GrassEncounterFrame;
+
+static u16 FrameRand(u32 *state)
+{
+    *state = *state * LCRNG_MULTIPLIER + LCRNG_INCREMENT;
+    return *state >> 16;
+}
+
+// same as LCRNG_RandMod
+static u16 FrameRandMod(u32 *state, u16 n)
+{
+    return FrameRand(state) / ((0xFFFF / n) + 1);
+}
+
+// same table as GetGroundEncounterSlot
+static u8 GrassSlotFromRoll(u8 roll)
+{
+    static const u8 sSlotEnds[MAX_GRASS_ENCOUNTERS] = { 20, 40, 50, 60, 70, 80, 85, 90, 94, 98, 99, 100 };
+    u8 slot = 0;
+
+    while (roll >= sSlotEnds[slot]) {
+        slot++;
+    }
+
+    return slot;
+}
+
+// Bit n is set if grass slot n can hold the species: its own slot, or the morning/day/night (2 and 3) and
+// swarm (0 and 1) replacements, which keep the replaced slot's level.
+static u16 GetGrassSlotsForSpecies(FieldSystem *fieldSystem, u16 species, u8 *slotLevels)
+{
+    const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
+    u16 slots = 0;
+
+    for (int i = 0; i < MAX_GRASS_ENCOUNTERS; i++) {
+        BOOL match = encounters->grassEncounters.encounters[i].species == species;
+
+        if (i == 2 || i == 3) {
+            match |= encounters->dayEncounters[i - 2] == species || encounters->nightEncounters[i - 2] == species;
+        } else if (i == 0 || i == 1) {
+            match |= encounters->swarmEncounters[i] == species;
+        }
+
+        slotLevels[i] = encounters->grassEncounters.encounters[i].level;
+
+        if (match) {
+            slots |= 1 << i;
+        }
+    }
+
+    return slots;
+}
+
+static BOOL GenerateGrassEncounterFrame(u32 seed, u16 slots, GrassEncounterFrame *frame)
+{
+    u32 state = seed;
+    u8 slot = GrassSlotFromRoll(FrameRandMod(&state, 100));
+
+    if ((slots & (1 << slot)) == 0) {
+        return FALSE;
+    }
+
+    u8 nature = FrameRandMod(&state, 25);
+    u32 personality;
+
+    do {
+        personality = FrameRand(&state);
+        personality |= (u32)FrameRand(&state) << 16;
+    } while (Pokemon_GetNatureOf(personality) != nature);
+
+    u16 ivs1 = FrameRand(&state);
+    u16 ivs2 = FrameRand(&state);
+
+    // HP, Attack, Defense, then Speed, Sp. Atk, Sp. Def, as BoxPokemon init unpacks them
+    frame->ivs[0] = ivs1 & 0x1F;
+    frame->ivs[1] = (ivs1 >> 5) & 0x1F;
+    frame->ivs[2] = (ivs1 >> 10) & 0x1F;
+    frame->ivs[3] = ivs2 & 0x1F;
+    frame->ivs[4] = (ivs2 >> 5) & 0x1F;
+    frame->ivs[5] = (ivs2 >> 10) & 0x1F;
+    frame->personality = personality;
+    frame->slot = slot;
+
+    return TRUE;
+}
+
+static int CountPerfectIVs(const GrassEncounterFrame *frame)
+{
+    int count = 0;
+
+    for (int stat = 0; stat < NUM_STATS; stat++) {
+        count += frame->ivs[stat] == 31;
+    }
+
+    return count;
+}
+
+static int SumIVs(const GrassEncounterFrame *frame)
+{
+    int sum = 0;
+
+    for (int stat = 0; stat < NUM_STATS; stat++) {
+        sum += frame->ivs[stat];
+    }
+
+    return sum;
+}
+
+static BOOL IsBetterFrame(const GrassEncounterFrame *frame, const GrassEncounterFrame *best)
+{
+    int perfect = CountPerfectIVs(frame);
+    int bestPerfect = CountPerfectIVs(best);
+
+    return perfect > bestPerfect || (perfect == bestPerfect && SumIVs(frame) > SumIVs(best));
+}
+
+// Higher search levels and longer chains roll more encounters and keep the one with the best IVs, and
+// give more shiny rolls. A shiny is searched for among the same legal encounters.
+static BOOL RollHiddenMon(FieldSystem *fieldSystem)
 {
     u32 otID = TrainerInfo_ID(SaveData_GetTrainerInfo(fieldSystem->saveData));
     int shinyRolls = 1 + sSearch.searchLevel / 10 + sSearch.chain / 5;
-    int stat;
+    int candidates = 1 + sSearch.searchLevel / 2 + sSearch.chain * 2;
+    u8 slotLevels[MAX_GRASS_ENCOUNTERS];
+    u16 slots = GetGrassSlotsForSpecies(fieldSystem, sSearch.species, slotLevels);
+    GrassEncounterFrame frame, best;
+    int found = 0;
 
-    sSearch.perfectIVs = sSearch.searchLevel / 5 + (sSearch.chain >= 10 ? 1 : 0);
+    if (slots == 0) {
+        return FALSE;
+    }
 
-    if (sSearch.perfectIVs > MAX_PERFECT_IVS) {
-        sSearch.perfectIVs = MAX_PERFECT_IVS;
+    if (candidates > MAX_CANDIDATES) {
+        candidates = MAX_CANDIDATES;
     }
 
     sSearch.shiny = FALSE;
@@ -191,26 +327,42 @@ static void RollHiddenMon(FieldSystem *fieldSystem)
         }
     }
 
-    sSearch.personality = Random32();
-
     if (sSearch.shiny) {
-        // Gen 4 shininess: (otID high ^ otID low ^ pid high ^ pid low) < 8
-        u16 low = sSearch.personality & 0xFFFF;
-        u16 high = (otID >> 16) ^ (otID & 0xFFFF) ^ low;
-        sSearch.personality = ((u32)high << 16) | low;
+        sSearch.shiny = FALSE;
+
+        for (int attempt = 0; attempt < MAX_SHINY_SEARCH_SEEDS; attempt++) {
+            if (GenerateGrassEncounterFrame(Random32(), slots, &frame) && Pokemon_IsPersonalityShiny(otID, frame.personality)) {
+                best = frame;
+                found = 1;
+                sSearch.shiny = TRUE;
+                break;
+            }
+        }
     }
 
-    for (stat = 0; stat < NUM_STATS; stat++) {
-        sSearch.ivs[stat] = LCRNG_RandMod(32);
+    for (int attempt = 0; found < candidates && attempt < MAX_SEARCH_SEEDS; attempt++) {
+        if (GenerateGrassEncounterFrame(Random32(), slots, &frame)) {
+            if (found == 0 || IsBetterFrame(&frame, &best)) {
+                best = frame;
+            }
+
+            found++;
+        }
     }
 
-    for (int i = 0; i < sSearch.perfectIVs; i++) {
-        do {
-            stat = LCRNG_RandMod(NUM_STATS);
-        } while (sSearch.ivs[stat] == 31 && i < NUM_STATS);
-
-        sSearch.ivs[stat] = 31;
+    if (found == 0) {
+        return FALSE;
     }
+
+    sSearch.personality = best.personality;
+    sSearch.level = slotLevels[best.slot];
+    sSearch.perfectIVs = CountPerfectIVs(&best);
+
+    for (int stat = 0; stat < NUM_STATS; stat++) {
+        sSearch.ivs[stat] = best.ivs[stat];
+    }
+
+    return TRUE;
 }
 
 static u16 HiddenMonAbility(void)
@@ -302,14 +454,14 @@ static void DrawHud(FieldSystem *fieldSystem)
     AppendNumber(line, sSearch.searchLevel, heapID);
     PrintRight(line, 0);
 
-    // line 2: nature, ability, and potential (one star per guaranteed perfect IV)
+    // line 2: nature, ability, and potential (one star per perfect IV)
     String_Clear(line);
     AppendFromBank(line, TEXT_BANK_NATURE_NAMES, Pokemon_GetNatureOf(sSearch.personality), heapID);
     AppendAscii(line, "  ");
     AppendFromBank(line, TEXT_BANK_ABILITY_NAMES, HiddenMonAbility(), heapID);
     Text_AddPrinterWithParams(sSearch.hud, FONT_SYSTEM, line, 0, 16, TEXT_SPEED_NO_TRANSFER, NULL);
 
-    // chain, then potential: one star per guaranteed perfect IV
+    // chain, then potential: one star per perfect IV
     String_Clear(line);
     AppendAscii(line, "Chain ");
     AppendNumber(line, sSearch.chain, heapID);
@@ -380,7 +532,10 @@ BOOL DexNavSearch_TryStart(FieldSystem *fieldSystem)
             }
 
             sSearch.searchLevel = DexNavSave_GetSearchLevel(fieldSystem->saveData, sSearch.species);
-            RollHiddenMon(fieldSystem);
+
+            if (!RollHiddenMon(fieldSystem)) {
+                return FALSE;
+            }
 
             sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
             sSearch.active = TRUE;
