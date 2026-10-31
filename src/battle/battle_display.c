@@ -2714,9 +2714,19 @@ static void Task_ShowEncounterWithoutBall(SysTask *task, void *data)
     case 0:
         monShowData->btlMonObjData = NULL;
 
-        if ((BattleSystem_GetBattleStatusMask(monShowData->battleSys) & BATTLE_STATUS_RECORDED) == FALSE
-            && (monShowData->battlerType == BATTLER_TYPE_SOLO_PLAYER || monShowData->battlerType == BATTLER_TYPE_PLAYER_SIDE_SLOT_1)) {
-            monShowData->btlMonObjData = BattleMonOBJData_NewAll(monShowData->battleSys, HEAP_ID_BATTLE);
+        // same rule as Task_ShowEncounter for which battler snapshots every battler's sprite (double battles
+        // don't get here: BattleSystem_MonEntersWithoutBall leaves them the Poke Ball)
+        if (BattleSystem_GetBattleType(monShowData->battleSys) & BATTLE_TYPE_2vs2) {
+            if ((BattleSystem_GetBattleStatusMask(monShowData->battleSys) & BATTLE_STATUS_RECORDED) == FALSE
+                && monShowData->battlerType == BATTLER_TYPE_PLAYER_SIDE_SLOT_1) {
+                monShowData->btlMonObjData = BattleMonOBJData_NewAll(monShowData->battleSys, HEAP_ID_BATTLE);
+            }
+        } else if ((BattleSystem_GetBattleStatusMask(monShowData->battleSys) & BATTLE_STATUS_RECORDED) == FALSE) {
+            if (BattleSystem_IsInitialized(monShowData->battleSys) == TRUE && monShowData->battlerType == BATTLER_TYPE_PLAYER_SIDE_SLOT_1) {
+                monShowData->btlMonObjData = BattleMonOBJData_NewAll(monShowData->battleSys, HEAP_ID_BATTLE);
+            } else if (monShowData->battlerType == BATTLER_TYPE_SOLO_PLAYER) {
+                monShowData->btlMonObjData = BattleMonOBJData_NewAll(monShowData->battleSys, HEAP_ID_BATTLE);
+            }
         }
 
         monShowData->state++;

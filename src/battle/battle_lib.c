@@ -70,13 +70,14 @@ static int CalcMoveType(BattleSystem *battleSys, BattleContext *battleCtx, int i
 static const Fraction sStatStageBoosts[];
 
 // Following Platinum: the player's follower runs in and out of battle instead of using its Poke Ball,
-// and so do both starters in the first rival battle, which were sent out on Route 201 beforehand
+// and so do both starters in the first rival battle, which were sent out on Route 201 beforehand. Double battles
+// keep the Poke Ball: the no-ball send-out crashes a few frames after a double battle's opening.
 static BOOL BattleSystem_MonEntersWithoutBall(BattleSystem *battleSys, int battler, int partySlot)
 {
     u16 enemyTrainer = battleSys->trainerIDs[BATTLER_ENEMY_1];
     u32 battleType = BattleSystem_GetBattleType(battleSys);
 
-    if (battleType & (BATTLE_TYPE_LINK | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PAL_PARK | BATTLE_TYPE_CATCH_TUTORIAL)) {
+    if (battleType & (BATTLE_TYPE_LINK | BATTLE_TYPE_SAFARI | BATTLE_TYPE_PAL_PARK | BATTLE_TYPE_CATCH_TUTORIAL | BATTLE_TYPE_DOUBLES)) {
         return FALSE;
     }
 
