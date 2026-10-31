@@ -18,7 +18,8 @@
 #include "sys_task_manager.h"
 #include "touch_screen.h"
 
-// DexNav Pokétch app: the Pokemon of the current area the player has seen. Tapping one sets it as the
+// DexNav Pokétch app: the Pokemon of the current area, caught ones in full, seen ones as silhouettes and unseen
+// ones as question marks. Tapping a seen one sets it as the
 // DexNav's target (the R button then searches for it), plays its cry and makes its icon hop.
 
 #define MON_HITBOX(r, c)                                                               \
@@ -91,7 +92,8 @@ static BOOL New(void **appData, PoketchSystem *poketchSys, BgConfig *bgConfig, u
     return FALSE;
 }
 
-// The seen Pokemon of this area, land first then water, without repeats.
+// The Pokemon of this area, land first then water, without repeats. Seen ones come first so a full grid
+// never pushes them out; unseen ones fill what is left as question marks.
 static void BuildAreaList(PoketchDexNav *appData)
 {
     FieldSystem *fieldSystem = appData->poketchSys->fieldSystem;
@@ -104,20 +106,25 @@ static void BuildAreaList(PoketchDexNav *appData)
 
     appData->data.count = 0;
 
-    for (int i = 0; i < DEXNAV_TOTAL_SLOTS && appData->data.count < POKETCH_DEXNAV_MAX_MONS; i++) {
-        u16 species = area->slots[i].species;
-        BOOL listed = FALSE;
+    for (int pass = 0; pass < 2; pass++) {
+        for (int i = 0; i < DEXNAV_TOTAL_SLOTS && appData->data.count < POKETCH_DEXNAV_MAX_MONS; i++) {
+            u16 species = area->slots[i].species;
+            BOOL listed = FALSE;
 
-        if (species == SPECIES_NONE || !Pokedex_HasSeenSpecies(pokedex, species)) {
-            continue;
-        }
+            if (species == SPECIES_NONE || Pokedex_HasSeenSpecies(pokedex, species) != (pass == 0)) {
+                continue;
+            }
 
-        for (int j = 0; j < appData->data.count; j++) {
-            listed |= appData->data.species[j] == species;
-        }
+            for (int j = 0; j < appData->data.count; j++) {
+                listed |= appData->data.species[j] == species;
+            }
 
-        if (!listed) {
-            appData->data.species[appData->data.count++] = species;
+            if (!listed) {
+                appData->data.status[appData->data.count] = pass == 1 ? POKETCH_DEXNAV_MON_UNSEEN
+                    : Pokedex_HasCaughtSpecies(pokedex, species)     ? POKETCH_DEXNAV_MON_CAUGHT
+                                                                     : POKETCH_DEXNAV_MON_SEEN;
+                appData->data.species[appData->data.count++] = species;
+            }
         }
     }
 
@@ -247,7 +254,8 @@ static BOOL State_UpdateApp(PoketchDexNav *appData)
     }
 
     if (appData->buttonState == BUTTON_MANAGER_STATE_TOUCH) {
-        if (appData->pressedIdx < appData->data.count) {
+        // an unseen Pokemon can't be searched for (and its name and cry would give it away)
+        if (appData->pressedIdx < appData->data.count && appData->data.status[appData->pressedIdx] != POKETCH_DEXNAV_MON_UNSEEN) {
             u16 species = appData->data.species[appData->pressedIdx];
 
             DexNavSave_SetSelectedSpecies(appData->poketchSys->saveData, species);

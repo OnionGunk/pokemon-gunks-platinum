@@ -6,6 +6,9 @@
 #include "applications/poketch/poketch_graphics.h"
 #include "applications/poketch/poketch_task.h"
 
+#include "constants/forms.h"
+#include "constants/species.h"
+
 #include "bg_window.h"
 #include "font.h"
 #include "heap.h"
@@ -31,6 +34,9 @@
 
 #define ICON_ANIM_STILL   0
 #define ICON_ANIM_BOUNCE  4
+
+// palettes 0-3 hold the icon palettes; 4 is every color in the Poketch's darkest shade, for silhouettes
+#define SILHOUETTE_PALETTE 4
 
 static void EndTask(PoketchTaskManager *taskMan);
 static void Task_DrawBackground(SysTask *task, void *taskMan);
@@ -195,15 +201,22 @@ static void SetupSprites(PoketchDexNavGraphics *graphics, const PoketchDexNavDat
     };
 
     PoketchTask_LoadPokemonIconLuminancePalette(0);
+    PoketchTask_FillPaletteFromActivePaletteSlot(1, SILHOUETTE_PALETTE);
     PoketchAnimation_LoadSpriteFromNARC(&graphics->spriteData, NARC_INDEX_GRAPHIC__POKETCH, poke_icon_cell_NCER_lz, poke_icon_anim_NANR_lz, HEAP_ID_POKETCH_APP);
 
     int i;
     for (i = 0; i < data->count; i++) {
-        graphics->iconIndices[i] = PokeIconSpriteIndex(data->species[i], FALSE, 0);
+        // an unseen Pokemon is shown as the silhouette of Unown ?, a plain question mark
+        if (data->status[i] == POKETCH_DEXNAV_MON_UNSEEN) {
+            graphics->iconIndices[i] = PokeIconSpriteIndex(SPECIES_UNOWN, FALSE, UNOWN_FORM_QUE);
+        } else {
+            graphics->iconIndices[i] = PokeIconSpriteIndex(data->species[i], FALSE, 0);
+        }
+
         graphics->sprites[i] = PoketchAnimation_SetupNewAnimatedSprite(graphics->animMan, &animData[i], &graphics->spriteData);
 
         PoketchAnimation_SetSpriteCharNo(graphics->sprites[i], i * 16);
-        PoketchAnimation_SetCParam(graphics->sprites[i], PokeIconPaletteIndex(data->species[i], 0, FALSE));
+        PoketchAnimation_SetCParam(graphics->sprites[i], data->status[i] == POKETCH_DEXNAV_MON_CAUGHT ? PokeIconPaletteIndex(data->species[i], 0, FALSE) : SILHOUETTE_PALETTE);
     }
 
     for (; i < POKETCH_DEXNAV_MAX_MONS; i++) {

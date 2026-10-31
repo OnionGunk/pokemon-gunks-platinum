@@ -13,9 +13,17 @@
 #define POKETCH_DEXNAV_ICON_STEP_X 40
 #define POKETCH_DEXNAV_ICON_STEP_Y 48
 
-// The Pokemon of the current area the player has seen, laid out like the Pokemon History app.
+// how each Pokemon of the area is drawn
+enum PoketchDexNavMonStatus {
+    POKETCH_DEXNAV_MON_UNSEEN = 0, // a question mark
+    POKETCH_DEXNAV_MON_SEEN, // a silhouette
+    POKETCH_DEXNAV_MON_CAUGHT, // the full icon
+};
+
+// The Pokemon that can be found in the current area, laid out like the Pokemon History app.
 typedef struct PoketchDexNavData {
     u16 species[POKETCH_DEXNAV_MAX_MONS];
+    u8 status[POKETCH_DEXNAV_MAX_MONS];
     u32 count;
     u16 selectedSpecies;
 } PoketchDexNavData;
