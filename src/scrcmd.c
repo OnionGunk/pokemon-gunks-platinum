@@ -13,6 +13,7 @@
 #include "constants/heap.h"
 #include "constants/items.h"
 #include "constants/overworld_weather.h"
+#include "constants/pokemon_follower.h"
 #include "constants/scrcmd.h"
 #include "constants/species.h"
 #include "constants/string.h"
@@ -771,6 +772,7 @@ static BOOL ScrCmd_CheckNoWiFiPlazaCooldown(ScriptContext *ctx);
 static BOOL ScrCmd_SetPartyGiratinaForm(ScriptContext *ctx);
 static BOOL ScrCmd_CheckPartyHasFatefulEncounterRegigigas(ScriptContext *ctx);
 static BOOL ScriptContext_WaitForMovement(ScriptContext *ctx);
+static BOOL ScriptContext_WaitForFollowerWalk(ScriptContext *ctx);
 static void sub_02040F28(FieldSystem *fieldSystem, SysTask *param1, MapObjectAnimCmd *param2);
 static void sub_02040F5C(SysTask *param0, void *param1);
 static u32 SaveData_GetRotomFormsInSave(SaveData *saveData);
@@ -2070,6 +2072,15 @@ static BOOL ScrCmd_ApplyMovement(ScriptContext *ctx)
         return FALSE;
     }
 
+    // Following Platinum's scenes can give the follower its next walk while it is still on the last one (quickly
+    // with INSTANT text). Two walks on one object fight, one never ends and the next WaitMovement waits forever,
+    // so wait for the last walk to end, then run this command again.
+    if (localID == POKEMON_FOLLOWER_LOCAL_ID && MapObject_CheckStatus(object, MAP_OBJ_STATUS_4)) {
+        ctx->scriptPtr -= sizeof(u16) + sizeof(u16) + sizeof(u32); // the command, its object and its movement
+        ScriptContext_Pause(ctx, ScriptContext_WaitForFollowerWalk);
+        return TRUE;
+    }
+
     SysTask *task = MapObject_StartAnimation(object, (MapObjectAnimCmd *)(ctx->scriptPtr + movementOffset));
     u8 *movementCount = FieldSystem_GetScriptMemberPtr(ctx->fieldSystem, SCRIPT_MANAGER_MOVEMENT_COUNT);
     (*movementCount)++;
@@ -2158,6 +2169,12 @@ static BOOL ScriptContext_WaitForMovement(ScriptContext *ctx)
     }
 
     return FALSE;
+}
+
+static BOOL ScriptContext_WaitForFollowerWalk(ScriptContext *ctx)
+{
+    MapObject *follower = GetLocalMapObjByIndex(ctx->fieldSystem, POKEMON_FOLLOWER_LOCAL_ID);
+    return follower == NULL || !MapObject_CheckStatus(follower, MAP_OBJ_STATUS_4);
 }
 
 static void sub_02040F28(FieldSystem *fieldSystem, SysTask *param1, MapObjectAnimCmd *param2)
