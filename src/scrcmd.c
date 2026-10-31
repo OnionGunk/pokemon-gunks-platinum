@@ -238,6 +238,7 @@ typedef struct {
     SysTask *unk_04;
     MapObjectAnimCmd *unk_08;
     FieldSystem *fieldSystem;
+    ScriptManager *scriptManager;
 } UnkStruct_02040F28;
 
 static BOOL ScrCmd_Noop(ScriptContext *ctx);
@@ -2189,6 +2190,9 @@ static void sub_02040F28(FieldSystem *fieldSystem, SysTask *param1, MapObjectAni
     }
 
     v0->fieldSystem = fieldSystem;
+    // The script that started the movement, found now: by the time the movement ends another field task can be
+    // current (the screen shake of ScrCmd_29F), and its memory isn't a script's movement count.
+    v0->scriptManager = FieldTask_GetEnv(fieldSystem->task);
     v0->unk_04 = param1;
     v0->unk_08 = param2;
     v0->unk_00 = SysTask_Start(sub_02040F5C, v0, 0);
@@ -2199,7 +2203,7 @@ static void sub_02040F28(FieldSystem *fieldSystem, SysTask *param1, MapObjectAni
 static void sub_02040F5C(SysTask *task, void *param1)
 {
     UnkStruct_02040F28 *v0 = (UnkStruct_02040F28 *)param1;
-    u8 *v1 = FieldSystem_GetScriptMemberPtr(v0->fieldSystem, SCRIPT_MANAGER_MOVEMENT_COUNT);
+    ScriptManager *scriptManager = v0->scriptManager;
 
     if (MapObject_HasAnimationEnded(v0->unk_04) == 1) {
         MapObject_FinishAnimation(v0->unk_04);
@@ -2210,6 +2214,13 @@ static void sub_02040F5C(SysTask *task, void *param1)
         }
 
         Heap_Free(param1);
+
+        // the script has ended meanwhile
+        if (scriptManager->magic != SCRIPT_MANAGER_MAGIC_NUMBER) {
+            return;
+        }
+
+        u8 *v1 = ScriptManager_GetMemberPtr(scriptManager, SCRIPT_MANAGER_MOVEMENT_COUNT);
 
         if (*v1 == 0) {
             GF_ASSERT(FALSE);
