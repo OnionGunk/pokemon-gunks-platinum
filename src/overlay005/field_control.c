@@ -183,6 +183,10 @@ void FieldInput_Update(FieldInput *input, FieldSystem *fieldSystem, u16 pressedK
 
 BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
 {
+    if (FieldSystem_TryTestWarp(fieldSystem) == TRUE) {
+        return TRUE;
+    }
+
     if (input->dummy5 == FALSE && FieldSystem_RunInitScript(fieldSystem, INIT_SCRIPT_ON_FRAME_TABLE) == TRUE) {
         return TRUE;
     }

@@ -555,12 +555,22 @@ OverworldAnimManager *PokemonFollower_RecallIfCannotEnter(FieldSystem *fieldSyst
     return PokemonFollower_RecallToBall(fieldSystem);
 }
 
+#ifdef TEST_SKIP_INTRO
+// Test hook: no follower is created while set, for control runs of the story sweep.
+u16 gTestNoFollower;
+#endif
+
 // Ported from Following Platinum's spawn routine: the lead Pokemon follows the player, starting
 // hidden on the player's own tile.
 void FieldMapChange_CreatePokemonFollower(FieldSystem *fieldSystem)
 {
     Pokemon *lead = PokemonFollower_GetLead(fieldSystem->saveData);
 
+#ifdef TEST_SKIP_INTRO
+    if (gTestNoFollower) {
+        return;
+    }
+#endif
     if (lead == NULL) {
         return;
     }
@@ -760,6 +770,24 @@ static void TestSave_ApplyPostgame(VarsFlags *varsFlags)
     }
 }
 #endif
+
+#ifdef TEST_SKIP_INTRO
+// Test hook: the emulator harness writes a map header, x, z and facing here, then sets gTestWarp[0];
+// the next free overworld frame warps there (as Fly does). Lets one boot visit every map.
+u16 gTestWarp[5];
+#endif
+
+BOOL FieldSystem_TryTestWarp(FieldSystem *fieldSystem)
+{
+#ifdef TEST_SKIP_INTRO
+    if (gTestWarp[0]) {
+        gTestWarp[0] = 0;
+        FieldTask_StartMapChangeFly(fieldSystem, gTestWarp[1], -1, gTestWarp[2], gTestWarp[3], gTestWarp[4]);
+        return TRUE;
+    }
+#endif
+    return FALSE;
+}
 
 void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem)
 {

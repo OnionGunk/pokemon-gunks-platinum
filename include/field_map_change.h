@@ -38,6 +38,7 @@ void FieldMapChange_Set3DDisplay(FieldSystem *fieldSystem);
 void FieldMapChange_UpdateGameData(FieldSystem *fieldSystem, BOOL param1);
 void FieldMapChange_UpdateGameDataDistortionWorld(FieldSystem *fieldSystem, BOOL param1);
 void sub_02053494(FieldSystem *fieldSystem);
+BOOL FieldSystem_TryTestWarp(FieldSystem *fieldSystem);
 void FieldSystem_SetLoadNewGameSpawnTask(FieldSystem *fieldSystem);
 void FieldSystem_SetLoadSavedGameMapTask(FieldSystem *fieldSystem);
 void FieldSystem_StartLoadMapFromErrorTask(FieldSystem *fieldSystem);
