@@ -8,6 +8,7 @@
 
 #include "bg_window.h"
 #include "font_special_chars.h"
+#include "pc_boxes.h"
 #include "message.h"
 #include "sprite.h"
 #include "string_gf.h"
@@ -30,15 +31,14 @@ typedef struct {
     NNSG2dScreenData *unk_38;
     Bitmap unk_3C;
     FontSpecialCharsContext *unk_44;
-    Sprite *unk_48[18];
+    Sprite *unk_48[MAX_PC_BOXES];
     Sprite *unk_90;
-    u32 unk_94[18];
+    u32 unk_94[MAX_PC_BOXES];
     SysTask *unk_DC;
     s32 unk_E0;
     u16 unk_E4[8][48];
-    u8 unk_3E4[18][1024];
-    u8 unk_4BE4[18];
-    u8 padding_4BF6[2];
+    u8 unk_3E4[MAX_PC_BOXES][1024];
+    u8 unk_4BE4[MAX_PC_BOXES];
     MessageLoader *unk_4BF8;
     String *unk_4BFC;
 } UnkStruct_ov19_021DBA9C;

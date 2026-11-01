@@ -121,7 +121,7 @@ BOOL ov19_021DB8E4(UnkStruct_ov19_021DBA9C *param0, UnkStruct_ov19_021D61B0 *par
     param0->unk_3C.height = 32;
     param0->unk_4BF8 = MessageLoader_Init(MSG_LOADER_LOAD_ON_DEMAND, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_ITEM_DESCRIPTIONS, HEAP_ID_BOX_GRAPHICS);
 
-    for (v0 = 0; v0 < 18; v0++) {
+    for (v0 = 0; v0 < MAX_PC_BOXES; v0++) {
         param0->unk_48[v0] = NULL;
     }
 
@@ -315,7 +315,7 @@ static int ov19_021DBD40(UnkStruct_ov19_021DBA9C *param0)
     int v0 = param0->unk_E0 - (7 / 2);
 
     if (v0 < 0) {
-        v0 += 18;
+        v0 += MAX_PC_BOXES;
     }
 
     return v0;
@@ -325,7 +325,7 @@ static void ov19_021DBD4C(UnkStruct_ov19_021DBA9C *param0)
 {
     int v0;
 
-    for (v0 = 0; v0 < 18; v0++) {
+    for (v0 = 0; v0 < MAX_PC_BOXES; v0++) {
         param0->unk_4BE4[v0] = 0;
     }
 }
@@ -379,7 +379,7 @@ static void ov19_021DBDF4(UnkStruct_ov19_021DBA9C *param0)
         Sprite_SetPosition(param0->unk_48[v4], &v3);
         ov19_021DBD68(param0, v5);
 
-        if (++v5 >= 18) {
+        if (++v5 >= MAX_PC_BOXES) {
             v5 = 0;
         }
     }
@@ -411,7 +411,7 @@ static void ov19_021DBF18(UnkStruct_ov19_021DBA9C *param0)
         ov19_021DBD9C(param0, v1, v0);
         Sprite_SetDrawFlag(param0->unk_48[v1], TRUE);
 
-        if (++v0 >= 18) {
+        if (++v0 >= MAX_PC_BOXES) {
             v0 = 0;
         }
     }
@@ -454,7 +454,7 @@ static void ov19_021DBFC4(UnkStruct_ov19_021DBA9C *param0)
     for (v1 = 0; v1 < 7; v1++) {
         FontSpecialChars_DrawPartyScreenHPText(param0->unk_44, param0->unk_94[v0], 2, 2, v2, 32 * v1, 0);
 
-        if (++v0 >= 18) {
+        if (++v0 >= MAX_PC_BOXES) {
             v0 = 0;
         }
     }

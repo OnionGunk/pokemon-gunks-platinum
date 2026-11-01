@@ -320,6 +320,18 @@
     {
       "id": "pl_msg_00000018_00079",
       "en_US": "No"
+    },
+    {
+      "id": "PokemonStorageSystem_Text_Box19",
+      "en_US": "BOX 19"
+    },
+    {
+      "id": "PokemonStorageSystem_Text_Box20",
+      "en_US": "BOX 20"
+    },
+    {
+      "id": "PokemonStorageSystem_Text_Box21",
+      "en_US": "BOX 21"
     }
   ]
 }

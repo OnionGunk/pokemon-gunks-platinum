@@ -805,8 +805,8 @@ static void ov19_021DD854(UnkStruct_ov19_021DCF88 *param0)
     v1 = ov19_021D780C(param0->unk_00);
     v4 = BoxApp_GetTouchDialOffset(param0->unk_04) + 3;
 
-    if (v4 >= 18) {
-        v4 -= 18;
+    if (v4 >= MAX_PC_BOXES) {
+        v4 -= MAX_PC_BOXES;
     }
 
     for (v3 = 0; v3 < 10; v3++) {
@@ -821,7 +821,7 @@ static void ov19_021DD854(UnkStruct_ov19_021DCF88 *param0)
         v4--;
 
         if (v4 < 0) {
-            v4 = 18 - 1;
+            v4 = MAX_PC_BOXES - 1;
         }
     }
 
@@ -840,8 +840,8 @@ static void ov19_021DD8F8(UnkStruct_ov19_021DCF88 *param0)
     if (param0->unk_04->touchDialHelper.scrollDelta > 0) {
         v4 = (v4 - param0->unk_04->touchDialHelper.scrollDelta) + (3 + 1);
 
-        if (v4 >= 18) {
-            v4 -= 18;
+        if (v4 >= MAX_PC_BOXES) {
+            v4 -= MAX_PC_BOXES;
         }
 
         v5 = 1;
@@ -858,7 +858,7 @@ static void ov19_021DD8F8(UnkStruct_ov19_021DCF88 *param0)
         v4 = (v4 - param0->unk_04->touchDialHelper.scrollDelta) - (2 + 1);
 
         if (v4 < 0) {
-            v4 += 18;
+            v4 += MAX_PC_BOXES;
         }
 
         v5 = -1;
@@ -881,8 +881,8 @@ static void ov19_021DD8F8(UnkStruct_ov19_021DCF88 *param0)
         v4 += v5;
 
         if (v4 < 0) {
-            v4 = 18 - 1;
-        } else if (v4 >= 18) {
+            v4 = MAX_PC_BOXES - 1;
+        } else if (v4 >= MAX_PC_BOXES) {
             v4 = 0;
         }
 

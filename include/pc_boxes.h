@@ -4,7 +4,7 @@
 #include "pokemon.h"
 #include "string_gf.h"
 
-#define MAX_PC_BOXES              18
+#define MAX_PC_BOXES              21 // quality of life: vanilla has 18; 21 holds a living dex through Sinnoh with three to spare
 #define MAX_PC_ROWS               5
 #define MAX_PC_COLS               6
 #define MAX_MONS_PER_BOX          (MAX_PC_ROWS * MAX_PC_COLS)

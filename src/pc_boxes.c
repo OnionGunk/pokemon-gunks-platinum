@@ -47,7 +47,9 @@ static void PCBoxes_InitInternal(PCBoxes *pcBoxes)
     MessageLoader *messageLoader = MessageLoader_Init(MSG_LOADER_LOAD_ON_DEMAND, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_POKEMON_STORAGE_SYSTEM, HEAP_ID_SYSTEM);
     if (messageLoader) {
         for (boxID = 0; boxID < MAX_PC_BOXES; boxID++) {
-            MessageLoader_Get(messageLoader, PokemonStorageSystem_Text_Box1 + boxID, pcBoxes->names[boxID]);
+            // vanilla's 18 names are in a row; the added boxes' names come at the end of the bank
+            u32 nameID = boxID < 18 ? PokemonStorageSystem_Text_Box1 + boxID : PokemonStorageSystem_Text_Box19 + (boxID - 18);
+            MessageLoader_Get(messageLoader, nameID, pcBoxes->names[boxID]);
         }
 
         MessageLoader_Free(messageLoader);
