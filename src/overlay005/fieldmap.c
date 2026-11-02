@@ -47,6 +47,7 @@
 #include "camera.h"
 #include "char_transfer.h"
 #include "comm_player_manager.h"
+#include "dexnav_search.h"
 #include "dynamic_map_features.h"
 #include "easy3d.h"
 #include "field_bgm.h"
@@ -233,6 +234,7 @@ static BOOL FieldMap_Init(ApplicationManager *appMan, int *state)
     case FIELD_MAP_INIT_STATE_DONE:
         if (FieldSystem_IsBottomScreenRunningDummy(fieldSystem)) {
             fieldSystem->runningFieldMap = TRUE;
+            DexNavSearch_OnFieldReturn(fieldSystem);
             ret = TRUE;
         }
         break;
@@ -296,6 +298,7 @@ static BOOL FieldMap_Exit(ApplicationManager *appMan, int *param1)
         ov5_021ECC78(fieldSystem->mapObjMan);
 
         MapObjectMan_StopAllMovement(fieldSystem->mapObjMan);
+        DexNavSearch_OnFieldExit();
         FieldEffectManager_Free(fieldSystem->fieldEffMan);
 
         MapObjectsToPreload_Free(fieldSystem->mapObjectsToPreload);

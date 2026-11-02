@@ -609,6 +609,38 @@ void DexNavSearch_Update(FieldSystem *fieldSystem)
     }
 }
 
+// The patch and the bar live in the field's heap and BG layers, which go away whenever the field does (a menu
+// screen, a battle, a door). Take them down while the field still exists, or the next frame that touches them
+// reads freed memory (the bar's VRAM copy then DMAs from a stale address and the game hangs).
+void DexNavSearch_OnFieldExit(void)
+{
+    if (sSearch.active) {
+        if (sSearch.anim != NULL) {
+            OverworldAnimManager_Finish(sSearch.anim);
+        }
+
+        RemoveHud();
+        sSearch.anim = NULL;
+    }
+}
+
+// Puts the patch and the bar back once the field is up again, if the player is still on the search's map.
+void DexNavSearch_OnFieldReturn(FieldSystem *fieldSystem)
+{
+    if (!sSearch.active) {
+        return;
+    }
+
+    if (fieldSystem->location->mapHeaderID != sSearch.mapHeaderID) {
+        sSearch.chain = 0;
+        DexNavSearch_End(FALSE);
+        return;
+    }
+
+    sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
+    DrawHud(fieldSystem);
+}
+
 BOOL DexNavSearch_IsPlayerInPatch(FieldSystem *fieldSystem, int playerX, int playerZ)
 {
     return sSearch.active && fieldSystem->location->mapHeaderID == sSearch.mapHeaderID && playerX == sSearch.x && playerZ == sSearch.z;
