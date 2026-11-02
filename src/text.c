@@ -269,6 +269,11 @@ static void SysTask_RunTextPrinter(SysTask *task, void *data)
             return;
 
         case RENDER_FINISH:
+            // instant text may have printed the message's last characters this frame without copying them
+            if (printer->instant) {
+                Window_CopyToVRAM(printer->template.window);
+            }
+
             Text_DestroyPrinterTask(printer->id);
             return;
         }

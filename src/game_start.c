@@ -115,6 +115,8 @@ static int GameStartNewSave_Init(ApplicationManager *appMan, int *state)
 #ifdef TEST_SKIP_INTRO
 // lives in the resident binary (dexnav_search.c): this file is an overlay whose .bss is cleared on load
 extern u16 gTestLeadSpecies;
+extern u16 gTestLeadLevel;
+extern u16 gTestLeadItem;
 extern u16 gTestSaveMode;
 #endif
 
@@ -195,7 +197,16 @@ static int GameStartNewSave_Main(ApplicationManager *appMan, int *state)
     // bit 15 of gTestLeadSpecies makes the lead shiny
     u16 lead = (gTestLeadSpecies & 0x7FFF) != SPECIES_NONE ? (gTestLeadSpecies & 0x7FFF) : SPECIES_PIPLUP;
 
-    Pokemon_GiveMonFromScript(HEAP_ID_GAME_START, saveData, lead, 30, 0, 0, 0);
+    Pokemon_GiveMonFromScript(HEAP_ID_GAME_START, saveData, lead, gTestLeadLevel != 0 ? gTestLeadLevel : 30, gTestLeadItem, 0, 0);
+
+    if (gTestLeadLevel != 0) {
+        Pokemon *leadMon = Party_GetPokemonBySlotIndex(SaveData_GetParty(saveData), 0);
+        u32 exp = Pokemon_GetSpeciesBaseExpAt(lead, gTestLeadLevel + 1) - 1;
+
+        Pokemon_SetValue(leadMon, MON_DATA_EXPERIENCE, &exp);
+        // so the harness's first-move battles end in one hit, whatever the species learned
+        Pokemon_ResetMoveSlot(leadMon, MOVE_TACKLE, 0);
+    }
 
     if (gTestLeadSpecies & 0x8000) {
         Pokemon *leadMon = Party_GetPokemonBySlotIndex(SaveData_GetParty(saveData), 0);

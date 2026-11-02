@@ -3540,7 +3540,8 @@ u16 Pokemon_GetEvolutionTargetSpecies(Party *party, Pokemon *mon, u8 evoClass, u
     u16 monPersonalityUpper = (monPersonality & 0xFFFF0000) >> 16;
     u8 itemHoldEffect = Item_LoadParam(monHeldItem, ITEM_PARAM_HOLD_EFFECT, HEAP_ID_SYSTEM);
 
-    if (monSpecies != SPECIES_KADABRA
+    // Kadabra ignores the Everstone only when traded, so its added level-up evolution still respects it
+    if ((monSpecies != SPECIES_KADABRA || evoClass != EVO_CLASS_BY_TRADE)
         && itemHoldEffect == HOLD_EFFECT_NO_EVOLVE
         && evoClass != EVO_CLASS_BY_ITEM) {
         return SPECIES_NONE;
