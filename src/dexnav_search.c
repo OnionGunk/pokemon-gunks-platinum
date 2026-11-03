@@ -58,8 +58,14 @@
 #define SHINY_ODDS             4096
 // encounters rolled per search, and seed budgets (the rarest grass slot is 1%)
 #define MAX_CANDIDATES         512
-#define MAX_SEARCH_SEEDS       (MAX_CANDIDATES * 200)
-#define MAX_SHINY_SEARCH_SEEDS 0x100000
+// RNG calls walked looking for a shiny frame: about 8192 / (the species' share of the slots) are needed, 819,200
+// for a species only in the two 1% slots, so this gives up (no shiny) about once in 150 such searches
+#define MAX_SHINY_SCAN_CALLS   0x400000
+#define SHINY_SCAN_HISTORY     64
+#define LCRNG_MULTIPLIER_INV   0xEEB9EB65
+#define LCRNG_INCREMENT_INV    0x0A3561A1
+#define SLOT_ROLL_DIVISOR      656  // FrameRandMod(100): rand / (0xFFFF / 100 + 1)
+#define NATURE_ROLL_DIVISOR    2622 // FrameRandMod(25)
 
 #define HUD_LEFT               2
 #define HUD_TOP                19
@@ -358,6 +364,103 @@ static BOOL IsBetterFrame(const GrassEncounterFrame *frame, const GrassEncounter
     return perfect > bestPerfect || (perfect == bestPerfect && SumIVs(frame) > SumIVs(best));
 }
 
+// How many 16-bit slot-roll values land on a slot that can hold the species: rand / 656 is the roll (0-99), and
+// roll 99 is short (65536 - 99 * 656 values).
+static u32 SlotRollValues(u16 slots)
+{
+    u32 count = 0;
+
+    for (int roll = 0; roll < 100; roll++) {
+        if (slots & (1 << GrassSlotFromRoll(roll))) {
+            count += roll < 99 ? SLOT_ROLL_DIVISOR : 0x10000 - 99 * SLOT_ROLL_DIVISOR;
+        }
+    }
+
+    return count;
+}
+
+// A seed whose slot roll lands on one of `slots`, uniformly among all such seeds (what drawing random seeds and
+// skipping the others gives, without the skipping: a species only in the 1% slots skipped about 99 of 100 and
+// stalled the game): the slot roll's 16 bits are drawn from the allowed values, its low 16 bits at random, and the
+// RNG is stepped back over that call.
+static u32 SeedInSlots(u16 slots, u32 slotRollValues)
+{
+    u32 pick = Random32() % slotRollValues;
+    u32 rand = 0;
+
+    for (int roll = 0; roll < 100; roll++) {
+        u32 width = roll < 99 ? SLOT_ROLL_DIVISOR : 0x10000 - 99 * SLOT_ROLL_DIVISOR;
+
+        if ((slots & (1 << GrassSlotFromRoll(roll))) == 0) {
+            continue;
+        }
+
+        if (pick < width) {
+            rand = roll * SLOT_ROLL_DIVISOR + pick;
+            break;
+        }
+
+        pick -= width;
+    }
+
+    u32 state = (rand << 16) | LCRNG_Next();
+
+    return state * LCRNG_MULTIPLIER_INV + LCRNG_INCREMENT_INV;
+}
+
+// A shiny encounter, found cheaply (the method Gunk's HeartGold uses): walk the RNG one call at a time until two
+// consecutive outputs make a shiny personality, then step back over the personality rerolls before it (each must
+// have the wrong nature) to a call that rolled its nature, and the slot roll before that. If that slot can hold
+// the species, the call before the slot roll is the seed; the frame is then generated from it in full and must
+// come out with that personality.
+static BOOL FindShinyFrame(u32 otID, u16 slots, GrassEncounterFrame *frame)
+{
+    u32 states[SHINY_SCAN_HISTORY]; // the RNG state after each call, the last SHINY_SCAN_HISTORY of them
+    u32 state = Random32();
+    u16 trainerShiny = (otID & 0xFFFF) ^ (otID >> 16);
+
+    for (u32 call = 0; call < MAX_SHINY_SCAN_CALLS; call++) {
+        state = state * LCRNG_MULTIPLIER + LCRNG_INCREMENT;
+        states[call % SHINY_SCAN_HISTORY] = state;
+
+        u16 high = state >> 16;
+        u16 low = states[(call - 1) % SHINY_SCAN_HISTORY] >> 16;
+
+        if (call < 4 || (trainerShiny ^ low ^ high) >= 8) {
+            continue;
+        }
+
+        u32 personality = low | ((u32)high << 16);
+        u8 nature = personality % 25;
+
+        // the personality's low half is call - 1; the nature roll is at call - 2, call - 4, ...
+        for (u32 back = 2; back + 2 <= call && back + 2 < SHINY_SCAN_HISTORY; back += 2) {
+            u32 natureCall = call - back;
+
+            if (back > 2) {
+                // the reroll just after this nature roll was rejected, so its nature isn't this one
+                u32 rejected = (states[(natureCall + 1) % SHINY_SCAN_HISTORY] >> 16) | (states[(natureCall + 2) % SHINY_SCAN_HISTORY] & 0xFFFF0000);
+
+                if (rejected % 25 == nature) {
+                    break;
+                }
+            }
+
+            if ((states[natureCall % SHINY_SCAN_HISTORY] >> 16) / NATURE_ROLL_DIVISOR != nature) {
+                continue;
+            }
+
+            u32 seed = states[(natureCall - 2) % SHINY_SCAN_HISTORY];
+
+            if (GenerateGrassEncounterFrame(seed, slots, frame) && frame->personality == personality) {
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}
+
 // Higher search levels and longer chains roll more encounters and keep the one with the best IVs, and
 // give more shiny rolls. A shiny is searched for among the same legal encounters, and is kept as found:
 // a better-IV encounter from the extra rolls would not be shiny.
@@ -389,25 +492,17 @@ static BOOL RollHiddenMon(FieldSystem *fieldSystem)
     }
 
     if (sSearch.shiny) {
-        sSearch.shiny = FALSE;
-
-        for (int attempt = 0; attempt < MAX_SHINY_SEARCH_SEEDS; attempt++) {
-            if (GenerateGrassEncounterFrame(Random32(), slots, &frame) && Pokemon_IsPersonalityShiny(otID, frame.personality)) {
-                best = frame;
-                found = 1;
-                sSearch.shiny = TRUE;
-                break;
-            }
-        }
+        sSearch.shiny = FindShinyFrame(otID, slots, &best) && Pokemon_IsPersonalityShiny(otID, best.personality);
+        found = sSearch.shiny;
     }
 
-    for (int attempt = 0; !sSearch.shiny && found < candidates && attempt < MAX_SEARCH_SEEDS; attempt++) {
-        if (GenerateGrassEncounterFrame(Random32(), slots, &frame)) {
-            if (found == 0 || IsBetterFrame(&frame, &best)) {
-                best = frame;
-            }
+    u32 slotRollValues = SlotRollValues(slots);
 
-            found++;
+    for (; !sSearch.shiny && found < candidates; found++) {
+        GenerateGrassEncounterFrame(SeedInSlots(slots, slotRollValues), slots, &frame);
+
+        if (found == 0 || IsBetterFrame(&frame, &best)) {
+            best = frame;
         }
     }
 
