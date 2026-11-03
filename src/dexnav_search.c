@@ -332,7 +332,8 @@ static BOOL IsBetterFrame(const GrassEncounterFrame *frame, const GrassEncounter
 }
 
 // Higher search levels and longer chains roll more encounters and keep the one with the best IVs, and
-// give more shiny rolls. A shiny is searched for among the same legal encounters.
+// give more shiny rolls. A shiny is searched for among the same legal encounters, and is kept as found:
+// a better-IV encounter from the extra rolls would not be shiny.
 static BOOL RollHiddenMon(FieldSystem *fieldSystem)
 {
     u32 otID = TrainerInfo_ID(SaveData_GetTrainerInfo(fieldSystem->saveData));
@@ -373,7 +374,7 @@ static BOOL RollHiddenMon(FieldSystem *fieldSystem)
         }
     }
 
-    for (int attempt = 0; found < candidates && attempt < MAX_SEARCH_SEEDS; attempt++) {
+    for (int attempt = 0; !sSearch.shiny && found < candidates && attempt < MAX_SEARCH_SEEDS; attempt++) {
         if (GenerateGrassEncounterFrame(Random32(), slots, &frame)) {
             if (found == 0 || IsBetterFrame(&frame, &best)) {
                 best = frame;
