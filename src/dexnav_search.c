@@ -30,7 +30,9 @@
 #include "player_avatar.h"
 #include "render_window.h"
 #include "save_player.h"
+#include "script_manager.h"
 #include "string_gf.h"
+#include "system.h"
 #include "terrain_collision_manager.h"
 #include "text.h"
 #include "trainer_info.h"
@@ -39,6 +41,14 @@
 #define SEARCH_MAX_DISTANCE    4
 #define SEARCH_LOST_DISTANCE   8
 #define SEARCH_PLACE_ATTEMPTS  40
+// a search lasts 10 seconds of free field time (not menus, scripts or battles), and the patch shakes
+// twice a second until then; real time, from the hardware timer: the field runs at 30 frames a second,
+// or 60 with Following Platinum's unlocked frame rate
+#define SEARCH_MS              10000
+#define SHAKE_INTERVAL_MS      500
+// a longer gap between two field frames means the field was stopped (a menu, a script, a battle)
+#define MAX_FRAME_MS           100
+#define PAUSED_FRAME_MS        33
 #define PATCH_SHAKE_SOFT       0
 #define PATCH_SHAKE_SHINY      2
 
@@ -83,6 +93,8 @@ typedef struct DexNavSearch {
     u16 chainSpecies;
     int chainMapHeaderID;
     u16 chain;
+    u16 elapsedMs; // free field time since the search started
+    u32 lastTick;  // the hardware timer (OS_GetTick) at the last field frame
 } DexNavSearch;
 
 // Lives in the main binary so it survives the field unloading for the DexNav screen and battles.
@@ -588,6 +600,8 @@ BOOL DexNavSearch_TryStart(FieldSystem *fieldSystem)
 
             sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
             sSearch.active = TRUE;
+            sSearch.elapsedMs = 0;
+            sSearch.lastTick = (u32)OS_GetTick();
             DrawHud(fieldSystem);
             return TRUE;
         }
@@ -614,17 +628,55 @@ void DexNavSearch_Update(FieldSystem *fieldSystem)
         return;
     }
 
-    // the shake animation runs once, so restart it to keep the patch rustling
-    if (sSearch.anim != NULL && ov5_021F31A8(sSearch.anim)) {
-        OverworldAnimManager_Finish(sSearch.anim);
-        sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
-    }
-
     // A message box may have borrowed the bar's VRAM tiles. The window's pixel buffer in RAM is
     // untouched, so re-uploading it restores the bar without re-rendering any text.
     if (sSearch.hud != NULL) {
         Window_DrawMessageBox(sSearch.hud, FIELD_MSGBOX_BASE_TILE, FIELD_MSGBOX_PALETTE);
         Window_ScheduleCopyToVRAM(sSearch.hud);
+    }
+}
+
+// Every frame the field is free (FieldInput_Process): the search's 10 seconds run out, and the patch shakes
+// again every half second (the shake animation plays once). When time runs out the Pokemon gets away: the
+// search ends, the chain is broken, and TRUE says a script with the message was started.
+BOOL DexNavSearch_Tick(FieldSystem *fieldSystem)
+{
+    if (!sSearch.active) {
+        return FALSE;
+    }
+
+    u32 now = (u32)OS_GetTick();
+    u32 ticks = now - sSearch.lastTick;
+    u32 ms = ticks > OS_MilliSecondsToTicks32(MAX_FRAME_MS) ? PAUSED_FRAME_MS : OS_TicksToMilliSeconds32(ticks);
+    u16 before = sSearch.elapsedMs;
+
+    sSearch.lastTick = now;
+    sSearch.elapsedMs += ms;
+
+    if (sSearch.elapsedMs >= SEARCH_MS) {
+        sSearch.chain = 0;
+        DexNavSearch_End(TRUE);
+        ScriptManager_Set(fieldSystem, SCRIPT_ID(COMMON_SCRIPTS, 0x810 - SCRIPT_ID_OFFSET_COMMON_SCRIPTS), NULL);
+        return TRUE;
+    }
+
+    if (sSearch.elapsedMs / SHAKE_INTERVAL_MS != before / SHAKE_INTERVAL_MS && fieldSystem->location->mapHeaderID == sSearch.mapHeaderID) {
+        if (sSearch.anim != NULL) {
+            OverworldAnimManager_Finish(sSearch.anim);
+        }
+
+        sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
+    }
+
+    return FALSE;
+}
+
+// A wild battle is starting (a random encounter, fishing, or the patch's own): a different species than the
+// chain's breaks the chain. The patch's own battle then adds to the chain (DexNavSearch_CreateEncounterMon).
+void DexNavSearch_OnWildEncounter(u16 species)
+{
+    if (species != sSearch.chainSpecies) {
+        sSearch.chain = 0;
     }
 }
 

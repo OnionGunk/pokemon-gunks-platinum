@@ -56,6 +56,8 @@ BOOL DexNavSearch_TryStart(FieldSystem *fieldSystem);
 
 // Per-step upkeep: keeps the patch shaking, redraws the search bar, and drops the search if the player wanders off.
 void DexNavSearch_Update(FieldSystem *fieldSystem);
+BOOL DexNavSearch_Tick(FieldSystem *fieldSystem);
+void DexNavSearch_OnWildEncounter(u16 species);
 
 // Called by the field map as it shuts down and once it is running again, so a search survives menus and battles.
 void DexNavSearch_OnFieldExit(void);

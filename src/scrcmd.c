@@ -3987,6 +3987,7 @@ enum DexNavSearchResult {
     DEXNAV_SEARCH_NONE_SELECTED,
     DEXNAV_SEARCH_NO_GRASS,
     DEXNAV_SEARCH_NOT_HERE,
+    DEXNAV_SEARCH_GOT_AWAY,
 };
 
 static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx)
@@ -4101,6 +4102,7 @@ static const char *const sDexNavMessages[] = {
     [DEXNAV_SEARCH_NONE_SELECTED] = "Select a Pok#mon in the DexNav|first.",
     [DEXNAV_SEARCH_NO_GRASS] = "There is no tall grass close enough|to search.",
     [DEXNAV_SEARCH_NOT_HERE] = "This Pok#mon can't be found here.",
+    [DEXNAV_SEARCH_GOT_AWAY] = "The Pok#mon got away...",
 };
 
 static BOOL ScrCmd_DexNavPrintMessage(ScriptContext *ctx)

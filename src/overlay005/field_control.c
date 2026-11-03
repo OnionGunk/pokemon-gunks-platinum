@@ -187,6 +187,10 @@ BOOL FieldInput_Process(const FieldInput *input, FieldSystem *fieldSystem)
         return TRUE;
     }
 
+    if (DexNavSearch_Tick(fieldSystem) == TRUE) {
+        return TRUE;
+    }
+
     if (input->dummy5 == FALSE && FieldSystem_RunInitScript(fieldSystem, INIT_SCRIPT_ON_FRAME_TABLE) == TRUE) {
         return TRUE;
     }

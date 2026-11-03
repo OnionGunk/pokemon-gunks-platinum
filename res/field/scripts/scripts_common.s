@@ -90,6 +90,7 @@
     ScriptEntry CommonScript_EndlessRepel @ 0x80D
     ScriptEntry CommonScript_MoveTutor @ 0x80E
     ScriptEntry CommonScript_ExpAll @ 0x80F
+    ScriptEntry CommonScript_DexNavGotAway @ 0x810
     ScriptEntryEnd
 
 CommonScript_Dummy2010:
@@ -1759,6 +1760,11 @@ CommonScript_DexNav:
     GoToIfNe VAR_RESULT, 0, CommonScript_DexNavMessage
     ReleaseAll
     End
+
+CommonScript_DexNavGotAway:
+    LockAll
+    SetVar VAR_RESULT, 4 // DEXNAV_SEARCH_GOT_AWAY (scrcmd.c)
+    GoTo CommonScript_DexNavMessage
 
 CommonScript_DexNavMessage:
     OpenMessage

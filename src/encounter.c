@@ -40,6 +40,7 @@
 #include "pokeradar.h"
 #include "save_player.h"
 #include "script_manager.h"
+#include "dexnav_search.h"
 #include "sound.h"
 #include "system_flags.h"
 #include "system_vars.h"
@@ -339,8 +340,18 @@ static void FreeWildEncounter(WildEncounter *encounter)
     Heap_Free(encounter);
 }
 
+// a wild Pokemon of another species than the DexNav chain's breaks the chain
+static void BreakDexNavChain(FieldBattleDTO *dto)
+{
+    Pokemon *mon = Party_GetPokemonBySlotIndex(dto->parties[BATTLER_ENEMY_1], 0);
+
+    DexNavSearch_OnWildEncounter(Pokemon_GetValue(mon, MON_DATA_SPECIES, NULL));
+}
+
 void Encounter_NewVsWild(FieldSystem *fieldSystem, FieldBattleDTO *dto)
 {
+    BreakDexNavChain(dto);
+
     if (SystemFlag_CheckSafariGameActive(SaveData_GetVarsFlags(fieldSystem->saveData)) != FALSE) {
         Encounter *encounter = NewEncounter(dto, EncEffects_CutInEffect(dto), EncEffects_BGM(dto), NULL);
         FieldSystem_CreateTask(fieldSystem, FieldTask_SafariEncounter, encounter);
@@ -352,6 +363,8 @@ void Encounter_NewVsWild(FieldSystem *fieldSystem, FieldBattleDTO *dto)
 
 void Encounter_StartVsWild(FieldSystem *fieldSystem, FieldTask *task, FieldBattleDTO *dto)
 {
+    BreakDexNavChain(dto);
+
     if (SystemFlag_CheckSafariGameActive(SaveData_GetVarsFlags(fieldSystem->saveData)) != FALSE) {
         Encounter *encounter = NewEncounter(dto, EncEffects_CutInEffect(dto), EncEffects_BGM(dto), NULL);
         FieldTask_InitJump(task, FieldTask_SafariEncounter, encounter);
