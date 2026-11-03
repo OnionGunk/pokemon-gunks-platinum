@@ -7,6 +7,7 @@
 #include "constants/field/window.h"
 #include "constants/savedata/save_table.h"
 #include "constants/species.h"
+#include "generated/abilities.h"
 
 #include "field/field_system.h"
 #include "overlay005/ov5_021F2D20.h"
@@ -23,6 +24,8 @@
 #include "message.h"
 #include "game_options.h"
 #include "message_util.h"
+#include "party.h"
+#include "pokemon.h"
 #include "overworld_anim_manager.h"
 #include "player_avatar.h"
 #include "render_window.h"
@@ -673,7 +676,24 @@ Pokemon *DexNavSearch_CreateEncounterMon(FieldSystem *fieldSystem, enum HeapID h
         Pokemon_SetValue(mon, MON_DATA_HP_IV + stat, &iv);
     }
 
+    // East or West Sea, from the map's encounter data, as a wild encounter sets it (wild_encounters.c); a
+    // West Sea Shellos on an east route is illegal. Unown's letters only matter in the Solaceon Ruins,
+    // which have no tall grass to search.
+    if (sSearch.species == SPECIES_SHELLOS || sSearch.species == SPECIES_GASTRODON) {
+        const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
+        u8 form = encounters->encounterRatesForms[sSearch.species == SPECIES_SHELLOS ? 0 : 1] ? 1 : 0;
+
+        Pokemon_SetValue(mon, MON_DATA_FORM, &form);
+    }
+
     Pokemon_CalcLevelAndStats(mon);
+
+    // a wild held item, rolled as a wild encounter rolls it (more often with a Compound Eyes lead)
+    Pokemon *lead = Party_GetPokemonBySlotIndex(SaveData_GetParty(fieldSystem->saveData), 0);
+    int compoundEyes = !Pokemon_GetValue(lead, MON_DATA_IS_EGG, NULL)
+        && Pokemon_GetValue(lead, MON_DATA_ABILITY, NULL) == ABILITY_COMPOUND_EYES;
+
+    Pokemon_GiveHeldItem(mon, 0, compoundEyes);
 
     DexNavSave_IncrementSearchLevel(fieldSystem->saveData, sSearch.species);
 
