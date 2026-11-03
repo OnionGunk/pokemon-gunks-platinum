@@ -154,6 +154,18 @@ void DexNavSave_SetLastRepel(SaveData *saveData, u16 item)
     GetDexNavSave(saveData)->lastRepel = item;
 }
 
+u16 DexNavSave_GetLastBall(SaveData *saveData)
+{
+    return GetDexNavSave(saveData)->lastBall;
+}
+
+void DexNavSave_SetLastBall(SaveData *saveData, u16 item)
+{
+    if (item < 32) {
+        GetDexNavSave(saveData)->lastBall = item;
+    }
+}
+
 BOOL DexNavSave_IsEndlessRepelOn(SaveData *saveData)
 {
     return GetDexNavSave(saveData)->endlessRepelOn;

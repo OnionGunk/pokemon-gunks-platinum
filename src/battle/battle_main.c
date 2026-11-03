@@ -30,6 +30,7 @@
 #include "battle/healthbox.h"
 #include "battle/stop_recording_task_data.h"
 #include "battle/terrain.h"
+#include "battle/quick_ball.h"
 #include "battle_anim/battle_anim_system.h"
 #include "overlay010/ov10_0221F800.h"
 #include "overlay011/particle_helper.h"
@@ -1044,6 +1045,7 @@ static void BattleSys_New(BattleSystem *battleSys, FieldBattleDTO *dto)
     battleSys->options = dto->options;
     battleSys->palPad = dto->palPad;
     battleSys->bagCursor = dto->bagCursor;
+    QuickBall_Reset(dto->saveData);
     battleSys->subscreenCursorOn = dto->subscreenCursorOn;
     battleSys->poketch = dto->poketch;
     battleSys->mapEvolutionMethod = dto->mapEvolutionMethod;

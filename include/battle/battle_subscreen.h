@@ -278,5 +278,6 @@ int BattleSubscreen_GetSuppressActivationSFX(BattleSubscreen *btlSubscreen);
 void BattleSubscreen_SetSuppressActivationSFX(BattleSubscreen *btlSubscreen, int isCursorEnabled);
 void BattleSubscreen_ShowStopRecordingMessage(BattleSubscreen *btlSubscreen, int flag);
 u8 BattleSubscreen_IsWaitingForPartner(BattleSubscreen *btlSubscreen);
+int BattleSubscreen_PressActionButton(BattleSubscreen *btlSubscreen, int buttonResult);
 
 #endif // POKEPLATINUM_BATTLE_BATTLE_SUBSCREEN_H

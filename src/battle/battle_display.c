@@ -35,6 +35,8 @@
 #include "battle/message_defs.h"
 #include "battle/party_gauge.h"
 #include "battle/trainer_ai.h"
+#include "battle/battle_controller_player.h"
+#include "battle/quick_ball.h"
 #include "battle_anim/battle_anim_system.h"
 #include "battle_anim/const_ov12_0223B0A0.h"
 #include "battle_anim/ov12_02235E94.h"
@@ -3668,6 +3670,7 @@ static void Task_PlayerSetCommandSelection(SysTask *task, void *data)
             dummy_02268468(healthbox);
         }
 
+        QuickBall_Show(commandSetData->battleSys);
         commandSetData->state = 5;
         break;
     case 5:
@@ -3680,7 +3683,30 @@ static void Task_PlayerSetCommandSelection(SysTask *task, void *data)
             }
         }
 
-        commandSetData->input = BattleSystem_MenuInput(btlSubscreen);
+        // Quick Ball: tap L to throw the ball in the widget, hold L and press Left or Right to pick another
+        switch (QuickBall_HandleInput(commandSetData->battleSys)) {
+        case QUICK_BALL_INPUT_HELD:
+            commandSetData->input = 0xFFFFFFFF;
+            break;
+        case QUICK_BALL_INPUT_THROW:
+            commandSetData->input = BattleSubscreen_PressActionButton(btlSubscreen, PLAYER_INPUT_ITEM);
+
+            if (commandSetData->input != 0xFFFFFFFF) {
+                commandSetData->input = PLAYER_INPUT_QUICK_BALL | (QuickBall_Ball() << 8);
+            }
+            break;
+        case QUICK_BALL_INPUT_BAG:
+            commandSetData->input = BattleSubscreen_PressActionButton(btlSubscreen, PLAYER_INPUT_ITEM);
+            break;
+        default:
+            // Quick Run: R does what the RUN button does
+            if (gSystem.pressedKeys & PAD_BUTTON_R) {
+                commandSetData->input = BattleSubscreen_PressActionButton(btlSubscreen, PLAYER_INPUT_RUN);
+            } else {
+                commandSetData->input = BattleSystem_MenuInput(btlSubscreen);
+            }
+            break;
+        }
 
         if (commandSetData->input != 0xFFFFFFFF) {
             commandSetData->unused_0B = 10; // set but never used
@@ -3690,13 +3716,16 @@ static void Task_PlayerSetCommandSelection(SysTask *task, void *data)
         break;
     case 6:
         if (BattleSubscreen_IsReady(btlSubscreen) == 1 || commandSetData->input == 1) {
-            switch (commandSetData->input) {
+            QuickBall_Hide(commandSetData->battleSys);
+
+            switch (commandSetData->input & 0xFF) {
             case 1: // Fight
                 if (BattleSystem_GetBattleType(commandSetData->battleSys) & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_PAL_PARK)) {
                     commandSetData->state = 7;
                 }
                 break;
-            case 2: { // Bag
+            case 2: // Bag
+            case PLAYER_INPUT_QUICK_BALL: {
                 NARC *bgNarc = NARC_ctor(NARC_INDEX_BATTLE__GRAPHIC__PL_BATT_BG, HEAP_ID_BATTLE);
                 NARC *objNarc = NARC_ctor(NARC_INDEX_BATTLE__GRAPHIC__PL_BATT_OBJ, HEAP_ID_BATTLE);
 

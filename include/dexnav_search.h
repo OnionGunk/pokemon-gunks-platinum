@@ -16,9 +16,11 @@
 
 typedef struct DexNavSave {
     u16 selectedSpecies;
-    // quality of life, in the block's spare field: the Repel to offer when one wears off, and the
-    // Endless Repel's on/off state
-    u16 lastRepel : 14;
+    // quality of life, in the block's spare field: the Repel to offer when one wears off (item ids are
+    // below 512), the last Poke Ball thrown for the battle's Quick Ball (0 in saves from before it,
+    // which were always 0 in these bits), and the Endless Repel's on/off state
+    u16 lastRepel : 9;
+    u16 lastBall : 5;
     u16 endlessRepelOn : 1;
     u16 expAllOn : 1;
 } DexNavSave;
@@ -40,6 +42,8 @@ u16 DexNavSave_GetLastRepel(SaveData *saveData);
 void DexNavSave_SetLastRepel(SaveData *saveData, u16 item);
 BOOL DexNavSave_IsEndlessRepelOn(SaveData *saveData);
 void DexNavSave_SetEndlessRepelOn(SaveData *saveData, BOOL on);
+u16 DexNavSave_GetLastBall(SaveData *saveData);
+void DexNavSave_SetLastBall(SaveData *saveData, u16 item);
 BOOL DexNavSave_IsExpAllOn(SaveData *saveData);
 void DexNavSave_SetExpAllOn(SaveData *saveData, BOOL on);
 

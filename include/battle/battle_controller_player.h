@@ -63,6 +63,7 @@ enum BattleControllerPlayerInput {
     PLAYER_INPUT_ITEM,
     PLAYER_INPUT_PARTY,
     PLAYER_INPUT_RUN,
+    PLAYER_INPUT_QUICK_BALL = 6, // L at the action menu: throw the ball in the second byte (quick_ball.c)
 
     PLAYER_INPUT_SAFARI_BALL = PLAYER_INPUT_FIGHT,
     PLAYER_INPUT_SAFARI_BAIT = PLAYER_INPUT_ITEM,

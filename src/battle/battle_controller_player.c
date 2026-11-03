@@ -30,6 +30,7 @@
 #include "battle/battle_system.h"
 #include "battle/common.h"
 #include "battle/message_defs.h"
+#include "battle/quick_ball.h"
 
 #include "bag.h"
 #include "communication_system.h"
@@ -471,6 +472,14 @@ static void BattleControllerPlayer_CommandSelectionInput(BattleSystem *battleSys
                         battleCtx->battlerActions[i][BATTLE_ACTION_PICK_COMMAND] = BATTLE_CONTROL_ITEM;
                         battleCtx->curCommandState[i] = COMMAND_SELECTION_ITEM_SELECT_INIT;
                     }
+                    break;
+
+                case PLAYER_INPUT_QUICK_BALL:
+                    // what the Bag sends when that ball is picked and used (BattleItemUse: item, then category)
+                    battleCtx->battlerActions[i][BATTLE_ACTION_SELECTED_COMMAND] = PLAYER_INPUT_ITEM;
+                    battleCtx->battlerActions[i][BATTLE_ACTION_PICK_COMMAND] = BATTLE_CONTROL_ITEM;
+                    battleCtx->battlerActions[i][BATTLE_ACTION_TEMP_VALUE] = battleCtx->ioBuffer[i][1] | (ITEM_BATTLE_CATEGORY_POKE_BALLS << 16);
+                    battleCtx->curCommandState[i] = COMMAND_SELECTION_WAIT;
                     break;
 
                 case PLAYER_INPUT_PARTY:
@@ -1960,6 +1969,7 @@ static void BattleControllerPlayer_ItemCommand(BattleSystem *battleSys, BattleCo
                 && (BattleSystem_GetBattleType(battleSys) & BATTLE_TYPE_CATCH_TUTORIAL) == FALSE) {
                 Bag_TryRemoveItem(BattleSystem_GetBag(battleSys), used->item, 1, HEAP_ID_BATTLE);
                 Bag_SetLastBattleItemUsed(BattleSystem_GetBagCursor(battleSys), used->item, used->category);
+                QuickBall_SetLastThrown(battleSys, used->item);
             }
 
             break;

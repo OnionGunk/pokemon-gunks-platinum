@@ -12,6 +12,8 @@ It keeps the game's difficulty and story as they are and takes the grind and fri
   interactions, and the follower returns to its Poké Ball while you Surf.
 - **21 PC boxes** (18 in the original game): a living dex through Gen 4 with three boxes to spare.
 - **Faster play:** instant text, a faster EXP bar, auto-run, faster egg hatching.
+- **Quick Run and Quick Ball** in wild battles: press R to run, or L to throw the ball shown at the bottom
+  left of the top screen. Hold L and press Left or Right to pick another ball; it remembers the last one thrown.
 - **Items:** reusable TMs, two registered items (Y and Select), bag sorting, a prompt to use another Repel
   when one runs out, and an Endless Repel toggle.
 - **Pokémon:** IV and EV view in the summary, Exp. All, vitamins up to 252 EVs, and trade evolutions without

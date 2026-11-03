@@ -3962,3 +3962,37 @@ u8 BattleSubscreen_IsWaitingForPartner(BattleSubscreen *btlSubscreen)
 {
     return btlSubscreen->isWaitingForPartner;
 }
+
+// Quick Run and Quick Ball: R or L at the plain action menu presses its RUN or BAG button, with the same
+// button animation and cursor reset as touching it. Returns the button's result, or 0xffffffff when the
+// active menu isn't the plain action menu (Safari, Pal Park, the first battle, a doubles partner's) or is
+// still sliding in.
+int BattleSubscreen_PressActionButton(BattleSubscreen *btlSubscreen, int buttonResult)
+{
+    if (btlSubscreen->activeMenuConfigIndex != 1 || btlSubscreen->isPanelSliding == TRUE) {
+        return 0xffffffff;
+    }
+
+    const BattleMenuConfig *config = &sBattleMenuConfigs[1];
+    int index;
+
+    for (index = 0; index < 4 && config->buttonResults[index] != buttonResult; index++) { }
+
+    if (index == 4) {
+        return 0xffffffff;
+    }
+
+    int result = config->processInput(btlSubscreen, buttonResult, config->buttonSlots[index]);
+
+    if (result != 0xffffffff) {
+        if (config->saveCursorPos) {
+            config->saveCursorPos(btlSubscreen, index);
+        }
+
+        MI_CpuClear8(&btlSubscreen->cursor, sizeof(MenuCursor));
+        CursorRenderer_HideAllSprites(btlSubscreen->cursorRenderer);
+        btlSubscreen->suppressActivationSfx = 1;
+    }
+
+    return result;
+}

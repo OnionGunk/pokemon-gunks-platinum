@@ -698,6 +698,7 @@ Overlay battle
 	Object src/battle/terrain.c
 	Object src/battle/battle_subscreen.c
 	Object src/battle/party_gauge.c
+	Object src/battle/quick_ball.c
 	Object src/battle/cursor_renderer.c
 	Object src/battle/indicator.c
 	Object src/battle/stop_recording_task_data.c
