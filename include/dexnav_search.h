@@ -58,6 +58,7 @@ BOOL DexNavSearch_TryStart(FieldSystem *fieldSystem);
 void DexNavSearch_Update(FieldSystem *fieldSystem);
 BOOL DexNavSearch_Tick(FieldSystem *fieldSystem);
 void DexNavSearch_OnWildEncounter(u16 species);
+void DexNavSearch_OnBattleEnd(int resultMask);
 
 // Called by the field map as it shuts down and once it is running again, so a search survives menus and battles.
 void DexNavSearch_OnFieldExit(void);

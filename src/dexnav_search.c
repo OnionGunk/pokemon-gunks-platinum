@@ -3,6 +3,7 @@
 #include <nitro.h>
 #include <string.h>
 
+#include "constants/battle.h"
 #include "constants/charcode.h"
 #include "constants/field/window.h"
 #include "constants/savedata/save_table.h"
@@ -101,6 +102,7 @@ typedef struct DexNavSearch {
     u16 chain;
     u16 elapsedMs; // free field time since the search started
     u32 lastTick;  // the hardware timer (OS_GetTick) at the last field frame
+    BOOL battling; // the patch's own battle is running
 } DexNavSearch;
 
 // Lives in the main binary so it survives the field unloading for the DexNav screen and battles.
@@ -775,6 +777,16 @@ void DexNavSearch_OnWildEncounter(u16 species)
     }
 }
 
+// A battle is over (FieldTask_Encounter): running from the patch's own Pokemon breaks the chain.
+void DexNavSearch_OnBattleEnd(int resultMask)
+{
+    if (sSearch.battling && resultMask == BATTLE_RESULT_PLAYER_FLED) {
+        sSearch.chain = 0;
+    }
+
+    sSearch.battling = FALSE;
+}
+
 // The patch and the bar live in the field's heap and BG layers, which go away whenever the field does (a menu
 // screen, a battle, a door). Take them down while the field still exists, or the next frame that touches them
 // reads freed memory (the bar's VRAM copy then DMAs from a stale address and the game hangs).
@@ -862,6 +874,7 @@ Pokemon *DexNavSearch_CreateEncounterMon(FieldSystem *fieldSystem, enum HeapID h
 
     sSearch.chainSpecies = sSearch.species;
     sSearch.chainMapHeaderID = sSearch.mapHeaderID;
+    sSearch.battling = TRUE;
 
     DexNavSearch_End(TRUE);
     return mon;

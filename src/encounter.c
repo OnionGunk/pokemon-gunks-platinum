@@ -183,6 +183,7 @@ static BOOL FieldTask_Encounter(FieldTask *task)
 
     case 3:
         UpdateFieldSystemFromDTO(encounter->dto, fieldSystem);
+        DexNavSearch_OnBattleEnd(encounter->dto->resultMask);
 
         if (encounter->dto->battleType == BATTLE_TYPE_WILD_MON
             || encounter->dto->battleType == BATTLE_TYPE_ROAMER
