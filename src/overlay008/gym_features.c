@@ -91,7 +91,10 @@
 #define ETERNA_GYM_ONE_HOUR_ROTATION 0x1559
 #define ETERNA_GYM_MAX_ROTATION      0x10000
 
-#define VEILSTONE_GYM_OBJECT_LOCALID 0xFD
+#define VEILSTONE_GYM_OBJECT_LOCALID 0xFB
+// Saves from before v1.0.2 hold the tire stacks and punching bags with 0xFD, which is also the Pokemon follower's
+// local ID: the follower was taken for a punching bag (its species is data 0) and overran the bag array.
+#define VEILSTONE_GYM_OBJECT_OLD_LOCALID 0xFD
 #define VEILSTONE_NUM_TIRE_STACKS    11
 #define VEILSTONE_NUM_PUNCHING_BAGS  9
 
@@ -3167,7 +3170,12 @@ static void VeilstoneGym_ReinitMapObjects(VeilstoneGymSystem *gymSystem)
     VeilstoneGymPunchingBag *punchingBag = gymSystem->punchingBags;
 
     while (MapObjectMan_FindObjectWithStatus(mapObjMan, &mapObj, &objIndex, MAP_OBJ_STATUS_0) == TRUE) {
-        if (MapObject_GetLocalID(mapObj) == VEILSTONE_GYM_OBJECT_LOCALID) {
+        u32 localID = MapObject_GetLocalID(mapObj);
+
+        if (localID == VEILSTONE_GYM_OBJECT_LOCALID
+            || (localID == VEILSTONE_GYM_OBJECT_OLD_LOCALID && MapObject_GetGraphicsID(mapObj) == OBJ_EVENT_GFX_INVISIBLE)) {
+            MapObject_SetLocalID(mapObj, VEILSTONE_GYM_OBJECT_LOCALID);
+
             if (VEILSTONE_OBJ_IS_TIRE_STACK(mapObj)) {
                 VeilstoneGym_InitAnimManagerForObject(&tireStack->obj, mapObj, fieldSystem);
                 tireStack->exists = TRUE;
