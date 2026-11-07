@@ -28,6 +28,7 @@ void GetRadarMon(RadarChain *chain, int *species, int *level);
 const BOOL sub_02069798(const RadarChain *chain);
 void PokeRadar_ClearIfAllOutOfView(FieldSystem *fieldSystem);
 BOOL GetRadarChainActive(const RadarChain *chain);
+BOOL PokeRadar_IsPatchAt(const RadarChain *chain, int x, int z);
 BOOL RefreshRadarChain(FieldTask *param0);
 void RadarChain_Increment(FieldSystem *fieldSystem);
 int GetChainCount(FieldSystem *fieldSystem);

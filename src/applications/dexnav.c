@@ -162,6 +162,19 @@ static BOOL SlotIsSeen(DexNav *dexNav, int slot)
     return species != SPECIES_NONE && Pokedex_HasSeenSpecies(dexNav->pokedex, species);
 }
 
+// Land Pokemon are searched for in tall grass and water Pokemon while surfing; one only fished up can't be searched for.
+// A species on both lists keeps its first water method (the surf table is read first).
+static BOOL SlotHasSearch(DexNav *dexNav, int slot)
+{
+    return dexNav->args->slots[slot].species != SPECIES_NONE && (slot < DEXNAV_SECTION_SLOTS || dexNav->args->slots[slot].method == DEXNAV_METHOD_SURF);
+}
+
+// only a Pokemon the player has seen can be chosen
+static BOOL SlotIsSearchable(DexNav *dexNav, int slot)
+{
+    return SlotIsSeen(dexNav, slot) && SlotHasSearch(dexNav, slot);
+}
+
 BOOL DexNav_Init(ApplicationManager *appMan, int *state)
 {
     // measured peak is ~68 KB with two icons; 24 icons add ~24 KB, so 128 KB leaves a safe margin
@@ -270,7 +283,7 @@ static BOOL DexNav_HandleInput(DexNav *dexNav)
     int row = section * DEXNAV_GRID_ROWS + index / DEXNAV_GRID_COLS;
     int oldCursor = dexNav->cursor;
 
-    if (JOY_NEW(PAD_BUTTON_A) && dexNav->cursor < DEXNAV_SECTION_SLOTS && SlotIsSeen(dexNav, dexNav->cursor)) {
+    if (JOY_NEW(PAD_BUTTON_A) && SlotIsSearchable(dexNav, dexNav->cursor)) {
         Sound_PlayEffect(SEQ_SE_DP_DECIDE_sseq);
         DexNavSave_SetSelectedSpecies(dexNav->args->saveData, dexNav->args->slots[dexNav->cursor].species);
         DexNav_DrawGrid(dexNav);
@@ -332,6 +345,15 @@ static void DexNav_DrawGrid(DexNav *dexNav)
 
         if (!SlotIsSeen(dexNav, slot)) {
             PrintAscii(dexNav, window, "?", x + 17, y + 7, TEXT_DARK);
+        }
+
+        // caught: a Poke Ball in the top left corner (the Bag's pocket icon)
+        if (Pokedex_HasCaughtSpecies(dexNav->pokedex, species)) {
+            String *ball = String_Init(4, dexNav->heapID);
+
+            String_AppendChar(ball, CHAR_POCKET_ICON_POKEBALLS);
+            PrintString(window, ball, x + 2, y + 1, TEXT_DARK);
+            String_Free(ball);
         }
 
         if (species == selected) {
@@ -411,10 +433,19 @@ static void DexNav_DrawDetails(DexNav *dexNav)
     PrintAscii(dexNav, window, "Search", 16, 136, TEXT_DARK);
 
     if (selected != SPECIES_NONE) {
+        BOOL onLand = FALSE, onWater = FALSE;
+
+        for (int i = 0; i < DEXNAV_TOTAL_SLOTS; i++) {
+            if (dexNav->args->slots[i].species == selected && SlotHasSearch(dexNav, i)) {
+                onLand |= i < DEXNAV_SECTION_SLOTS;
+                onWater |= i >= DEXNAV_SECTION_SLOTS;
+            }
+        }
+
         String *name = MessageUtil_SpeciesName(selected, dexNav->heapID);
         PrintString(window, name, 20, 152, TEXT_DARK);
         String_Free(name);
-        PrintAscii(dexNav, window, "Press R in tall grass to search.", 20, 168, TEXT_DARK);
+        PrintAscii(dexNav, window, onWater ? (onLand ? "Press R in grass or while surfing." : "Press R while surfing to search.") : "Press R in tall grass to search.", 20, 168, TEXT_DARK);
     } else {
         PrintAscii(dexNav, window, "Press A on a Pokemon to choose it.", 20, 156, TEXT_DARK);
     }

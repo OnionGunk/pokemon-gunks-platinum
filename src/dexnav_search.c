@@ -29,6 +29,7 @@
 #include "pokemon.h"
 #include "overworld_anim_manager.h"
 #include "player_avatar.h"
+#include "pokeradar.h"
 #include "render_window.h"
 #include "save_player.h"
 #include "script_manager.h"
@@ -103,6 +104,7 @@ typedef struct DexNavSearch {
     u16 elapsedMs; // free field time since the search started
     u32 lastTick;  // the hardware timer (OS_GetTick) at the last field frame
     BOOL battling; // the patch's own battle is running
+    BOOL water;    // a Surf search: the patch is on water and rolls from the surf table
 } DexNavSearch;
 
 // Lives in the main binary so it survives the field unloading for the DexNav screen and battles.
@@ -229,7 +231,14 @@ static u32 Random32(void)
 
 static BOOL IsSearchableTile(FieldSystem *fieldSystem, int x, int z, fx32 playerHeight)
 {
-    if (!TileBehavior_IsTallGrass(TerrainCollisionManager_GetTileBehavior(fieldSystem, x, z))) {
+    u8 behavior = TerrainCollisionManager_GetTileBehavior(fieldSystem, x, z);
+
+    if (sSearch.water ? !TileBehavior_IsSurfable(behavior) : !TileBehavior_IsTallGrass(behavior)) {
+        return FALSE;
+    }
+
+    // a Poke Radar patch: its own tile, never shared (stepping there must start the battle it shows)
+    if (PokeRadar_IsPatchAt(fieldSystem->chain, x, z)) {
         return FALSE;
     }
 
@@ -243,14 +252,23 @@ static BOOL IsSearchableTile(FieldSystem *fieldSystem, int x, int z, fx32 player
     return MapMatrix_GetMapHeaderIDAtCoords(fieldSystem->mapMatrix, x / 32, z / 32) == fieldSystem->location->mapHeaderID;
 }
 
-// A wild grass encounter exactly as Platinum makes one (PIDIV "Method J"), so the caught Pokemon passes
-// legality checks: from an RNG seed, the encounter slot, then the nature, then personality values until
-// one has that nature, then the IVs. The species and level must come from the rolled slot.
-typedef struct GrassEncounterFrame {
+// A wild grass or surf encounter exactly as Platinum makes one (PIDIV "Method J"), so the caught Pokemon passes
+// legality checks: from an RNG seed, the encounter slot, then (surfing only) the level, then the nature, then
+// personality values until one has that nature, then the IVs. The species and level must come from the rolled slot.
+typedef struct EncounterFrame {
     u32 personality;
     u8 ivs[NUM_STATS];
     u8 slot;
-} GrassEncounterFrame;
+    u8 level;
+} EncounterFrame;
+
+// The encounter table a search rolls from: the grass table, or the surf table for a Surf search.
+typedef struct SearchTable {
+    BOOL water;
+    u16 slots; // bit n is set if slot n can hold the species
+    u8 minLevels[MAX_GRASS_ENCOUNTERS];
+    u8 maxLevels[MAX_GRASS_ENCOUNTERS];
+} SearchTable;
 
 static u16 FrameRand(u32 *state)
 {
@@ -264,25 +282,53 @@ static u16 FrameRandMod(u32 *state, u16 n)
     return FrameRand(state) / ((0xFFFF / n) + 1);
 }
 
-// same table as GetGroundEncounterSlot
-static u8 GrassSlotFromRoll(u8 roll)
+// same tables as GetGroundEncounterSlot and GetWaterEncounterSlot
+static u8 SlotFromRoll(BOOL water, u8 roll)
 {
-    static const u8 sSlotEnds[MAX_GRASS_ENCOUNTERS] = { 20, 40, 50, 60, 70, 80, 85, 90, 94, 98, 99, 100 };
+    static const u8 sGrassSlotEnds[MAX_GRASS_ENCOUNTERS] = { 20, 40, 50, 60, 70, 80, 85, 90, 94, 98, 99, 100 };
+    static const u8 sWaterSlotEnds[MAX_WATER_ENCOUNTERS] = { 60, 90, 95, 99, 100 };
+    const u8 *slotEnds = water ? sWaterSlotEnds : sGrassSlotEnds;
     u8 slot = 0;
 
-    while (roll >= sSlotEnds[slot]) {
+    while (roll >= slotEnds[slot]) {
         slot++;
     }
 
     return slot;
 }
 
-// Bit n is set if grass slot n can hold the species: its own slot, or the morning/day/night (2 and 3) and
-// swarm (0 and 1) replacements, which keep the replaced slot's level.
-static u16 GetGrassSlotsForSpecies(FieldSystem *fieldSystem, u16 species, u8 *slotLevels)
+// A surf slot holds its own species only; its level range is ordered as GetWildMonLevel orders it.
+static void GetSurfSearchTable(FieldSystem *fieldSystem, u16 species, SearchTable *table)
+{
+    const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
+
+    for (int i = 0; i < MAX_WATER_ENCOUNTERS; i++) {
+        const WaterEncounter *slot = &encounters->surfEncounters.encounters[i];
+        u8 a = slot->minLevel, b = slot->maxLevel;
+
+        table->minLevels[i] = a < b ? a : b;
+        table->maxLevels[i] = a < b ? b : a;
+
+        if (slot->species == species) {
+            table->slots |= 1 << i;
+        }
+    }
+}
+
+// A grass slot can hold its own species, or the morning/day/night (2 and 3) and swarm (0 and 1) replacements,
+// which keep the replaced slot's level.
+static void GetSearchTable(FieldSystem *fieldSystem, u16 species, BOOL water, SearchTable *table)
 {
     const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
     u16 slots = 0;
+
+    memset(table, 0, sizeof(SearchTable));
+    table->water = water;
+
+    if (water) {
+        GetSurfSearchTable(fieldSystem, species, table);
+        return;
+    }
 
     for (int i = 0; i < MAX_GRASS_ENCOUNTERS; i++) {
         BOOL match = encounters->grassEncounters.encounters[i].species == species;
@@ -293,23 +339,31 @@ static u16 GetGrassSlotsForSpecies(FieldSystem *fieldSystem, u16 species, u8 *sl
             match |= encounters->swarmEncounters[i] == species;
         }
 
-        slotLevels[i] = encounters->grassEncounters.encounters[i].level;
+        table->minLevels[i] = encounters->grassEncounters.encounters[i].level;
+        table->maxLevels[i] = encounters->grassEncounters.encounters[i].level;
 
         if (match) {
             slots |= 1 << i;
         }
     }
 
-    return slots;
+    table->slots = slots;
 }
 
-static BOOL GenerateGrassEncounterFrame(u32 seed, u16 slots, GrassEncounterFrame *frame)
+static BOOL GenerateEncounterFrame(u32 seed, const SearchTable *table, EncounterFrame *frame)
 {
     u32 state = seed;
-    u8 slot = GrassSlotFromRoll(FrameRandMod(&state, 100));
+    u8 slot = SlotFromRoll(table->water, FrameRandMod(&state, 100));
 
-    if ((slots & (1 << slot)) == 0) {
+    if ((table->slots & (1 << slot)) == 0) {
         return FALSE;
+    }
+
+    // a grass slot has one level; a surf slot's level is rolled next (GetWildMonLevel)
+    u8 level = table->minLevels[slot];
+
+    if (table->water) {
+        level += FrameRand(&state) % (u8)(table->maxLevels[slot] - table->minLevels[slot] + 1);
     }
 
     u8 nature = FrameRandMod(&state, 25);
@@ -332,11 +386,12 @@ static BOOL GenerateGrassEncounterFrame(u32 seed, u16 slots, GrassEncounterFrame
     frame->ivs[5] = (ivs2 >> 10) & 0x1F;
     frame->personality = personality;
     frame->slot = slot;
+    frame->level = level;
 
     return TRUE;
 }
 
-static int CountPerfectIVs(const GrassEncounterFrame *frame)
+static int CountPerfectIVs(const EncounterFrame *frame)
 {
     int count = 0;
 
@@ -347,7 +402,7 @@ static int CountPerfectIVs(const GrassEncounterFrame *frame)
     return count;
 }
 
-static int SumIVs(const GrassEncounterFrame *frame)
+static int SumIVs(const EncounterFrame *frame)
 {
     int sum = 0;
 
@@ -358,7 +413,7 @@ static int SumIVs(const GrassEncounterFrame *frame)
     return sum;
 }
 
-static BOOL IsBetterFrame(const GrassEncounterFrame *frame, const GrassEncounterFrame *best)
+static BOOL IsBetterFrame(const EncounterFrame *frame, const EncounterFrame *best)
 {
     int perfect = CountPerfectIVs(frame);
     int bestPerfect = CountPerfectIVs(best);
@@ -368,12 +423,12 @@ static BOOL IsBetterFrame(const GrassEncounterFrame *frame, const GrassEncounter
 
 // How many 16-bit slot-roll values land on a slot that can hold the species: rand / 656 is the roll (0-99), and
 // roll 99 is short (65536 - 99 * 656 values).
-static u32 SlotRollValues(u16 slots)
+static u32 SlotRollValues(const SearchTable *table)
 {
     u32 count = 0;
 
     for (int roll = 0; roll < 100; roll++) {
-        if (slots & (1 << GrassSlotFromRoll(roll))) {
+        if (table->slots & (1 << SlotFromRoll(table->water, roll))) {
             count += roll < 99 ? SLOT_ROLL_DIVISOR : 0x10000 - 99 * SLOT_ROLL_DIVISOR;
         }
     }
@@ -385,7 +440,7 @@ static u32 SlotRollValues(u16 slots)
 // skipping the others gives, without the skipping: a species only in the 1% slots skipped about 99 of 100 and
 // stalled the game): the slot roll's 16 bits are drawn from the allowed values, its low 16 bits at random, and the
 // RNG is stepped back over that call.
-static u32 SeedInSlots(u16 slots, u32 slotRollValues)
+static u32 SeedInSlots(const SearchTable *table, u32 slotRollValues)
 {
     u32 pick = Random32() % slotRollValues;
     u32 rand = 0;
@@ -393,7 +448,7 @@ static u32 SeedInSlots(u16 slots, u32 slotRollValues)
     for (int roll = 0; roll < 100; roll++) {
         u32 width = roll < 99 ? SLOT_ROLL_DIVISOR : 0x10000 - 99 * SLOT_ROLL_DIVISOR;
 
-        if ((slots & (1 << GrassSlotFromRoll(roll))) == 0) {
+        if ((table->slots & (1 << SlotFromRoll(table->water, roll))) == 0) {
             continue;
         }
 
@@ -412,11 +467,12 @@ static u32 SeedInSlots(u16 slots, u32 slotRollValues)
 
 // A shiny encounter, found cheaply (the method Gunk's HeartGold uses): walk the RNG one call at a time until two
 // consecutive outputs make a shiny personality, then step back over the personality rerolls before it (each must
-// have the wrong nature) to a call that rolled its nature, and the slot roll before that. If that slot can hold
-// the species, the call before the slot roll is the seed; the frame is then generated from it in full and must
-// come out with that personality.
-static BOOL FindShinyFrame(u32 otID, u16 slots, GrassEncounterFrame *frame)
+// have the wrong nature) to a call that rolled its nature, and the slot roll (and a surf level roll) before that.
+// If that slot can hold the species, the call before the slot roll is the seed; the frame is then generated from it
+// in full and must come out with that personality.
+static BOOL FindShinyFrame(u32 otID, const SearchTable *table, EncounterFrame *frame)
 {
+    u32 seedBack = table->water ? 3 : 2; // calls from the nature roll back to the seed
     u32 states[SHINY_SCAN_HISTORY]; // the RNG state after each call, the last SHINY_SCAN_HISTORY of them
     u32 state = Random32();
     u16 trainerShiny = (otID & 0xFFFF) ^ (otID >> 16);
@@ -436,7 +492,7 @@ static BOOL FindShinyFrame(u32 otID, u16 slots, GrassEncounterFrame *frame)
         u8 nature = personality % 25;
 
         // the personality's low half is call - 1; the nature roll is at call - 2, call - 4, ...
-        for (u32 back = 2; back + 2 <= call && back + 2 < SHINY_SCAN_HISTORY; back += 2) {
+        for (u32 back = 2; back + seedBack <= call && back + seedBack < SHINY_SCAN_HISTORY; back += 2) {
             u32 natureCall = call - back;
 
             if (back > 2) {
@@ -452,9 +508,9 @@ static BOOL FindShinyFrame(u32 otID, u16 slots, GrassEncounterFrame *frame)
                 continue;
             }
 
-            u32 seed = states[(natureCall - 2) % SHINY_SCAN_HISTORY];
+            u32 seed = states[(natureCall - seedBack) % SHINY_SCAN_HISTORY];
 
-            if (GenerateGrassEncounterFrame(seed, slots, frame) && frame->personality == personality) {
+            if (GenerateEncounterFrame(seed, table, frame) && frame->personality == personality) {
                 return TRUE;
             }
         }
@@ -471,12 +527,13 @@ static BOOL RollHiddenMon(FieldSystem *fieldSystem)
     u32 otID = TrainerInfo_ID(SaveData_GetTrainerInfo(fieldSystem->saveData));
     int shinyRolls = 1 + sSearch.searchLevel / 10 + sSearch.chain / 5;
     int candidates = 1 + sSearch.searchLevel / 2 + sSearch.chain * 2;
-    u8 slotLevels[MAX_GRASS_ENCOUNTERS];
-    u16 slots = GetGrassSlotsForSpecies(fieldSystem, sSearch.species, slotLevels);
-    GrassEncounterFrame frame, best;
+    SearchTable table;
+    EncounterFrame frame, best;
     int found = 0;
 
-    if (slots == 0) {
+    GetSearchTable(fieldSystem, sSearch.species, sSearch.water, &table);
+
+    if (table.slots == 0) {
         return FALSE;
     }
 
@@ -494,14 +551,14 @@ static BOOL RollHiddenMon(FieldSystem *fieldSystem)
     }
 
     if (sSearch.shiny) {
-        sSearch.shiny = FindShinyFrame(otID, slots, &best) && Pokemon_IsPersonalityShiny(otID, best.personality);
+        sSearch.shiny = FindShinyFrame(otID, &table, &best) && Pokemon_IsPersonalityShiny(otID, best.personality);
         found = sSearch.shiny;
     }
 
-    u32 slotRollValues = SlotRollValues(slots);
+    u32 slotRollValues = SlotRollValues(&table);
 
     for (; !sSearch.shiny && found < candidates; found++) {
-        GenerateGrassEncounterFrame(SeedInSlots(slots, slotRollValues), slots, &frame);
+        GenerateEncounterFrame(SeedInSlots(&table, slotRollValues), &table, &frame);
 
         if (found == 0 || IsBetterFrame(&frame, &best)) {
             best = frame;
@@ -513,7 +570,7 @@ static BOOL RollHiddenMon(FieldSystem *fieldSystem)
     }
 
     sSearch.personality = best.personality;
-    sSearch.level = slotLevels[best.slot];
+    sSearch.level = best.level;
     sSearch.perfectIVs = CountPerfectIVs(&best);
 
     for (int stat = 0; stat < NUM_STATS; stat++) {
@@ -666,6 +723,8 @@ BOOL DexNavSearch_TryStart(FieldSystem *fieldSystem)
     }
 
     sSearch.requested = FALSE;
+    // surfing, the patch goes on the water and the Pokemon comes from the surf table
+    sSearch.water = PlayerAvatar_GetPlayerState(fieldSystem->playerAvatar) == PLAYER_AVATAR_SURFING;
 
     int playerX = PlayerAvatar_GetXPos(fieldSystem->playerAvatar);
     int playerZ = PlayerAvatar_GetZPos(fieldSystem->playerAvatar);

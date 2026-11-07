@@ -12,6 +12,7 @@
 #include "overlay006/radar_chain_records.h"
 
 #include "bag.h"
+#include "dexnav_search.h"
 #include "field_bgm.h"
 #include "field_task.h"
 #include "gfx_box_test.h"
@@ -298,6 +299,12 @@ BOOL GetRadarChainActive(const RadarChain *chain)
     return chain->active;
 }
 
+BOOL PokeRadar_IsPatchAt(const RadarChain *chain, int x, int z)
+{
+    u8 patchRing;
+    return chain->active && PlayerStandingInPatch(chain, x, z, &patchRing);
+}
+
 static BOOL CheckTileIsGrass(FieldSystem *fieldSystem, const fx32 param1, const int param2, const int param3, const u8 param4, const u8 param5, GrassPatch *patch)
 {
     int v0 = (param2 - (9 / 2)) + param4;
@@ -306,7 +313,8 @@ static BOOL CheckTileIsGrass(FieldSystem *fieldSystem, const fx32 param1, const 
     patch->z = v1;
     u8 v2 = TerrainCollisionManager_GetTileBehavior(fieldSystem, v0, v1);
 
-    if (TileBehavior_IsTallGrass(v2)) {
+    // a DexNav search's patch already shakes there: two patches on one tile would hide which battle it starts
+    if (TileBehavior_IsTallGrass(v2) && !DexNavSearch_IsPlayerInPatch(fieldSystem, v0, v1)) {
         u8 v3;
         patch->position.x = FX32_ONE * 16 * v0;
         patch->position.z = FX32_ONE * 16 * v1;

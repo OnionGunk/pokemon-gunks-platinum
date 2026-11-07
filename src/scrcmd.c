@@ -3982,13 +3982,32 @@ static BOOL ScrCmd_OpenDexNav(ScriptContext *ctx)
     return TRUE;
 }
 
+// DEXNAV_SEARCH_GOT_AWAY's value is also in scripts_common.s (CommonScript_DexNavGotAway)
 enum DexNavSearchResult {
     DEXNAV_SEARCH_STARTED = 0,
     DEXNAV_SEARCH_NONE_SELECTED,
     DEXNAV_SEARCH_NO_GRASS,
     DEXNAV_SEARCH_NOT_HERE,
     DEXNAV_SEARCH_GOT_AWAY,
+    DEXNAV_SEARCH_NO_WATER,
+    DEXNAV_SEARCH_IN_GRASS,
+    DEXNAV_SEARCH_ON_WATER,
+    DEXNAV_SEARCH_FISHING,
+    DEXNAV_SEARCH_GREAT_MARSH,
 };
+
+static BOOL DexNav_IsSurfSpecies(FieldSystem *fieldSystem, u16 species)
+{
+    const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
+
+    for (int i = 0; i < MAX_WATER_ENCOUNTERS; i++) {
+        if (encounters->surfEncounters.encounters[i].species == species) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
 
 static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx)
 {
@@ -4001,27 +4020,49 @@ static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx)
         return FALSE;
     }
 
-    // only land slots can be searched for now
+    // the Great Marsh's battles are Safari Game battles (Safari Balls): a DexNav battle would be an ordinary one,
+    // and what it caught couldn't be legal there
+    if (SystemFlag_CheckSafariGameActive(SaveData_GetVarsFlags(fieldSystem->saveData))
+        || (fieldSystem->location->mapHeaderID >= MAP_HEADER_GREAT_MARSH_1 && fieldSystem->location->mapHeaderID <= MAP_HEADER_GREAT_MARSH_6)) {
+        *destVar = DEXNAV_SEARCH_GREAT_MARSH;
+        return FALSE;
+    }
+
+    // tall grass searches roll from the land slots; surfing, from the surf table (not the rods' tables)
     DexNavData *area = Heap_Alloc(HEAP_ID_FIELD3, sizeof(DexNavData));
-    const DexNavEntry *entry = NULL;
+    const DexNavEntry *land = NULL, *water = NULL;
+    BOOL surfing = PlayerAvatar_GetPlayerState(fieldSystem->playerAvatar) == PLAYER_AVATAR_SURFING;
 
     memset(area, 0, sizeof(DexNavData));
     DexNav_BuildAreaData(fieldSystem, area);
 
-    for (int i = 0; i < DEXNAV_SECTION_SLOTS; i++) {
+    for (int i = 0; i < DEXNAV_TOTAL_SLOTS; i++) {
         if (area->slots[i].species == species) {
-            entry = &area->slots[i];
-            break;
+            if (i < DEXNAV_SECTION_SLOTS) {
+                land = &area->slots[i];
+            } else {
+                water = &area->slots[i];
+            }
         }
     }
 
-    if (entry == NULL) {
+    BOOL surfable = water != NULL && DexNav_IsSurfSpecies(fieldSystem, species);
+    const DexNavEntry *entry = surfing ? (surfable ? water : NULL) : land;
+
+    if (land == NULL && water == NULL) {
         *destVar = DEXNAV_SEARCH_NOT_HERE;
+    } else if (entry == NULL) {
+        *destVar = surfing ? (land != NULL ? DEXNAV_SEARCH_IN_GRASS : DEXNAV_SEARCH_FISHING) : (surfable ? DEXNAV_SEARCH_ON_WATER : DEXNAV_SEARCH_FISHING);
     } else {
         // restarting replaces any search already running
         DexNavSearch_End(TRUE);
         DexNavSearch_Request(species, entry->minLevel + LCRNG_RandMod(entry->maxLevel - entry->minLevel + 1));
-        *destVar = DexNavSearch_TryStart(fieldSystem) ? DEXNAV_SEARCH_STARTED : DEXNAV_SEARCH_NO_GRASS;
+
+        if (DexNavSearch_TryStart(fieldSystem)) {
+            *destVar = DEXNAV_SEARCH_STARTED;
+        } else {
+            *destVar = surfing ? DEXNAV_SEARCH_NO_WATER : DEXNAV_SEARCH_NO_GRASS;
+        }
     }
 
     Heap_Free(area);
@@ -4103,6 +4144,11 @@ static const char *const sDexNavMessages[] = {
     [DEXNAV_SEARCH_NO_GRASS] = "There is no tall grass close enough|to search.",
     [DEXNAV_SEARCH_NOT_HERE] = "This Pok#mon can't be found here.",
     [DEXNAV_SEARCH_GOT_AWAY] = "The Pok#mon got away...",
+    [DEXNAV_SEARCH_NO_WATER] = "There is no water close enough|to search.",
+    [DEXNAV_SEARCH_IN_GRASS] = "Search for this Pok#mon in the|tall grass.",
+    [DEXNAV_SEARCH_ON_WATER] = "Surf to search for this Pok#mon.",
+    [DEXNAV_SEARCH_FISHING] = "This Pok#mon can only be found|by fishing.",
+    [DEXNAV_SEARCH_GREAT_MARSH] = "The DexNav can't search in the|Great Marsh.",
 };
 
 static BOOL ScrCmd_DexNavPrintMessage(ScriptContext *ctx)

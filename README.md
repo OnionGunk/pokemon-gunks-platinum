@@ -5,9 +5,11 @@ It keeps the game's difficulty and story as they are and takes the grind and fri
 
 ## Features
 
-- **DexNav.** A Pokétch app shows each route's land and water Pokémon: caught in color, seen as a silhouette,
-  unseen as a question mark. Pick one, then press **R** in the grass to search for it. Searches roll legal
-  wild encounters, and search levels and chains raise the odds of good IVs and shinies.
+- **DexNav.** Dawn (or Lucas) gives it to you on Route 202. Its screen shows each area's land and water Pokémon:
+  caught in color with a Poké Ball mark, seen as a silhouette, unseen as a question mark. Pick one, then press
+  **R** in the tall grass, or while surfing for a water Pokémon, to search for it. A Pokétch app shows the same
+  area at a glance. Searches roll legal wild encounters, and search levels and chains raise the odds of good IVs
+  and shinies.
 - **Pokémon follow you**, ported from Following Platinum. All species are included, with emotes and
   interactions, and the follower returns to its Poké Ball while you Surf.
 - **21 PC boxes** (18 in the original game): a living dex through Gen 4 with three boxes to spare.
