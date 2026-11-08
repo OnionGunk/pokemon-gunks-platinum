@@ -4028,7 +4028,7 @@ static BOOL ScrCmd_DexNavStartSearch(ScriptContext *ctx)
         return FALSE;
     }
 
-    // tall grass searches roll from the land slots; surfing, from the surf table (not the rods' tables)
+    // land searches roll from the land slots; surfing, from the surf table (not the rods' tables)
     DexNavData *area = Heap_Alloc(HEAP_ID_FIELD3, sizeof(DexNavData));
     const DexNavEntry *land = NULL, *water = NULL;
     BOOL surfing = PlayerAvatar_GetPlayerState(fieldSystem->playerAvatar) == PLAYER_AVATAR_SURFING;
@@ -4141,11 +4141,11 @@ static BOOL ScrCmd_DexNavStartBattle(ScriptContext *ctx)
 // '#' stands for e-acute, '|' for a line break
 static const char *const sDexNavMessages[] = {
     [DEXNAV_SEARCH_NONE_SELECTED] = "Select a Pok#mon in the DexNav|first.",
-    [DEXNAV_SEARCH_NO_GRASS] = "There is no tall grass close enough|to search.",
+    [DEXNAV_SEARCH_NO_GRASS] = "There is nowhere close enough|to search.",
     [DEXNAV_SEARCH_NOT_HERE] = "This Pok#mon can't be found here.",
     [DEXNAV_SEARCH_GOT_AWAY] = "The Pok#mon got away...",
     [DEXNAV_SEARCH_NO_WATER] = "There is no water close enough|to search.",
-    [DEXNAV_SEARCH_IN_GRASS] = "Search for this Pok#mon in the|tall grass.",
+    [DEXNAV_SEARCH_IN_GRASS] = "Search for this Pok#mon on land.",
     [DEXNAV_SEARCH_ON_WATER] = "Surf to search for this Pok#mon.",
     [DEXNAV_SEARCH_FISHING] = "This Pok#mon can only be found|by fishing.",
     [DEXNAV_SEARCH_GREAT_MARSH] = "The DexNav can't search in the|Great Marsh.",

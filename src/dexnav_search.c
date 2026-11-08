@@ -233,7 +233,9 @@ static BOOL IsSearchableTile(FieldSystem *fieldSystem, int x, int z, fx32 player
 {
     u8 behavior = TerrainCollisionManager_GetTileBehavior(fieldSystem, x, z);
 
-    if (sSearch.water ? !TileBehavior_IsSurfable(behavior) : !TileBehavior_IsTallGrass(behavior)) {
+    // land: wherever walking can start a wild battle (tall grass, very tall grass, cave and Old Chateau floors,
+    // bridges over them), as wild_encounters.c decides it
+    if (sSearch.water ? !TileBehavior_IsSurfable(behavior) : !TileBehavior_HasEncounters(behavior) || TileBehavior_IsSurfable(behavior)) {
         return FALSE;
     }
 
@@ -907,11 +909,14 @@ Pokemon *DexNavSearch_CreateEncounterMon(FieldSystem *fieldSystem, enum HeapID h
     }
 
     // East or West Sea, from the map's encounter data, as a wild encounter sets it (wild_encounters.c); a
-    // West Sea Shellos on an east route is illegal. Unown's letters only matter in the Solaceon Ruins,
-    // which have no tall grass to search.
+    // West Sea Shellos on an east route is illegal. Unown's letter comes from the Solaceon Ruins room's own set.
     if (sSearch.species == SPECIES_SHELLOS || sSearch.species == SPECIES_GASTRODON) {
         const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
         u8 form = encounters->encounterRatesForms[sSearch.species == SPECIES_SHELLOS ? 0 : 1] ? 1 : 0;
+
+        Pokemon_SetValue(mon, MON_DATA_FORM, &form);
+    } else if (sSearch.species == SPECIES_UNOWN) {
+        u8 form = WildEncounters_RandomUnownForm(MapHeaderData_GetWildEncounters(fieldSystem));
 
         Pokemon_SetValue(mon, MON_DATA_FORM, &form);
     }

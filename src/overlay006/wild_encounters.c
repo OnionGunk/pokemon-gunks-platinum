@@ -178,6 +178,13 @@ static const UnownFormsGroup WildEncounters_UnownTables[] = {
     { 0x2, UnownOnlyExcQue }
 };
 
+// An Unown letter for this map, rolled as a wild encounter rolls it (the DexNav's battles use it too)
+u8 WildEncounters_RandomUnownForm(const WildEncounters *encounterData)
+{
+    const UnownFormsGroup *group = &WildEncounters_UnownTables[encounterData->unownTableID != 0 ? encounterData->unownTableID - 1 : 0];
+    return group->forms[LCRNG_Next() % group->numberForms];
+}
+
 // Default encounters are morning. They get replaced by this if it is not morning.
 void WildEncounters_ReplaceTimedEncounters(const WildEncounters *encounterData, int *timedSlot1, int *timedSlot2)
 {

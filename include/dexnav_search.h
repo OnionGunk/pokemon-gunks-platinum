@@ -51,7 +51,7 @@ void DexNavSave_SetExpAllOn(SaveData *saveData, BOOL on);
 void DexNavSearch_Request(u16 species, u8 level);
 
 // Called once the field is back: rolls the hidden Pokemon and places a shaking grass patch near the player.
-// Returns FALSE when no searchable grass is close enough.
+// Returns FALSE when no searchable tile (grass, cave floor, water when surfing) is close enough.
 BOOL DexNavSearch_TryStart(FieldSystem *fieldSystem);
 
 // Per-step upkeep: keeps the patch shaking, redraws the search bar, and drops the search if the player wanders off.

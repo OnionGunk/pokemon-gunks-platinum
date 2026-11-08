@@ -162,7 +162,7 @@ static BOOL SlotIsSeen(DexNav *dexNav, int slot)
     return species != SPECIES_NONE && Pokedex_HasSeenSpecies(dexNav->pokedex, species);
 }
 
-// Land Pokemon are searched for in tall grass and water Pokemon while surfing; one only fished up can't be searched for.
+// Land Pokemon are searched for where walking meets them (grass, caves) and water Pokemon while surfing; one only fished up can't be searched for.
 // A species on both lists keeps its first water method (the surf table is read first).
 static BOOL SlotHasSearch(DexNav *dexNav, int slot)
 {
@@ -445,7 +445,7 @@ static void DexNav_DrawDetails(DexNav *dexNav)
         String *name = MessageUtil_SpeciesName(selected, dexNav->heapID);
         PrintString(window, name, 20, 152, TEXT_DARK);
         String_Free(name);
-        PrintAscii(dexNav, window, onWater ? (onLand ? "Press R in grass or while surfing." : "Press R while surfing to search.") : "Press R in tall grass to search.", 20, 168, TEXT_DARK);
+        PrintAscii(dexNav, window, onWater ? (onLand ? "Press R on land or while surfing." : "Press R while surfing to search.") : "Press R in grass or caves.", 20, 168, TEXT_DARK);
     } else {
         PrintAscii(dexNav, window, "Press A on a Pokemon to choose it.", 20, 156, TEXT_DARK);
     }

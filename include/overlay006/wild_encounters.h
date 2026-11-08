@@ -51,6 +51,7 @@ typedef struct WildEncounters {
 #include "field_battle_data_transfer.h"
 #include "field_task.h"
 
+u8 WildEncounters_RandomUnownForm(const WildEncounters *encounterData);
 void WildEncounters_ReplaceTimedEncounters(const WildEncounters *encounterData, int *param1, int *param2);
 BOOL WildEncounters_TryWildEncounter(FieldSystem *fieldSystem);
 BOOL WildEncounters_TryFishingEncounter(FieldSystem *fieldSystem, enum EncounterFishingRodType fishingRodType, FieldBattleDTO **param2);
