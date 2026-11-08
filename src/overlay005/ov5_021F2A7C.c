@@ -5,6 +5,7 @@
 
 #include "struct_decls/map_object.h"
 
+#include "field/field_system.h"
 #include "overlay005/field_effect_manager.h"
 
 #include "map_object.h"
@@ -35,6 +36,7 @@ static void ov5_021F2AA8(UnkStruct_ov5_021F2AA8 *param0);
 static void ov5_021F2AD0(UnkStruct_ov5_021F2AA8 *param0);
 
 static const OverworldAnimManagerFuncs Unk_ov5_022004C4;
+static const OverworldAnimManagerFuncs sTileRippleFuncs;
 
 void *ov5_021F2A7C(FieldEffectManager *param0)
 {
@@ -131,5 +133,39 @@ static const OverworldAnimManagerFuncs Unk_ov5_022004C4 = {
     ov5_021F2B48,
     ov5_021F2B80,
     ov5_021F2B8C,
+    ov5_021F2BB4
+};
+
+// DexNav: the ripple on a water tile instead of under a map object, for a search patch on the water. It loops
+// until the search finishes it (the puddle ripple above plays once and ends itself); `fast` plays it at double
+// speed (a shiny Pokemon's patch).
+OverworldAnimManager *RippleEffect_StartOnTile(FieldSystem *fieldSystem, int x, int z, BOOL fast)
+{
+    UnkStruct_ov5_021F2AE4 data;
+    VecFx32 pos;
+
+    data.unk_00 = fieldSystem->fieldEffMan;
+    data.unk_04 = FieldEffectManager_GetRendererContext(data.unk_00, 17);
+
+    VecFx32_SetPosFromMapCoords(x, z, &pos);
+    pos.y = 0;
+    MapObject_RecalculatePositionHeight(fieldSystem, &pos);
+    pos.z += FX32_ONE;
+
+    return FieldEffectManager_InitAnimManager(data.unk_00, &sTileRippleFuncs, &pos, fast, &data, 0xff);
+}
+
+static void TileRipple_Update(OverworldAnimManager *anim, void *context)
+{
+    UnkStruct_ov5_021F2B48 *ripple = context;
+
+    Simple3D_UpdateAnim(&ripple->unk_00, OverworldAnimManager_GetUserInt(anim) ? FX32_ONE * 2 : FX32_ONE, TRUE);
+}
+
+static const OverworldAnimManagerFuncs sTileRippleFuncs = {
+    sizeof(UnkStruct_ov5_021F2B48),
+    ov5_021F2B48,
+    ov5_021F2B80,
+    TileRipple_Update,
     ov5_021F2BB4
 };

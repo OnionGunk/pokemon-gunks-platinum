@@ -11,6 +11,7 @@
 #include "generated/abilities.h"
 
 #include "field/field_system.h"
+#include "overlay005/ov5_021F2A7C.h"
 #include "overlay005/ov5_021F2D20.h"
 #include "overlay006/wild_encounters.h"
 
@@ -35,6 +36,7 @@
 #include "script_manager.h"
 #include "string_gf.h"
 #include "system.h"
+#include "map_object.h"
 #include "terrain_collision_manager.h"
 #include "text.h"
 #include "trainer_info.h"
@@ -105,6 +107,9 @@ typedef struct DexNavSearch {
     u32 lastTick;  // the hardware timer (OS_GetTick) at the last field frame
     BOOL battling; // the patch's own battle is running
     BOOL water;    // a Surf search: the patch is on water and rolls from the surf table
+    // added at the end so the test harness's offsets (legality.py S_*) still hold
+    OverworldAnimManager *ripple; // a Surf search's patch
+    u16 formRoll;                 // Unown's letter roll: the frame's second call after the IVs
 } DexNavSearch;
 
 // Lives in the main binary so it survives the field unloading for the DexNav screen and battles.
@@ -239,6 +244,12 @@ static BOOL IsSearchableTile(FieldSystem *fieldSystem, int x, int z, fx32 player
         return FALSE;
     }
 
+    // a tile the player can step onto: cave floors run under walls, rocks and statues (a grass tile rarely does),
+    // and a person or boulder standing there blocks it too
+    if (TerrainCollisionManager_CheckCollision(fieldSystem, x, z) || sub_0206326C(fieldSystem->mapObjMan, x, z, 0) != NULL) {
+        return FALSE;
+    }
+
     // a Poke Radar patch: its own tile, never shared (stepping there must start the battle it shows)
     if (PokeRadar_IsPatchAt(fieldSystem->chain, x, z)) {
         return FALSE;
@@ -262,6 +273,8 @@ typedef struct EncounterFrame {
     u8 ivs[NUM_STATS];
     u8 slot;
     u8 level;
+    // the second call after the IVs: a wild encounter rolls the held item, then (Unown only) the letter from it
+    u16 formRoll;
 } EncounterFrame;
 
 // The encounter table a search rolls from: the grass table, or the surf table for a Surf search.
@@ -378,6 +391,9 @@ static BOOL GenerateEncounterFrame(u32 seed, const SearchTable *table, Encounter
 
     u16 ivs1 = FrameRand(&state);
     u16 ivs2 = FrameRand(&state);
+
+    FrameRand(&state);
+    frame->formRoll = FrameRand(&state);
 
     // HP, Attack, Defense, then Speed, Sp. Atk, Sp. Def, as BoxPokemon init unpacks them
     frame->ivs[0] = ivs1 & 0x1F;
@@ -572,6 +588,7 @@ static BOOL RollHiddenMon(FieldSystem *fieldSystem)
     }
 
     sSearch.personality = best.personality;
+    sSearch.formRoll = best.formRoll;
     sSearch.level = best.level;
     sSearch.perfectIVs = CountPerfectIVs(&best);
 
@@ -707,6 +724,9 @@ static void RemoveHud(void)
     }
 }
 
+static void ShowPatch(FieldSystem *fieldSystem);
+static void HidePatch(void);
+
 void DexNavSearch_Request(u16 species, u8 level)
 {
     sSearch.species = species;
@@ -715,6 +735,7 @@ void DexNavSearch_Request(u16 species, u8 level)
     // any earlier patch and bar belonged to the field that was just torn down
     sSearch.active = FALSE;
     sSearch.anim = NULL;
+    sSearch.ripple = NULL;
     sSearch.hud = NULL;
 }
 
@@ -756,7 +777,7 @@ BOOL DexNavSearch_TryStart(FieldSystem *fieldSystem)
                 return FALSE;
             }
 
-            sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
+            ShowPatch(fieldSystem);
             sSearch.active = TRUE;
             sSearch.elapsedMs = 0;
             sSearch.lastTick = (u32)OS_GetTick();
@@ -794,6 +815,37 @@ void DexNavSearch_Update(FieldSystem *fieldSystem)
     }
 }
 
+// The patch: in grass the radar's shake, replayed every half second (it plays once); on water a ripple that loops
+// by itself (the grass shake would put a tuft of grass on the water), twice as fast when the Pokemon is shiny.
+static void ShowPatch(FieldSystem *fieldSystem)
+{
+    if (sSearch.water && sSearch.ripple == NULL) {
+        sSearch.ripple = RippleEffect_StartOnTile(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny);
+    }
+
+    if (!sSearch.water) {
+        if (sSearch.anim != NULL) {
+            OverworldAnimManager_Finish(sSearch.anim);
+        }
+
+        sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
+    }
+}
+
+static void HidePatch(void)
+{
+    if (sSearch.anim != NULL) {
+        OverworldAnimManager_Finish(sSearch.anim);
+    }
+
+    if (sSearch.ripple != NULL) {
+        OverworldAnimManager_Finish(sSearch.ripple);
+    }
+
+    sSearch.anim = NULL;
+    sSearch.ripple = NULL;
+}
+
 // Every frame the field is free (FieldInput_Process): the search's 10 seconds run out, and the patch shakes
 // again every half second (the shake animation plays once). When time runs out the Pokemon gets away: the
 // search ends, the chain is broken, and TRUE says a script with the message was started.
@@ -819,11 +871,7 @@ BOOL DexNavSearch_Tick(FieldSystem *fieldSystem)
     }
 
     if (sSearch.elapsedMs / SHAKE_INTERVAL_MS != before / SHAKE_INTERVAL_MS && fieldSystem->location->mapHeaderID == sSearch.mapHeaderID) {
-        if (sSearch.anim != NULL) {
-            OverworldAnimManager_Finish(sSearch.anim);
-        }
-
-        sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
+        ShowPatch(fieldSystem);
     }
 
     return FALSE;
@@ -854,12 +902,8 @@ void DexNavSearch_OnBattleEnd(int resultMask)
 void DexNavSearch_OnFieldExit(void)
 {
     if (sSearch.active) {
-        if (sSearch.anim != NULL) {
-            OverworldAnimManager_Finish(sSearch.anim);
-        }
-
+        HidePatch();
         RemoveHud();
-        sSearch.anim = NULL;
     }
 }
 
@@ -876,7 +920,7 @@ void DexNavSearch_OnFieldReturn(FieldSystem *fieldSystem)
         return;
     }
 
-    sSearch.anim = ov5_021F3154(fieldSystem, sSearch.x, sSearch.z, sSearch.shiny ? PATCH_SHAKE_SHINY : PATCH_SHAKE_SOFT);
+    ShowPatch(fieldSystem);
     DrawHud(fieldSystem);
 }
 
@@ -909,14 +953,15 @@ Pokemon *DexNavSearch_CreateEncounterMon(FieldSystem *fieldSystem, enum HeapID h
     }
 
     // East or West Sea, from the map's encounter data, as a wild encounter sets it (wild_encounters.c); a
-    // West Sea Shellos on an east route is illegal. Unown's letter comes from the Solaceon Ruins room's own set.
+    // West Sea Shellos on an east route is illegal. Unown's letter comes from the Solaceon Ruins room's own set,
+    // picked by the RNG call a wild encounter would use (two after the IVs): PKHeX checks that call.
     if (sSearch.species == SPECIES_SHELLOS || sSearch.species == SPECIES_GASTRODON) {
         const WildEncounters *encounters = MapHeaderData_GetWildEncounters(fieldSystem);
         u8 form = encounters->encounterRatesForms[sSearch.species == SPECIES_SHELLOS ? 0 : 1] ? 1 : 0;
 
         Pokemon_SetValue(mon, MON_DATA_FORM, &form);
     } else if (sSearch.species == SPECIES_UNOWN) {
-        u8 form = WildEncounters_RandomUnownForm(MapHeaderData_GetWildEncounters(fieldSystem));
+        u8 form = WildEncounters_UnownForm(MapHeaderData_GetWildEncounters(fieldSystem), sSearch.formRoll);
 
         Pokemon_SetValue(mon, MON_DATA_FORM, &form);
     }
@@ -947,14 +992,12 @@ Pokemon *DexNavSearch_CreateEncounterMon(FieldSystem *fieldSystem, enum HeapID h
 void DexNavSearch_End(BOOL removeFieldObjects)
 {
     if (removeFieldObjects) {
-        if (sSearch.anim != NULL) {
-            OverworldAnimManager_Finish(sSearch.anim);
-        }
-
+        HidePatch();
         RemoveHud();
     }
 
     sSearch.anim = NULL;
+    sSearch.ripple = NULL;
     sSearch.hud = NULL;
     sSearch.active = FALSE;
     sSearch.requested = FALSE;
