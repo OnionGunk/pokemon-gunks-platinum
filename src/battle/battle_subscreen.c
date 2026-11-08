@@ -3966,10 +3966,11 @@ u8 BattleSubscreen_IsWaitingForPartner(BattleSubscreen *btlSubscreen)
 // Quick Run and Quick Ball: R or L at the plain action menu presses its RUN or BAG button, with the same
 // button animation and cursor reset as touching it. Returns the button's result, or 0xffffffff when the
 // active menu isn't the plain action menu (Safari, Pal Park, the first battle, a doubles partner's) or is
-// still sliding in.
+// still sliding in. The plain action menu is config 1 on the battler's first turn and config 3 (same buttons,
+// redrawn rather than opened) on every later one.
 int BattleSubscreen_PressActionButton(BattleSubscreen *btlSubscreen, int buttonResult)
 {
-    if (btlSubscreen->activeMenuConfigIndex != 1 || btlSubscreen->isPanelSliding == TRUE) {
+    if ((btlSubscreen->activeMenuConfigIndex != 1 && btlSubscreen->activeMenuConfigIndex != 3) || btlSubscreen->isPanelSliding == TRUE) {
         return 0xffffffff;
     }
 
